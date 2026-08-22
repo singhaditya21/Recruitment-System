@@ -2,14 +2,16 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Draft v0.2 |
+| Status | Draft v0.3 |
 | Last updated | August 22, 2026 |
 | Product owner | Aditya Singh |
 | Initial market | San Francisco–based employer hiring in the United States |
 | Primary timezone | America/Los_Angeles |
 | Currency | USD |
 | Prototype deployment | Public GitHub Pages demonstration using synthetic data only |
-| Pilot/production deployment | Approved application host with a separate secure backend; provider TBD |
+| Pilot/production candidate deployment | Approved external application host and backend-for-frontend; providers TBD |
+| Pilot/production HR deployment | Native Salesforce Lightning application |
+| Operational system of record | Salesforce custom recruitment application |
 
 ## 1. Executive summary
 
@@ -19,7 +21,9 @@ The first release is a single-company product, not a multi-tenant SaaS platform.
 
 Development starts with a public GitHub Pages prototype containing synthetic demonstration data and no functioning collection of candidate information. Before a pilot handles real identities, applications, resumes, evaluations, or offers, the frontend must move to an approved production application host. GitHub Pages remains a project showcase and deployment preview, not the production recruitment system.
 
-### 1.1 Decisions introduced in v0.2
+For pilot and production, Salesforce is the operational recruitment system of record and workflow engine. Internal HR users work in a native Salesforce Lightning application. Candidates use an externally hosted React portal whose backend-for-frontend exposes only purpose-built recruitment operations to Salesforce. Candidate documents remain in approved private object storage and Salesforce stores controlled metadata and references.
+
+### 1.1 Key architecture decisions
 
 - Separate prototype, pilot, and production release definitions.
 - Restrict GitHub Pages to public, synthetic-data demonstrations.
@@ -28,6 +32,12 @@ Development starts with a public GitHub Pages prototype containing synthetic dem
 - Add candidate, workflow, and integration exception handling.
 - Add background-check/adverse-action, privacy-request, and data-lifecycle requirements.
 - Add job-search discovery, production operations, ownership, and rollout requirements.
+- Use Salesforce custom objects for recruitment records; do not repurpose Leads or Opportunities.
+- Use `Candidate__c` as the candidate identity record; do not enable Person Accounts solely for this product.
+- Use native Lightning Web Components and Salesforce Flow/Apex for the internal HR workspace.
+- Keep candidate authentication outside Salesforce in the default architecture; Experience Cloud is an evaluated alternative, not the baseline.
+- Store resume/offer/reference binaries outside Salesforce unless a later security, capacity, and licensing decision explicitly approves Salesforce Files.
+- Manage Salesforce metadata through Salesforce DX, an unlocked-package/source-driven model, automated validation, and reviewed Git commits.
 
 ## 2. Problem statement
 
@@ -63,10 +73,17 @@ The system will be designed against the following working assumptions. They are 
 | Federal-contractor status | Treat as not established; OFCCP requirements require separate review if applicable | Unconfirmed |
 | Background checks | Manual controlled handoff in pilot; provider integration later | Unconfirmed |
 | E-signature | Secure recorded acceptance in pilot; provider integration later | Unconfirmed |
+| Salesforce org | Dedicated recruitment org preferred; an existing company org requires an impact assessment | Unconfirmed |
+| Salesforce edition | Enterprise, Performance, or Unlimited target; exact edition and entitlements not supplied | Unconfirmed |
+| Salesforce licenses | Internal, integration, Shield, storage, masking, and analytics quantities not supplied | Unconfirmed |
+| Candidate portal identity | External identity provider and backend-for-frontend; no Salesforce external user by default | Confirmed architecture assumption |
+| HR workspace | Native Salesforce Lightning application | Confirmed architecture assumption |
+| Candidate system of record | Custom `Candidate__c`; no Lead/Contact/Person Account as canonical candidate record | Confirmed architecture assumption |
+| Document storage | External private object storage with signed URLs and malware scanning | Confirmed architecture assumption |
 | Languages | English/US first | Confirmed product assumption |
 | Hiring decisions | Human-owned; no autonomous ranking, rejection, advancement, or selection | Confirmed product principle |
 
-Changes to employer size, jurisdictions, federal-contractor status, industry, or worker types trigger a documented compliance and scope review.
+Changes to employer size, jurisdictions, federal-contractor status, industry, worker types, Salesforce org strategy, edition, licensing, or material platform entitlements trigger a documented compliance, architecture, and scope review.
 
 ## 4. Goals and success measures
 
@@ -224,7 +241,28 @@ Priority meanings:
 | RS-020 | Multi-brand, multi-country, multi-language, and multi-tenant capabilities | P2 | Out of v1 |
 | RS-021 | Validated explainable decision support with impact monitoring | P2 | No automated decision support in P0/P1 |
 
-Every product story, design screen, test case, release note, and material change should reference at least one `RS-###` requirement. A P0 item may be removed or materially weakened only through an approved PRD change that records owner, rationale, affected risks, and revised launch gate.
+#### Salesforce implementation requirements
+
+| ID | Capability | Priority | Acceptance summary |
+| --- | --- | --- | --- |
+| SFDC-001 | Org, edition, license, My Domain, and system-of-record decision | P0 | Approved org assessment and entitlement inventory before Salesforce build |
+| SFDC-002 | Source-driven Salesforce DX project and unlocked-package strategy | P0 | Metadata reproducibly validated and deployed from Git |
+| SFDC-003 | Custom recruitment object model and metadata dictionary | P0 | Objects, fields, relationships, ownership, retention, external IDs, and indexes approved |
+| SFDC-004 | Private-by-default sharing architecture | P0 | OWD, hierarchy, queues, permission-set groups, custom permissions, restriction rules, and managed sharing tested |
+| SFDC-005 | Native Lightning HR application | P0 | Required HR P0 screens implemented as secure Lightning pages/LWCs/Flows |
+| SFDC-006 | External candidate portal backend-for-frontend | P0 | No direct browser-to-Salesforce privileged access; purpose-built, candidate-scoped operations only |
+| SFDC-007 | Dedicated API-only integration identities | P0 | One least-privilege Salesforce integration user/external client app per trust boundary |
+| SFDC-008 | Governed Flow/Apex automation model | P0 | One documented entry strategy per object; bulk, idempotency, fault, and async tests pass |
+| SFDC-009 | External private document storage | P0 | Salesforce stores scan/status/hash/reference metadata; no permanent public document URLs |
+| SFDC-010 | Salesforce business audit, field history, and access monitoring model | P0 | Consequential actions reconstructable; Shield decision and compensating controls approved |
+| SFDC-011 | Salesforce capacity and limits model | P0 | Record/file/API/async/email/event budgets and alert thresholds accepted before load testing |
+| SFDC-012 | Salesforce reporting and protected analytics | P0 | Operational report types and sharing-safe dashboards reconcile to source records |
+| SFDC-013 | Sandbox/scratch-org data protection | P0 | Synthetic or approved masked data only; production PII prohibited in developer environments |
+| SFDC-014 | Durable integration and event reconciliation | P0 | Salesforce event bus is not the durable queue/audit store; replay and reconciliation tested |
+| SFDC-015 | Salesforce release and seasonal-upgrade operations | P0 | CI/CD, regression, rollback/fix-forward, runbooks, and ownership established |
+| SFDC-016 | Experience Cloud alternative assessment | P1 | License, identity, Contact/Person Account, sharing, guest, cost, and migration impact documented before adoption |
+
+Every product story, design screen, test case, release note, and material change should reference at least one `RS-###` or `SFDC-###` requirement. A P0 item may be removed or materially weakened only through an approved PRD change that records owner, rationale, affected risks, and revised launch gate.
 
 ### 7.3 Detailed v1 functional backlog
 
@@ -572,30 +610,35 @@ Request deadlines, extension rules, appeal routes, and templates are configurabl
 
 GitHub Pages is limited to a public project prototype using synthetic data. It must not collect candidate data, accept uploads, provide real authentication, display production records, or call production services. Pages sites are publicly available even when their source repository is private, and GitHub states that Pages should not be used for sensitive transactions or as commercial SaaS hosting. [GitHub Pages visibility](https://docs.github.com/en/pages/setting-up-a-github-pages-site-with-jekyll/creating-a-github-pages-site-with-jekyll) · [GitHub Pages limits](https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits)
 
-The pilot and production frontend require an approved application host supporting the organization’s security, availability, custom-domain, deployment, observability, and incident-response requirements. Authentication, authorization, database access, file storage, messaging, audit logs, scheduled jobs, and all trusted business logic run on approved backend services.
+The pilot and production candidate frontend requires an approved application host supporting the organization’s security, availability, custom-domain, deployment, observability, and incident-response requirements. Salesforce hosts the internal HR application and operational recruiting records. Candidate authentication, document storage, public delivery, and selected integration/observability functions run on approved external services connected through controlled trust boundaries.
 
 ### 13.2 Proposed starting stack
 
 | Layer | Proposed choice | Notes |
 | --- | --- | --- |
-| Frontend | React, TypeScript, Vite | Shared UI code may build both prototype and production applications |
+| Candidate frontend | React, TypeScript, Vite | Shared UI code may build both prototype and production candidate applications |
+| HR frontend | Salesforce Lightning application, Lightning Web Components, Screen Flows | Native internal workspace governed by Salesforce permissions and sharing |
 | Styling | CSS design tokens and accessible component primitives | Avoid locking core UI to a proprietary theme |
 | Prototype routing | Client router configured for `/Recruitment-System/` | Must handle GitHub Pages base path and direct navigation |
 | Prototype hosting | GitHub Pages via GitHub Actions | Public synthetic demo: `https://singhaditya21.github.io/Recruitment-System/` |
-| Pilot/production hosting | Approved application host, provider TBD | Custom domain, secure delivery controls, rollbacks, previews, and service ownership required |
-| Backend | Managed PostgreSQL, authentication, private object storage, and serverless functions | Provider selection requires an architecture decision record |
+| Candidate pilot/production hosting | Approved application host, provider TBD | Custom domain, secure delivery controls, rollbacks, previews, and service ownership required |
+| Candidate identity | Approved external identity provider | Passwordless access/recovery and candidate-to-Salesforce identity mapping |
+| Backend-for-frontend | Approved managed service, provider TBD | Authenticates candidates and exposes purpose-built operations; never forwards Salesforce credentials to browsers |
+| Operational system of record | Salesforce custom recruitment application | Jobs, candidates, applications, interviews, decisions, offers, consent, and operational audit |
+| Salesforce automation | Flow, Apex, Queueable/Batch Apex, and platform events under an approved decision matrix | One governed entry strategy per object; durable state stored outside the event bus |
 | Email | Transactional email provider invoked only from backend | Domain authentication and delivery events required |
-| Files | Private object storage with signed URLs and malware scanning | Never commit or publish candidate files |
-| Observability | Privacy-filtered application logs, error tracking, metrics, and audit events | No resume contents or sensitive form values in telemetry |
+| Files | External private object storage with signed URLs and malware scanning | Salesforce stores metadata, checksum, classification, scan state, and opaque object reference |
+| Reporting | Salesforce reports/dashboards for operational reporting; optional approved analytics platform | Restricted data and demographic cohorts remain separately controlled |
+| Observability | Salesforce business audit plus privacy-filtered external logs/error tracking; Shield decision required | No resume contents or sensitive form values in telemetry |
 
 ### 13.3 Frontend applications
 
-The synthetic prototype may present nonfunctional versions of both surfaces for usability review. The pilot may ship as one production-hosted SPA with strict route guards, but it has two conceptual surfaces:
+The synthetic prototype may present nonfunctional versions of both surfaces for usability review. Pilot and production have two separately deployed surfaces:
 
-- **Careers and candidate portal:** public job search/details plus authenticated application/status/offer routes.
-- **HR workspace:** authenticated dashboard, jobs, candidates, interviews, scorecards, reports, offers, settings, and audit routes.
+- **Careers and candidate portal:** externally hosted public job search/details plus authenticated application/status/offer routes backed by purpose-built APIs.
+- **HR workspace:** native Salesforce Lightning application containing dashboards, jobs, candidates, interviews, scorecards, reports, offers, settings, and audit routes.
 
-Public static bundles are inspectable by anyone. Therefore, hiding a route or configuration in the frontend is never an access-control mechanism.
+Public static bundles are inspectable by anyone. Therefore, hiding a route or configuration in the frontend is never an access-control mechanism. The candidate browser never receives a Salesforce integration credential or general-purpose Salesforce API access.
 
 ### 13.4 Core entities
 
@@ -652,9 +695,347 @@ Before any external integration is enabled, its architecture decision or specifi
 
 An integration cannot become the only path for a P0 action until its failure and reconciliation flows have passed end-to-end testing.
 
-## 14. Design direction
+## 14. Salesforce solution architecture
 
-### 14.1 Brand and visual language
+### 14.1 Target architecture decision
+
+The baseline architecture is:
+
+- Salesforce is the operational system of record for jobs, candidate identity metadata, applications, stages, interviews, evaluations, decisions, offers, consent, cases, and business audit events.
+- Internal HR users work in a native Salesforce Lightning application composed of Lightning pages, Lightning Web Components, reports/dashboards, Screen Flows, and governed Apex services.
+- Candidates use an externally hosted React portal. A backend-for-frontend authenticates the candidate and calls purpose-built Salesforce recruitment APIs using a dedicated API-only integration identity.
+- Public job data is projected from approved `Job_Posting__c` records to a public delivery/cache layer so anonymous traffic does not query Salesforce directly.
+- Resume, assessment attachment, reference attachment, identity, background, and offer-document binaries use approved external private object storage. Salesforce stores opaque references and security metadata.
+- Salesforce calls email, calendar, storage, e-signature, background, and other providers using Named Credentials/External Credentials or publishes durable work for an external integration worker.
+- A durable Salesforce record and/or approved external queue accompanies every event-driven integration. Platform events are transport, not the permanent business record.
+
+```mermaid
+flowchart LR
+    C["Candidate browser"] --> P["Production candidate portal"]
+    P --> B["Backend-for-frontend"]
+    B --> A["Purpose-built Salesforce recruitment API"]
+    A --> S["Salesforce recruitment objects"]
+    H["HR users"] --> L["Salesforce Lightning app"]
+    L --> S
+    B --> F["Private document storage and malware scanner"]
+    S --> I["Integration event record / platform event"]
+    I --> W["Integration worker"]
+    W --> X["Email, calendar, e-sign, background providers"]
+    S --> R["Reports, dashboards, audit and archive"]
+```
+
+This decision requires an architecture record before build. Replacing Salesforce as system of record, using Experience Cloud for candidate identity, storing candidate files primarily in Salesforce, or serving real candidate flows from GitHub Pages is a material PRD change.
+
+### 14.2 Org strategy, edition, and licensing
+
+#### Preferred org strategy
+
+A dedicated Salesforce recruitment org is preferred because candidate PII, hiring-team sharing, retention, automation, storage, and release ownership differ materially from sales/service data. Deployment into an existing company org is permitted only after an impact assessment covers:
+
+- Existing Account, Contact, Lead, Person Account, Individual, Case, Activity, File, and consent usage.
+- Existing organization-wide defaults, role hierarchy, Experience Cloud sites, sharing rules, restriction rules, queues, and public groups.
+- Existing Flows, Apex triggers, validation rules, approval automation, installed packages, integrations, event consumers, and naming conventions.
+- Available custom-object/field capacity, data/file storage, API and async usage, email allocations, and report/dashboard capacity.
+- Existing My Domain, SSO/MFA, session, IP/network, Shield, encryption, monitoring, backup, data residency, and incident controls.
+- Current admin ownership, release calendar, sandbox topology, managed-package dependencies, and seasonal-release testing.
+- Segregation requirements between recruiting, sales, service, HR, legal, finance, and system administrators.
+
+The approved org strategy is recorded in `ADR-SF-001`. No production object or Person Account setting is created before this assessment.
+
+#### Licensing and entitlement matrix
+
+| Capability | Working requirement | Decision required |
+| --- | --- | --- |
+| Salesforce edition | Enterprise, Performance, or Unlimited target | Confirm existing/new org, contract, region, and feature allocations |
+| Internal HR users | Salesforce Platform or full Salesforce licenses based on required objects/features | Map every persona to license, permission-set license, and cost |
+| Integration users | Dedicated Salesforce Integration user for each calling system/trust boundary | Confirm quantity and least-privilege permission sets |
+| Shield Platform Encryption | Required if approved controls depend on native encryption/key management | Confirm field/file coverage, functional limitations, key ownership, and add-on cost |
+| Event Monitoring | Required if Salesforce access/download monitoring is part of the audit design | Confirm events, retention, export/SIEM, alerts, and add-on cost |
+| Field Audit Trail | Required if standard field history cannot meet approved retention/evidence needs | Confirm tracked fields, archive behavior, retrieval, and add-on cost |
+| Data masking | Synthetic-only environments preferred; approved Salesforce masking needed for any copied production data | Confirm native masking/Data Mask entitlement and operating owner |
+| Additional data/file storage or archive | Capacity model determines need | Confirm price, alert thresholds, archive technology, and procurement lead time |
+| CRM Analytics | Optional P1 for complex historical/funnel analytics | Confirm whether standard reports/dashboards suffice |
+| Experience Cloud/External Identity | Not used in baseline candidate architecture | Evaluate only through SFDC-016 before purchase or implementation |
+
+Salesforce external site users require suitable external licenses, while API-only integrations should use dedicated integration identities. [Experience Cloud user licenses](https://help.salesforce.com/s/articleView?id=sf.users_license_types_communities.htm&language=en_US&type=0) · [Salesforce integration users](https://help.salesforce.com/s/articleView?id=sf.integration_user.htm&language=en_US&type=5) Shield capabilities and extended field audit are separately licensed capabilities in supported editions. [Salesforce Shield](https://help.salesforce.com/s/articleView?id=sf.salesforce_shield.htm&language=en_US&type=5) · [Field Audit Trail](https://help.salesforce.com/s/articleView?id=sf.field_audit_trail.htm&language=en_US&type=5)
+
+### 14.3 Candidate identity and portal boundary
+
+- `Candidate__c` is the canonical Salesforce candidate record. Leads, Opportunities, Contacts, and Person Accounts are not repurposed as the recruitment data model.
+- `Candidate_Identity__c` links the candidate to the external identity-provider subject using an opaque provider ID, verification state, former identifiers, and revocation state.
+- Candidate login, passwordless challenge, MFA if introduced, recovery, session, bot defense, and rate limiting run outside Salesforce.
+- The candidate browser calls only the backend-for-frontend. It never receives Salesforce client secrets, integration access tokens, session IDs, or general Salesforce REST/GraphQL access.
+- The backend-for-frontend authenticates the candidate, resolves the allowed `Candidate__c` identity, and exposes allow-listed operations such as view own application, save draft, submit, provide availability, withdraw, and respond to own offer.
+- Salesforce exposes purpose-built Apex REST/service operations that query by authenticated candidate context and business purpose. The general sObject API is not the candidate portal API.
+- Every candidate-originated write records the external subject, candidate, application, idempotency key, timestamp, source channel, and resulting Salesforce actor/integration user.
+- Candidate email change and recovery revoke relevant sessions/links and require re-verification before Salesforce identity fields change.
+
+Person Accounts are not enabled solely for this product because enabling them changes the Account/Contact model and cannot be reversed. [Salesforce Person Account guidance](https://help.salesforce.com/s/articleView?id=000387315&language=en_US&type=1)
+
+### 14.4 Salesforce data model
+
+| Object or metadata | Purpose | Ownership/sharing baseline |
+| --- | --- | --- |
+| `Recruiting_Settings__mdt` | Organization feature flags, policy references, integration routing, and nonsecret configuration | Deployed metadata; admins do not store secrets here |
+| `Pipeline_Stage__mdt`, `Disposition_Reason__mdt` | Stable reporting mappings, sequence, required tasks, and allowed transitions | Deployed/versioned metadata |
+| `Job_Requisition__c` | Headcount request, department, owner, manager, dates, status, and approval summary | Private; owner recruiter/HR queue; explicit approver sharing |
+| `Requisition_Approval__c` | Versioned approval request, approver, decision, timestamp, and invalidation | Controlled by/private to requisition participants |
+| `Job_Posting__c` | Approved public content, compensation, workplace type, canonical URL, publish/expiry state | Internal read broadly; external projection exposes only approved fields |
+| `Hiring_Plan__c` | Pipeline, competencies, assessment/interview plan, and template version | Private to assigned recruiting/hiring team |
+| `Hiring_Team_Member__c` | Job/application participant, responsibility, access level, effective dates, and revocation state | Private; source record for derived application and interview sharing |
+| `Candidate__c` | Canonical candidate identity, contact fields, source summary, and lifecycle state | Private; recruiting-operations queue or assigned owner |
+| `Candidate_Identity__c` | External identity-provider subjects, verification, aliases, and revocation | Private; identity administrators only |
+| `Application__c` | Candidate-to-job record, current stage, owner, SLA, disposition, and next action | Private; derived hiring-team sharing |
+| `Application_Response__c` | Immutable submitted application snapshot plus reporting-safe indexed answers | Controlled by application; sensitive fields separated where required |
+| `Application_Stage_Event__c` | Append-only stage transition, actor, reason, source/destination, and override evidence | Private; application viewers; no routine edits/deletes |
+| `Recruiter_Screen__c` | Versioned structured screen rubric and evidence | Private; assigned recruiter/hiring manager |
+| `Assessment_Assignment__c` | Assessment type/version, due date, accommodation flag, state, and result summary | Private; restricted attachment reference |
+| `Interview_Plan__c` | Ordered interview rounds, competencies, questions, and required scorecards | Private to hiring team |
+| `Interview_Session__c` | Scheduled session, timezone, mode, status, candidate communication, and logistics | Private; assignment-driven sharing |
+| `Interviewer_Assignment__c` | Interviewer, role, acknowledgment, access window, and submission state | Private; assigned interviewer sees own assignment |
+| `Scorecard__c`, `Scorecard_Response__c` | Independent recommendation, anchored ratings, evidence, submission, lock, and amendments | Private; submitter-only until debrief rule opens access |
+| `Decision__c` | Debrief decision, evidence completeness, decision-maker, rationale, and override | Private; hiring decision group |
+| `Reference_Check__c` | Consent, referee metadata, request/completion state, restricted summary, and file reference | Private; specifically entitled HR users |
+| `Offer__c`, `Offer_Version__c`, `Offer_Approval__c` | Offer lifecycle, immutable terms/document hash, approvals, expiry, and response | Private; compensation entitlement; hierarchy access disabled where approved |
+| `Communication__c`, `Delivery_Event__c` | Message purpose/template version, recipient reference, send state, provider ID, retry, and reply match | Private; body minimized or externalized |
+| `Consent_Record__c` | Notice/authorization type, immutable version, purpose, timestamp, and evidence | Private; no update to historical evidence |
+| `Restricted_HR_Case__c` | Accommodation, background, medical, privacy, or other restricted case metadata | Private; restricted queue; hierarchy access disabled where approved |
+| `Privacy_Request__c`, `Legal_Hold__c`, `Retention_Execution__c` | Data-rights workflow, hold scope, preview/approval/execution, and evidence | Private; privacy/legal entitlement and dual control |
+| `File_Reference__c` | Provider, opaque object key, classification, hash, size, MIME type, scan state, version, and retention class | Private; signed access generated externally |
+| `Integration_Event__c` | Durable work state, idempotency, attempt count, next retry, provider response, and reconciliation | Private; integration operators only |
+| `Business_Audit_Event__c` | Consequential business action, actor, target, request context, result, and correlation ID | Append-only logical model; auditors/admin service only |
+
+Data-model rules:
+
+- Candidate/application/job relationships use lookups with deletion protection rather than cascade deletion where retention or legal hold can differ.
+- Each submitted application has an immutable application-response snapshot; later template changes never rewrite it.
+- Stable external IDs and idempotency keys exist for every externally created or synchronized record.
+- Candidate duplicate detection uses normalized verified identifiers plus human review. Candidate records are never auto-merged.
+- High-volume histories, message bodies, and aged audit data are archived to approved storage while retaining Salesforce operational summaries and legal-hold behavior.
+- Search/report fields are deliberately indexed or submitted for custom indexing based on query/load testing; free-text sensitive content is not used as an integration key.
+- Every field has a data dictionary entry covering business definition, owner, source, classification, field-level access, encryption decision, history/audit requirement, retention class, integration use, and reporting use.
+
+### 14.5 Salesforce ownership, sharing, and authorization
+
+| Object family | OWD baseline | Ownership/access mechanism |
+| --- | --- | --- |
+| Requisitions and hiring plans | Private | Recruiter/queue ownership; explicit approver and hiring-team sharing |
+| Published job records | Public read-only to internal licensed users | External audiences receive a sanitized projection, not Salesforce guest access |
+| Candidates and applications | Private | Recruiting owner plus derived shares from `Hiring_Team_Member__c`/application assignment |
+| Interviews and assignments | Private | Time-bound Apex-managed sharing to assigned interviewers and coordinators |
+| Scorecards and decisions | Private | Submitter access before debrief; controlled debrief/decision-group sharing afterward |
+| Offers and compensation | Private | Named compensation permission and explicit case/record sharing; hierarchy access disabled where approved |
+| Restricted HR cases | Private | Restricted queues and named entitlements; hierarchy access disabled where approved |
+| Consent, privacy, legal hold, retention | Private | Privacy/legal administrators and approved auditors only |
+| Integration and audit events | Private | API-only services, operations, security, and read-only audit roles |
+
+- Profiles provide minimum login/default access. Permission sets and permission-set groups grant persona capabilities; custom permissions gate consequential application actions.
+- Permission sets grant access rather than deny it, so every user’s aggregate profile, permission-set, group, package, and license assignment must be tested. [Salesforce permissions](https://developer.salesforce.com/docs/atlas.en-us.securityImplGuide.meta/securityImplGuide/permissions_about_users_access.htm)
+- Apex-managed shares are created/revoked from stable hiring-team and interviewer-assignment records. Reassignment and user deactivation trigger deterministic share recalculation.
+- Separate named entitlements protect compensation, demographics, accommodation/medical, background, reference, privacy identity evidence, exports, legal holds, audit, and system-mode operations.
+- Lightning Data Service/UI API is preferred for standard record UI because it respects CRUD, field-level security, and sharing. Apex uses explicit sharing declarations and user-mode operations unless an approved system-mode service is required. [Lightning Data Service](https://developer.salesforce.com/docs/platform/lwc/guide/data-ui-api.html) · [Secure Apex](https://developer.salesforce.com/docs/platform/lwc/guide/apex-security)
+- Every approved system-mode operation documents why user mode is insufficient, validates input/record scope, applies least privilege, emits an audit event, and has negative authorization tests.
+- No candidate, interviewer, or integration access relies on page layout visibility, hidden components, client-side route guards, or obscured record IDs.
+
+### 14.6 Salesforce automation decision matrix
+
+| Domain | Primary mechanism | Architecture rule |
+| --- | --- | --- |
+| Requisition/offer approval orchestration | Screen/record-triggered Flow plus approval records | Version changes invalidate approvals; faults create owned operational work |
+| Candidate application ingestion | Purpose-built Apex REST/service layer | Bulk-safe, idempotent, candidate-scoped, no general sObject exposure |
+| Stage transition and disposition | Apex domain service invoked by LWC/Flow | One authoritative transition validator and audit writer |
+| Required fields/simple validation | Validation rules and before-save Flow | No duplicate validation logic across UI and service layers |
+| Tasks, reminders, SLAs | Scheduled paths/Flow for simple cases; invocable Apex for business-hours/complex rules | Recalculation and cancellation behavior documented |
+| Interview/scorecard access | Apex-managed sharing service | Grant and revoke access from assignment state; bulk-safe recalculation |
+| Communications and provider work | After-commit event plus Queueable Apex/external worker | Durable `Integration_Event__c`, idempotency, retry, and reconciliation required |
+| Candidate merge | Restricted Apex service | Preview, conflict report, dual authorization where configured, no history loss |
+| Retention/deletion | Scheduled/Batch Apex plus external deletion worker | Preview, legal-hold exclusion, dual control, reconciliation, and evidence |
+| Reporting snapshots/archive | Scheduled Flow/Apex or external data pipeline | Source counts reconcile; restricted data remains segregated |
+
+For each object, the solution design declares one primary record-triggered entry strategy and controlled execution order. Flow is preferred for low-density transparent orchestration; Apex is used for high-volume, transaction-sensitive, or complex logic. Salesforce warns that mixing automation entry points and ignoring automation density increases maintainability and limit risk. [Salesforce record-triggered automation guide](https://architect.salesforce.com/docs/architect/decision-guides/guide/record-triggered.html)
+
+All automations must be bulk-safe, recursion-safe, idempotent where externally triggered, observable, and testable. Flow fault paths must not terminate invisibly. Provider calls, large work, file processing, and noncritical notifications run after the source transaction commits.
+
+### 14.7 Salesforce integration architecture
+
+- Each external system uses its own External Client App/Connected App and dedicated Salesforce Integration user with API-only minimum access and purpose-specific permission sets.
+- Server-to-server portal and worker access uses an approved OAuth flow such as client credentials, with credentials stored only in the external secret manager. All actions run as the configured integration user, so its permissions are deliberately narrow. [Salesforce OAuth integration-user pattern](https://developer.salesforce.com/blogs/2024/02/invoke-rest-apis-with-the-salesforce-integration-user-and-oauth-client-credentials)
+- Salesforce outbound calls use modern Named Credentials and External Credentials; endpoints or tokens are not hardcoded in Apex, Flow, custom metadata, or repository files. [Salesforce Named Credentials](https://developer.salesforce.com/docs/platform/named-credentials/guide/get-started.html)
+- Public job delivery uses a sanitized projection/cache. Candidate reads/writes use purpose-built service resources. Internal system integrations use REST, Bulk API 2.0, CDC, Platform Events, or scheduled reconciliation according to the approved integration pattern.
+- Every integration record carries source system, external ID, correlation ID, idempotency key, payload/schema version, attempt state, and last verified reconciliation result.
+- Platform Events/CDC transport notifications but do not replace durable state. Salesforce documents a 72-hour event retention window; consumers store replay position and reconcile missed work from source records. [Salesforce event durability](https://developer.salesforce.com/docs/platform/pub-sub-api/guide/event-message-durability.html)
+- Webhooks validate signatures, timestamps, replay/nonces, payload size, and provider allow-listing before updating business records.
+- API version is pinned per integration and upgraded through test/UAT rather than floating automatically.
+- Integration users, credentials, scopes, certificates, secrets, and callbacks are unique per environment and rotated under an owned procedure.
+
+### 14.8 Files and highly sensitive content
+
+- Production resumes, assessment files, reference documents, background reports, offer PDFs, identity evidence, and accommodation/medical attachments are not stored as ordinary Salesforce Attachments.
+- The external storage service encrypts content, isolates environments, uses private buckets/containers, enforces retention, provides malware/content scanning, and generates short-lived audience-scoped URLs.
+- `File_Reference__c` contains only the opaque storage key, document classification, hash, file metadata, version, scan state, retention class, owner record, and provider deletion state.
+- A file remains unavailable until scan and validation succeed. A rejected or timed-out scan creates an owned exception without exposing content.
+- Downloads require current Salesforce/backend authorization at request time; copied signed URLs expire quickly and cannot bypass candidate/application/offer permissions.
+- File replacement creates a new version and preserves required evidence. Hashes bind immutable application/offer versions to their exact documents.
+- Salesforce Files may be used for public design assets and synthetic fixtures. Any future use for production candidate documents requires a Shield/encryption, file-sharing, version-retention, guest/external access, backup, deletion, storage-cost, and malware-scanning assessment.
+
+### 14.9 Salesforce audit, privacy, and retention
+
+The Salesforce evidence model has four complementary layers:
+
+1. **Business audit:** `Business_Audit_Event__c` records consequential hiring actions and their business context.
+2. **Field history:** Standard Field History Tracking and, if licensed/approved, Field Audit Trail preserve selected field changes.
+3. **Access/security monitoring:** Event Monitoring and external security telemetry capture logins, API use, exports, downloads, and anomalous behavior when licensed/configured.
+4. **Configuration audit:** Setup Audit Trail, metadata history, Git commits, package versions, and deployment records show configuration changes.
+
+No single layer is treated as complete. Platform Events are not audit storage, and Salesforce system timestamps alone do not explain a business decision.
+
+- Business audit events are logically append-only to human users. Corrections append superseding events rather than editing history.
+- Audit data required beyond active Salesforce capacity is exported to approved immutable/append-only archive storage with checksum, retention, legal-hold, and retrieval evidence.
+- The Shield decision identifies which candidate, compensation, restricted-case, and file fields require Platform Encryption and tests effects on search, filters, reports, formulas, automation, and integrations.
+- Field Audit Trail selection is field-by-field and record-class-aware. Existing archived history encryption behavior is assessed before enabling or changing encryption.
+- Recruitment-specific consent remains in immutable `Consent_Record__c`. If the organization already operates Salesforce’s standard Individual/Contact Point consent model, an architecture decision defines the link without making Contact or Person Account the canonical candidate. [Salesforce consent data model](https://help.salesforce.com/s/articleView?id=sf.consent_data_model_mc_about.htm&language=en_US&type=5)
+- Retention rules are stored as versioned policy metadata and executed through preview, approval, batch, external deletion, and reconciliation records.
+- Legal hold is evaluated before Salesforce delete, archive, file delete, search deindex, integration deletion, and backup-expiry requests.
+- Salesforce soft delete/Recycle Bin is not considered completed privacy deletion. Approved deletion verifies primary records, child records, files/versions, indexes, archives, integrations, and external storage under the applicable policy.
+- Data-subject exports are assembled through the controlled privacy workflow, reviewed, and delivered outside Salesforce through a secure expiring channel.
+
+### 14.10 Capacity, governor limits, and large-data-volume plan
+
+The initial five-year sizing envelope is a planning model to validate, not a promise of included Salesforce capacity:
+
+| Record/file family | Planning volume | Design response |
+| --- | ---: | --- |
+| Active/archived jobs and requisitions | 5,000 | Retain operational summary; archive obsolete versions where approved |
+| Candidates | 100,000 | Private custom records with selective identity keys |
+| Applications and submitted response snapshots | 150,000 each | Indexed job/candidate/status/owner/external IDs; immutable snapshot per submission |
+| Stage/audit events | 900,000+ | Active history in Salesforce; policy-driven archive for aged data |
+| Interviews, assignments, and scorecards | 300,000–750,000 related records | Selective job/application/date queries; archive closed-job detail as approved |
+| Communication/delivery metadata | Up to 1,000,000 | Store metadata and provider references; externalize large message bodies |
+| Integration/business audit events | 2,000,000+ before archive | Short active operational window plus durable external archive |
+| Resume and other candidate files | 100,000–300,000 binaries | External private storage; excluded from Salesforce file-capacity baseline |
+
+Salesforce storage varies by edition and license count, and data and file storage are allocated separately. Many custom records are estimated at approximately 2 KB before large field/body effects, so row multiplication is explicitly budgeted. [Salesforce data/file storage allocations](https://help.salesforce.com/s/articleView?id=limits.htm&language=en_US&type=5) · [Estimated record sizes](https://help.salesforce.com/s/articleView?id=000383664&language=en_US&type=1)
+
+Before pilot and at each scale step, the capacity model covers:
+
+- Data/file storage, Recycle Bin, field-history/archive, and backup growth.
+- Daily and peak API calls per integration and candidate workflow.
+- Synchronous SOQL/DML/CPU/heap, query rows, callouts, and transaction size.
+- Async Apex, scheduled jobs, Flow interviews, platform-event publish/delivery, and email/provider volume.
+- Report/dashboard query selectivity, sharing-calculation cost, search/index behavior, and concurrent HR activity.
+- Bulk import, job closure, stage update, reminder, retention, share recalculation, and integration-replay load.
+
+Operational alerts are configured at approved warning/critical thresholds, with 70%/80%/90% of purchased allocation as the initial review points unless Salesforce-specific behavior requires earlier action. Large datasets not needed for daily Salesforce work or reporting should be archived or maintained externally. [Salesforce Well-Architected reliability guidance](https://architect.salesforce.com/docs/architect/well-architected/guide/reliable)
+
+### 14.11 Salesforce reporting and analytics
+
+P0 standard report types include:
+
+- Requisitions with jobs and approvals.
+- Jobs with applications, current stage, owner, SLA, and disposition.
+- Applications with stage events and time-in-stage.
+- Interviews with assignments, attendance, and required scorecard status.
+- Scorecard/debrief completeness without exposing restricted notes to unauthorized viewers.
+- Offers with approval/version/response and compensation access controls.
+- Source, funnel, time-to-review, time-to-fill, time-to-hire, feedback SLA, communication SLA, and offer acceptance.
+- Data quality, failed automation/integration, stale work, retention, legal hold, and privacy-request operations.
+
+Reporting rules:
+
+- Custom report types and dashboard folders inherit record sharing and field-level security; separate restricted report types are used for compensation, privacy, background, accommodation, and demographics.
+- Voluntary demographics are not joined into ordinary application/interview reports. Approved cohort reports enforce minimum counts and do not permit row-level drill-through by decision-makers.
+- Historical trend requirements use approved reporting snapshots, archived facts, or an analytics platform rather than mutable current-state fields alone.
+- Dashboard totals reconcile on a scheduled basis to source-object counts and state-transition events.
+- CRM Analytics or an external warehouse is P1 and requires its own data-copy, permission, retention, export, and cost assessment.
+
+### 14.12 Salesforce DevOps, packaging, and environments
+
+| Environment | Salesforce purpose | Data rule |
+| --- | --- | --- |
+| Dev Hub | Manages scratch orgs and unlocked packages | No candidate production data |
+| Scratch org | Feature development and automated metadata tests | Generated synthetic data only |
+| Developer/Integration sandbox | Cross-component and integration testing where scratch org is insufficient | Synthetic data only by default |
+| UAT sandbox | HR workflow, permission, accessibility, and release acceptance | Synthetic or formally masked approved copy |
+| Training sandbox | Role-based HR training | Synthetic training scenarios only |
+| Production | Authorized hiring operations | Approved real data and integrations |
+
+- Salesforce metadata, Apex, LWC, Flow, permission sets, custom metadata, layouts, report definitions, and package configuration live in the repository as a Salesforce DX project.
+- A namespaced unlocked package is the preferred starting model for new recruitment metadata; deviations require `ADR-SF-002`. Salesforce supports source-driven unlocked packages and versioned installation artifacts. [Salesforce package creation](https://developer.salesforce.com/docs/platform/salesforce-cli-reference/guide/cli_reference_package_create.html)
+- Direct untracked production customization is prohibited. Emergency changes are retrieved, reviewed, tested, and committed immediately through the hotfix process.
+- CI performs source formatting/linting, Salesforce Code Analyzer/security checks, LWC unit tests, Apex tests, Flow/metadata validation, permission-negative tests, secret scanning, dependency checks, and a Salesforce validation deployment.
+- Apex coverage percentage alone is not acceptance. Tests cover positive/negative authorization, bulk operations, limit behavior, idempotency, retries, sharing recalculation, stage invariants, versioning, legal holds, and regulated workflow blocks.
+- Scratch org definitions and sandbox setup scripts capture required features/settings. Scratch orgs are short-lived and do not contain production metadata/data unless deliberately pushed from source. [Salesforce scratch-org development](https://developer.salesforce.com/docs/platform/lwc/guide/get-started-sfdx-scratch-org.html)
+- Any sandbox copied from production is masked before general developer/test access. Masking method, unsupported object/field types, validation, and residual-data handling are documented. [Salesforce Data Mask guidance](https://help.salesforce.com/s/articleView?id=000396214&language=en_US&type=1)
+- Releases use immutable version/tag, deployment manifest, pre/post-deployment steps, data migration, feature flags, smoke tests, monitoring window, fix-forward/rollback plan, and release evidence.
+- Salesforce API versions are pinned. Preview sandbox/scratch testing and regression suites run against each seasonal Salesforce release before production upgrade impact is accepted.
+- Secrets, user external credentials, auth tokens, certificates, environment IDs, candidate data, and production exports are never packaged or committed.
+
+### 14.13 Salesforce administration and operations
+
+| Cadence | Required review |
+| --- | --- |
+| Continuous/daily | Failed/paused Flows, failed Apex/async jobs, `Integration_Event__c` backlog, candidate/email failures, file-scan exceptions, login/security alerts, and candidate-support queue |
+| Weekly | Overdue/stale recruiting work, sharing exceptions, audit anomalies, API/async/event/storage trends, reconciliation failures, and data-quality dashboard |
+| Monthly | License/permission-set assignment, inactive users, integration identities, connected/external client apps, named credentials, capacity forecast, package/version drift, and critical vendor status |
+| Quarterly | Full access recertification, restricted entitlements, break-glass use, credential/certificate rotation plan, Shield/encryption review, retention sampling, restore exercise, incident tabletop, and seasonal-release readiness |
+
+Operations requirements:
+
+- Named Salesforce product owner, platform owner, primary/backup administrator, security owner, integration owner, release owner, and recruiting-operations owner.
+- SSO/MFA, login hours/IP/network policies as approved, session controls, deactivation SLA, and emergency/break-glass access with alerting and retrospective review.
+- Queue and record reassignment when a recruiter, interviewer, manager, approver, admin, or integration owner leaves or becomes unavailable.
+- Runbooks for failed Flow/Apex, locked records, sharing lag, integration outage, event replay, provider failure, storage/API limit pressure, email outage, file scanning, retention failure, restore, and Salesforce outage.
+- Configuration drift checks compare production metadata/package versions with Git and approved post-deploy configuration.
+- Support personnel cannot use “login as” or broad administrator access to view candidate/offer/restricted records without approved purpose and audit evidence.
+
+### 14.14 Salesforce migration and reconciliation
+
+Before importing any legacy spreadsheet, ATS, CRM, email, file, or shared-drive data:
+
+1. Inventory source owners, record classes, quality, duplicates, prohibited fields, notices/consent, retention status, holds, and security restrictions.
+2. Approve source-to-Salesforce field/object mappings, picklist translations, identity matching, external IDs, ownership, sharing, and record dates.
+3. Remove or restrict salary-history, unstructured medical/background, irrelevant protected information, credentials, and other data not approved for migration.
+4. Run duplicate analysis without auto-merging; preserve source IDs and produce a human-review queue.
+5. Load synthetic/dry-run data into a nonproduction org and reconcile source/target counts, totals, owners, state, files, errors, and checksums.
+6. Import through a dedicated API-only migration identity using bulk-safe processes and quarantined error records.
+7. Migrate files to approved private storage, scan them, then create verified `File_Reference__c` records.
+8. Recalculate sharing, search/indexing, derived fields, and reporting snapshots after load.
+9. Obtain business, privacy, security, and technical sign-off before production cutover.
+10. Preserve migration manifests, rejected rows, transformations, reconciliation, deletion of temporary copies, and rollback/fix-forward evidence.
+
+### 14.15 Experience Cloud alternative
+
+Experience Cloud is not the baseline candidate portal. It may replace the external identity/portal architecture only if `ADR-SF-003` demonstrates a better security, experience, cost, and operating outcome.
+
+The assessment must cover:
+
+- External Identity/Experience Cloud license type, member-versus-login pricing, expected unique daily/monthly logins, and growth.
+- Required Salesforce Contact or Person Account record for authenticated site users and the resulting candidate-model synchronization.
+- Irreversible Person Account impact if considered, existing Account/Contact model conflicts, duplicate behavior, storage, and reporting.
+- Site membership, registration, recovery, MFA, deactivation, guest profile, sharing sets, external OWD, role/account ownership, and candidate isolation.
+- Guest/public job-page security and prohibition on guest access to candidate, application, file, assessment, interview, offer, or restricted records.
+- Experience Builder/LWR accessibility, SEO, custom-domain, deployment, performance, telemetry, and release ownership.
+- Migration of existing external identities and links if the portal model changes later.
+
+All authenticated Experience Cloud users require an appropriate external-user license and are represented through Salesforce external-user identity records such as Contacts or Person Accounts. [Salesforce external-user considerations](https://help.salesforce.com/s/articleView?id=platform.networks_create_ext_users_considerations.htm&language=en_US&type=5)
+
+### 14.16 Salesforce acceptance gates
+
+- `SFDC-001` through `SFDC-015` are implemented and evidenced for pilot; `SFDC-016` is required only before any Experience Cloud adoption.
+- Org/edition/license/entitlement inventory and five-year capacity forecast are approved with procurement lead times.
+- Object/field dictionary, relationship diagram, ownership model, OWD, sharing logic, permission-set matrix, and restricted-entitlement tests are complete.
+- Candidate portal penetration tests confirm no direct privileged Salesforce access, cross-candidate access, general sObject enumeration, token leakage, or insecure record ID behavior.
+- Integration users are API-only, dedicated, least privilege, environment-specific, and traceable; Named/External Credentials contain outbound secrets.
+- Bulk/limit tests pass for imports, stage transitions, job closure, reminders, sharing recalculation, retention, and replay/reconciliation.
+- Salesforce and external file/audit/deletion paths pass end-to-end legal-hold, retention, data-request, and evidence tests.
+- Shield, Field Audit Trail, Event Monitoring, encryption, masking, CRM Analytics, archive, and storage decisions are documented with licensed/implemented controls or approved compensating controls.
+- UAT validates every HR persona, negative access case, candidate exception, report visibility, and administrator/support restriction.
+- CI/CD can reproduce the approved package/metadata version in a clean environment; production manual setup is documented and verified.
+- Seasonal-release, operations, support, incident, recovery, and platform-owner runbooks have named owners.
+
+## 15. Design direction
+
+### 15.1 Brand and visual language
 
 - San Francisco character without clichés: confident typography, generous whitespace, fog/charcoal neutrals, bay blue, and one warm accent.
 - Professional enough for HR operations; warm and plainspoken for candidates.
@@ -662,7 +1043,7 @@ An integration cannot become the only path for a P0 action until its failure and
 - Avoid decorative animations in task flows; honor reduced-motion preferences.
 - Use inclusive imagery only when authentic assets are available; do not fabricate employee representation.
 
-### 14.2 Initial information architecture
+### 15.2 Initial information architecture
 
 **Candidate navigation**
 
@@ -686,7 +1067,7 @@ An integration cannot become the only path for a P0 action until its failure and
 - Settings
 - Audit
 
-### 14.3 P0 screen inventory
+### 15.3 P0 screen inventory
 
 **Pages prototype**
 
@@ -701,7 +1082,7 @@ An integration cannot become the only path for a P0 action until its failure and
 
 - Sign-in/MFA/recovery, overview, requisition/job list, job editor/preview/approval, candidate list, candidate application/timeline, recruiter screen, pipeline action, interview plan/schedule, interviewer packet, scorecard, debrief, decision/disposition, offer draft/approval, communication preview/log, restricted privacy/accommodation case, users/roles, retention/legal hold, and audit view.
 
-### 14.4 Required interface states
+### 15.4 Required interface states
 
 Every P0 screen specifies and tests:
 
@@ -718,7 +1099,7 @@ Every P0 screen specifies and tests:
 
 Candidate-facing language must be maintained in a versioned content inventory with owner, reading-level review, template purpose, and legal-review flag where applicable.
 
-## 15. Analytics and instrumentation
+## 16. Analytics and instrumentation
 
 Track events such as job viewed, application started, step completed, application submitted, stage changed, assessment assigned/submitted, interview requested/confirmed/completed, scorecard submitted, decision recorded, offer sent/viewed/responded, and candidate withdrawn.
 
@@ -730,7 +1111,7 @@ Rules:
 - Separate operational analytics from protected demographic reporting.
 - Suppress small cohorts and restrict demographic reports to authorized users.
 
-### 15.1 Instrumentation contract
+### 16.1 Instrumentation contract
 
 Every approved event definition includes event name/version, business purpose, trigger, source service, actor type, opaque organization/job/application identifiers where permitted, event timestamp, schema owner, retention class, and downstream metrics. Schema validation rejects unexpected free text or prohibited personal data.
 
@@ -744,7 +1125,7 @@ The analytics specification must define before pilot:
 - Counsel-approved method for monitoring selection-rate differences without exposing individual demographic attributes to decision-makers.
 - A documented response process for a possible adverse-impact signal; analytics never automatically changes an individual decision.
 
-## 16. Non-functional requirements
+## 17. Non-functional requirements
 
 | Area | Requirement |
 | --- | --- |
@@ -758,13 +1139,15 @@ The analytics specification must define before pilot:
 | Auditability | All consequential hiring actions attributable to an authenticated user or named system rule |
 | Localization | English/US first, but store timezones, locale-aware dates, and currency explicitly |
 
-## 17. Release plan
+## 18. Release plan
 
 ### Phase 0 — Product, policy, and architecture foundation
 
 - Approve PRD assumptions, P0/P1/P2 boundary, and decision owners.
 - Choose product name and employer branding.
-- Select production frontend host, backend/auth/storage, email, and observability providers through architecture decision records.
+- Select the Salesforce org strategy, edition, licenses/add-ons, environments, Dev Hub, package/namespace model, and named platform owner.
+- Approve the Salesforce object model, sharing model, Flow/Apex automation matrix, capacity forecast, integration pattern, reporting model, and archive/recovery approach through architecture decision records.
+- Select the candidate-portal host, external identity/BFF, private file storage and scanning, email, and observability providers through architecture decision records.
 - Define threat model, data map, retention schedule, and legal notice requirements.
 - Approve permission, requisition, disposition, offer, background, privacy, and accommodation policies.
 
@@ -777,24 +1160,27 @@ The analytics specification must define before pilot:
 
 ### Phase 2 — Secure pilot foundation
 
-- Provision separated test and pilot environments on approved application/backend hosts.
-- Implement HR identity/MFA, backend RBAC, audit foundation, secrets, monitoring, backups, and deployment rollback.
-- Complete data-flow, authorization, threat-model, vendor, and logging reviews.
+- Provision the Dev Hub, scratch-org workflow, integration sandbox, UAT sandbox, training environment, and production org, plus separated candidate-portal test and pilot environments.
+- Establish the Salesforce DX project and approved unlocked/source-driven package; deploy metadata only through CI/CD with documented rollback and reconciliation.
+- Implement HR SSO/MFA, permission-set groups, OWD/sharing, field-level controls, separate least-privilege integration users, external IdP/BFF, secrets, audit foundation, monitoring, backups, and deployment rollback.
+- Complete Salesforce org-impact, license, storage, API-limit, data-flow, authorization, system-mode Apex, threat-model, vendor, and logging reviews.
 
 ### Phase 3 — P0 careers and application
 
-- Implement RS-002 through RS-004: requisitions/jobs, crawlable production job pages, candidate identity/application, private resume handling, privacy notice, confirmation, and status access.
+- Implement RS-002 through RS-004 on the candidate portal and purpose-built Salesforce APIs: requisitions/jobs, a sanitized public-job projection, crawlable production job pages, candidate identity/application, private resume handling, privacy notice, confirmation, and status access.
+- Persist canonical recruitment records in Salesforce and documents in approved private object storage; expose neither Salesforce credentials nor general Salesforce APIs to the browser.
 - Validate job discovery, structured data, application accessibility, abuse controls, and message delivery.
 
 ### Phase 4 — P0 ATS, interviews, decisions, and offers
 
-- Implement RS-005 through RS-010: application list/timeline, recruiter screen, fixed pipeline, interviews, scorecards, debrief, communication, decisions, dispositions, and offer workflow.
-- Exercise exception paths, permission boundaries, versioning, and idempotency.
+- Implement RS-005 through RS-010 in the native Salesforce Lightning application: application list/timeline, recruiter screen, fixed pipeline, interviews, scorecards, debrief, communication, decisions, dispositions, and offer workflow.
+- Exercise exception paths, record/field permissions, time-bound interviewer sharing, versioning, bulk behavior, governor-limit resilience, and idempotency.
 
 ### Phase 5 — P0 privacy, operations, and controlled pilot
 
 - Implement RS-011 and RS-012: restricted records, data-request case, retention/legal hold, audit coverage, and operational dashboard.
-- Complete accessibility, security, backup/restore, incident, legal, privacy, email, and operational-readiness gates.
+- Configure Salesforce reports/dashboards, durable integration-event reconciliation, archive jobs, access reviews, Flow/Apex failure handling, and the approved Shield/Event Monitoring/Field Audit Trail baseline.
+- Complete accessibility, Salesforce security, capacity/load, seasonal-release, backup/restore, incident, legal, privacy, email, and operational-readiness gates.
 - Run a time-boxed pilot with named HR users, limited jobs, daily support coverage, and weekly issue review.
 
 ### Phase 6 — Production v1 expansion
@@ -802,7 +1188,7 @@ The analytics specification must define before pilot:
 - Prioritize and implement approved P1 requirements RS-013 through RS-019 based on pilot evidence.
 - Repeat applicable launch gates for each new integration and regulated workflow.
 
-### 17.1 Delivery and operational ownership
+### 18.1 Delivery and operational ownership
 
 | Area | Accountable role | Required artifact/service |
 | --- | --- | --- |
@@ -811,26 +1197,31 @@ The analytics specification must define before pilot:
 | Legal and privacy | Qualified counsel/privacy owner | Notices, retention schedule, regulated workflows, request process |
 | Security | Named security owner | Threat model, access review, incident plan, vendor review |
 | Engineering | Engineering owner | Architecture decisions, implementation, CI/CD, reliability, recovery |
+| Salesforce platform | Salesforce product/platform owner | Org roadmap, license/capacity plan, architecture decisions, release approval |
+| Salesforce administration | Named Salesforce administrator | User lifecycle, permission-set groups, queues, configuration, access reviews |
+| Salesforce release engineering | Release/DevOps owner | Dev Hub, Salesforce DX, packaging, CI/CD, environment promotion, rollback |
+| Integrations and candidate portal | Integration owner | IdP/BFF, integration users, APIs/events, reconciliation, external file controls |
 | Accessibility and content | Product/design owner | Screen inventory, content inventory, accessibility evidence |
 | Candidate support | Recruiting operations | Monitored contact, response SLA, escalation and outage scripts |
 | Production operations | Engineering and HR operations | Monitoring, on-call/escalation, runbooks, status communication |
 
 No role is considered staffed merely because it appears in this table; a named person or approved provider must accept each responsibility before pilot.
 
-### 17.2 Pilot operating model
+### 18.2 Pilot operating model
 
 - Limit the initial pilot to named HR users, a documented maximum number of open jobs, and approved candidate cohorts.
 - Provide a monitored candidate-support address during stated Pacific Time support hours and an after-hours path for urgent interview/offer issues.
 - Review access, failed messages, overdue tasks, integration failures, privacy cases, and audit alerts on an assigned cadence.
+- Monitor Salesforce storage, API consumption, async work, Flow/Apex failures, sharing anomalies, package/configuration drift, and seasonal-release advisories.
 - Use feature flags or configuration to disable incomplete P1 capabilities.
 - Maintain migration/import reconciliation for any spreadsheet-sourced jobs or candidates; no silent partial import.
 - Publish incident, degradation, and recovery communications through approved templates.
 - Define rollback criteria, pilot suspension authority, and candidate communication steps before first real submission.
 - Hold weekly pilot reviews covering defects, accessibility, data quality, support themes, metrics, and scope decisions.
 
-## 18. Launch gates
+## 19. Launch gates
 
-### 18.1 Pages prototype gates
+### 19.1 Pages prototype gates
 
 - Repository and built artifacts contain no secrets, production endpoints with privileged access, real candidate data, resumes, or offer documents.
 - Every data-entry interaction is synthetic/nonfunctional or writes only to an isolated synthetic demonstration service explicitly approved for public use.
@@ -838,12 +1229,22 @@ No role is considered staffed merely because it appears in this table; a named p
 - Core prototype screens pass baseline automated accessibility and responsive checks.
 - Deployment uses GitHub Actions with reproducible build and rollback instructions.
 
-### 18.2 Real-candidate pilot gates
+### 19.2 Real-candidate pilot gates
 
 - All P0 flows pass end-to-end tests using non-production test identities.
+- Every P0 `RS-###` requirement and `SFDC-001` through `SFDC-015` has traceable acceptance evidence or a formally approved, time-bound exception; `SFDC-016` is evidenced before any Experience Cloud adoption.
 - The frontend is no longer hosted on GitHub Pages and uses approved pilot/production hosting.
+- Salesforce is the canonical operational system of record, the HR workspace runs in native Lightning, and the candidate browser communicates only with the approved BFF and public-content boundary.
 - No critical/high security findings and no secrets or PII in repository/build artifacts.
 - Server-side authorization tests cover every protected object and action.
+- OWD, role hierarchy, sharing rules/Apex-managed sharing, permission-set groups, custom permissions, field-level security, and time-bound interviewer access pass positive and negative tests.
+- All Apex entry points enforce record, object, and field access; any reviewed system-mode exception has a named owner and regression tests.
+- Separate least-privilege Salesforce integration identities, OAuth policies, credential rotation, IP/session controls, and per-environment secrets are verified.
+- Salesforce data/file storage, API, async, query, automation, event, reporting, and archive plans pass forecast and representative-load tests.
+- Durable integration reconciliation is proven across retries, duplicates, out-of-order delivery, event-retention expiry, and downstream outage.
+- The approved Salesforce package is promoted through the defined sandbox path; metadata drift, rollback, backup restore, and post-deploy smoke tests are demonstrated.
+- Non-production orgs contain only generated or properly masked data, and production support access is logged and time-bound.
+- The Shield, Event Monitoring, Field Audit Trail, Data Mask, backup, archive, and analytics licensing decisions are documented, funded where selected, and reflected in controls.
 - WCAG 2.2 AA automated checks pass and manual keyboard/screen-reader testing is complete.
 - Pay-range, salary-history, fair-chance, accommodations, privacy-notice, retention, and adverse-action workflows are reviewed by qualified counsel.
 - Email domain authentication and suppression/bounce handling are verified.
@@ -854,7 +1255,7 @@ No role is considered staffed merely because it appears in this table; a named p
 - Every operating assumption marked `Unconfirmed` has been resolved or explicitly accepted by the accountable owner with documented impact.
 - Every area in the delivery-ownership table has a named, accepting owner.
 
-## 19. Risks and mitigations
+## 20. Risks and mitigations
 
 | Risk | Impact | Mitigation |
 | --- | --- | --- |
@@ -866,9 +1267,20 @@ No role is considered staffed merely because it appears in this table; a named p
 | Communication mistakes | Candidate harm and brand damage | Preview, approvals for sensitive templates, idempotency, delivery logs, cancel window where feasible |
 | Retention conflict | Premature deletion or over-retention | Record-class rules, legal holds, verified privacy workflows, counsel-approved schedule |
 | Integration failure | Missed interviews or messages | Delivery states, retries, reconciliation views, clear manual fallback |
+| Existing-org collision | Recruitment metadata, automation, security, or limits interfere with current Salesforce workloads | Prefer a dedicated org; otherwise require dependency inventory, namespace/package analysis, limit baseline, regression plan, and platform-owner approval |
+| Misconfigured Salesforce sharing or system-mode code | Candidate, compensation, demographic, or interview data is exposed | Private/restricted OWD, permission-set groups, explicit sharing service, user-mode enforcement where possible, negative authorization tests, recurring access review |
+| Irreversible Person Account activation | Permanent org-model and integration complexity | Keep candidates in `Candidate__c`; consider Person Accounts only through a separately approved architecture decision and org-impact assessment |
+| Governor, storage, API, or async limits | Failed submissions, stale workflows, or platform degradation | Five-year capacity model, representative load tests, bulk-safe automation, daily limit telemetry, archive thresholds, vendor capacity review |
+| Flow/Apex automation sprawl | Recursion, ordering defects, unowned failures, and slow releases | One primary trigger strategy per object, decision matrix, domain ownership, fault routes, static analysis, bulk/idempotency tests |
+| Overprivileged integration identity | Broad data compromise through one credential | One least-privilege integration user per system/purpose, scoped OAuth, credential rotation, monitoring, rapid disable runbook |
+| Treating platform events as a durable ledger | Lost updates after retention expiry or subscriber outage | Persist `Integration_Event__c` state, replay/reconcile by external ID, and treat events as transport rather than the source of truth |
+| Missing Salesforce add-on entitlement | Audit, masking, retention, or monitoring controls cannot meet policy | Resolve license matrix in Phase 0; map every required control to base platform, add-on, or external service before pilot |
+| Production PII copied to sandboxes | Privacy breach and excessive test-data exposure | Generated data by default; approved Salesforce Data Mask or controlled masking pipeline; restrict refresh/export and verify post-refresh controls |
+| Candidate-document control failure | Malware exposure or unauthorized resume/offer access | External private storage, upload quarantine, scan-before-release, short-lived signed URLs, hash/version metadata, access logging, deletion reconciliation |
+| Salesforce outage or lock-in | Recruiting interruption and difficult migration | Manual continuity runbook, external backup/export, documented schemas and APIs, recovery tests, reconciliation, bounded vendor-specific logic |
 | Scope expansion | Delayed usable release | Single employer, English/US, explicit P0/P1/P2 IDs, controlled change approval |
 
-## 20. Open decisions
+## 21. Open decisions
 
 Open decisions do not block the synthetic prototype unless noted, but every item marked “Before pilot” blocks real-candidate collection.
 
@@ -885,8 +1297,16 @@ Open decisions do not block the synthetic prototype unless noted, but every item
 | OD-09 | Pilot size, support hours, named operators, success period, suspension criteria, and production rollout | Product owner / operations | Before pilot | Open |
 | OD-10 | Final design system and SF brand expression | Product/design | Prototype content approval | Open |
 | OD-11 | Delivery budget, service plans, vendor procurement, and ongoing operating cost owner | Product owner | Before provider commitment | Open |
+| OD-12 | Dedicated recruitment Salesforce org versus an approved existing org, including edition, contractual data location, business continuity, and org-impact assessment | Salesforce platform owner / security | Phase 0 | Open |
+| OD-13 | Salesforce internal/integration/external-user license counts and add-ons for Shield, Event Monitoring, Field Audit Trail, Data Mask, storage/archive, backup, and analytics | Product owner / procurement / security | Phase 0 | Open |
+| OD-14 | Candidate-portal production host, external IdP, BFF technology, Salesforce client-app/OAuth pattern, and public-job projection/caching | Engineering / Salesforce architect / security | Before pilot build | Open |
+| OD-15 | Dev Hub, sandbox strategy, Salesforce DX project, namespace/unlocked-package model, CI/CD, metadata ownership, and rollback process | Salesforce release owner | Phase 0 | Open |
+| OD-16 | Final Salesforce object/field data dictionary, external IDs, ownership, OWD, sharing, field-level security, encryption classification, indexing, and archive partitioning | Salesforce architect / HR / security | Before pilot build | Open |
+| OD-17 | Final Flow/Apex/async/event decision matrix, transaction boundaries, fault routing, retry rules, and performance/limit budgets | Salesforce architect / engineering | Before pilot build | Open |
+| OD-18 | Salesforce reports/dashboards, CRM Analytics decision, five-year capacity model, archive, backup/restore, RPO/RTO, and operational monitoring | Salesforce platform owner / operations | Before pilot | Open |
+| OD-19 | Whether Experience Cloud will be evaluated as a future candidate portal, including license, identity, sharing, guest-user, Person Account/Contact, and total-cost implications | Product owner / Salesforce architect | Before any Experience Cloud build | Open |
 
-## 21. Definition of v1 product approval
+## 22. Definition of v1 product approval
 
 This PRD is approved when the product owner confirms:
 
@@ -894,13 +1314,16 @@ This PRD is approved when the product owner confirms:
 - The roles and end-to-end workflow.
 - The prototype/P0/P1/P2 boundary and numbered release backlog.
 - GitHub Pages as a public synthetic-data prototype only, with approved hosting required for real candidate data.
+- Salesforce as the operational recruitment system of record, using custom recruitment objects led by `Candidate__c`, a native Lightning HR workspace, and purpose-built APIs behind an external candidate-portal BFF.
+- The approved Salesforce org/edition/license, data model, sharing model, Flow/Apex strategy, integration boundary, file-storage model, capacity/archive plan, DevOps/package model, reporting, audit, and recovery decisions.
 - Human-led decisions and prohibition on autonomous candidate selection in pilot/v1.
 - Default decision rights, exception behavior, data-lifecycle baseline, and regulated-workflow requirements.
 - The Phase 0 open decisions, accountable roles, milestones, and named owners for resolving them.
 
-## 22. Change log
+## 23. Change log
 
 | Version | Date | Summary |
 | --- | --- | --- |
+| 0.3 | August 22, 2026 | Made Salesforce the operational system of record; added the native Lightning HR workspace, external candidate-portal/BFF boundary, custom object and sharing model, Flow/Apex governance, integration and file patterns, capacity, audit, licensing, DevOps, reporting, migration, operations, acceptance gates, risks, and decisions |
 | 0.2 | August 22, 2026 | Added hosting correction, operating assumptions, prioritized releases, permission governance, exception flows, regulated workflows, data lifecycle, SEO, operations, and launch gates |
 | 0.1 | August 22, 2026 | Initial end-to-end PRD for a San Francisco–based company recruitment system |
