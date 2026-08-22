@@ -6,4 +6,4 @@ An end-to-end applicant tracking system for a San Francisco–based company.
 
 - [Product Requirements Document](docs/PRD.md)
 
-The planned application uses GitHub Pages for the static frontend and a separate secure backend for authentication, candidate data, resumes, interview feedback, offers, and audit records.
+Development begins with a public GitHub Pages prototype that uses synthetic data only. Any pilot or production system handling authentication, candidate data, resumes, interview feedback, offers, or audit records must use approved application hosting and secure backend services.
