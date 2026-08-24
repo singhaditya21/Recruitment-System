@@ -2,8 +2,8 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Draft v0.3 |
-| Last updated | August 22, 2026 |
+| Status | Draft v0.4 |
+| Last updated | August 24, 2026 |
 | Product owner | Aditya Singh |
 | Initial market | San Francisco–based employer hiring in the United States |
 | Primary timezone | America/Los_Angeles |
@@ -38,6 +38,13 @@ For pilot and production, Salesforce is the operational recruitment system of re
 - Keep candidate authentication outside Salesforce in the default architecture; Experience Cloud is an evaluated alternative, not the baseline.
 - Store resume/offer/reference binaries outside Salesforce unless a later security, capacity, and licensing decision explicitly approves Salesforce Files.
 - Manage Salesforce metadata through Salesforce DX, an unlocked-package/source-driven model, automated validation, and reviewed Git commits.
+- Model approved headcount as individual openings; accepting an offer reserves but does not fill an opening.
+- Treat `Application__c` as the candidate–requisition junction, with a formal ERD, cardinalities, uniqueness rules, and immutable application attempts.
+- Use governed Salesforce work items for required recruiting actions; standard Tasks/Events are projections or ordinary personal work, not the sole business ledger.
+- Separate offer acceptance, post-offer contingencies, ready-for-hire, handoff, and completed-hire states.
+- Evaluate versioned jurisdiction rules at posting and regulated-action time; preserve the applied policy snapshot.
+- Disable interview recording/transcription and automated candidate decision support by default; either capability requires a separately approved control package.
+- Use Salesforce External Client Apps for new OAuth integrations; Connected Apps are legacy-only unless an approved exception applies.
 
 ## 2. Problem statement
 
@@ -54,7 +61,7 @@ Recruiting data is often fragmented across email, spreadsheets, calendars, share
 
 ## 3. Product vision
 
-Enable a hiring team to run a fair, structured, human-led recruitment process from approved headcount to accepted offer, while giving every candidate timely information, control over their data, and a respectful experience.
+Enable a hiring team to run a fair, structured, human-led recruitment process from approved headcount through a reconciled hire handoff, while giving every candidate timely information, control over their data, and a respectful experience.
 
 ### 3.1 Operating assumptions requiring validation
 
@@ -76,6 +83,9 @@ The system will be designed against the following working assumptions. They are 
 | Salesforce org | Dedicated recruitment org preferred; an existing company org requires an impact assessment | Unconfirmed |
 | Salesforce edition | Enterprise, Performance, or Unlimited target; exact edition and entitlements not supplied | Unconfirmed |
 | Salesforce licenses | Internal, integration, Shield, storage, masking, and analytics quantities not supplied | Unconfirmed |
+| California privacy applicability | Employer revenue, California personal-information volume, sale/share practices, and other CCPA threshold facts not supplied | Unconfirmed |
+| Automated decision systems | No ranking, matching, scoring, knockout, resume screening, voice/facial analysis, or provider recommendation may affect a candidate unless separately inventoried and approved | Confirmed product principle |
+| Interview recording/transcription | Disabled for pilot and v1 unless counsel, privacy, security, accessibility, consent, storage, and retention controls are separately approved | Confirmed product principle |
 | Candidate portal identity | External identity provider and backend-for-frontend; no Salesforce external user by default | Confirmed architecture assumption |
 | HR workspace | Native Salesforce Lightning application | Confirmed architecture assumption |
 | Candidate system of record | Custom `Candidate__c`; no Lead/Contact/Person Account as canonical candidate record | Confirmed architecture assumption |
@@ -83,13 +93,13 @@ The system will be designed against the following working assumptions. They are 
 | Languages | English/US first | Confirmed product assumption |
 | Hiring decisions | Human-owned; no autonomous ranking, rejection, advancement, or selection | Confirmed product principle |
 
-Changes to employer size, jurisdictions, federal-contractor status, industry, worker types, Salesforce org strategy, edition, licensing, or material platform entitlements trigger a documented compliance, architecture, and scope review.
+Changes to employer size, revenue/privacy thresholds, jurisdictions, federal-contractor status, industry, worker types, Salesforce org strategy, edition, licensing, material platform entitlements, automated-decision usage, or recording/transcription usage trigger a documented compliance, architecture, and scope review.
 
 ## 4. Goals and success measures
 
 ### 4.1 Product goals
 
-1. Provide one system of record for jobs, candidates, applications, interviews, evaluations, decisions, and offers.
+1. Provide one system of record for requisitions/openings, jobs, candidates, applications, work items, interviews, evaluations, decisions, offers, contingencies, and hire handoffs.
 2. Make the next action, owner, and deadline visible for every active application.
 3. Standardize screening, assessments, interviews, and scorecards around job-related criteria.
 4. Automate routine coordination and notifications while preserving human hiring decisions.
@@ -106,7 +116,10 @@ Changes to employer size, jurisdictions, federal-contractor status, industry, wo
 | Candidate communication SLA | Stage-changing messages sent within 1 business day | At least 95% | Recruiting operations |
 | Scheduling cycle time | Median time from interview request to confirmed schedule | Under 2 business days | Recruiting coordinator |
 | Offer acceptance rate | Accepted offers / offers sent | Baseline first; target after two quarters | Head of HR |
-| Process completeness | Hires with complete approvals, scorecards, and audit history | 100% | HR administrator |
+| Process completeness | Hires with complete approvals, scorecards, and audit history | 100% | HR operations |
+| Headcount integrity | Hires with one reconciled opening, accepted offer version, cleared/waived contingencies, and completed handoff / all hires | 100% | HR operations / HRIS owner |
+| Work-item integrity | Required work items completed/canceled with owner, SLA, and evidence / generated required work items | 100% | Recruiting operations |
+| Unapproved automated decisions | Candidate-affecting provider/rule outputs without approved registry version | 0 | Legal/privacy and HR |
 | Accessibility | Critical WCAG 2.2 AA violations in release QA | 0 | Product and engineering |
 | Security | Critical or high-severity open findings at release | 0 | Security owner |
 
@@ -122,7 +135,10 @@ Metrics must be segmented only where privacy thresholds are met. Voluntary demog
 | Hiring manager | Define requirements, review candidates, approve stages, lead decisions | Their jobs and candidate packets |
 | Interviewer | Review interview kit, conduct interview, submit scorecard | Minimum candidate information for assigned interviews |
 | Offer approver | Review compensation and offer terms | Offer packet and necessary candidate data |
-| HR administrator | Configure organization, workflows, permissions, templates, retention, and integrations | Full administrative access |
+| HR configuration administrator | Configure recruiting policies, templates, queues, workflow metadata, and approved integrations | Configuration access; no automatic restricted-record or Salesforce platform-admin access |
+| Salesforce platform administrator | Operate org, releases, identity, metadata, capacity, and incident controls | Privileged platform access under purpose, logging, break-glass, and recurring review |
+| Legal/privacy administrator | Govern jurisdiction policies, notices, consent/authorization, privacy requests, holds, adverse-action controls, and automated-decision registry | Restricted legal/privacy records and configuration only |
+| HRIS/onboarding operator | Validate ready-for-hire data and reconcile downstream handoff | Ready-for-hire/handoff records and minimum required candidate/offer data |
 | Compliance auditor | Review immutable history, access logs, reports, and retention actions | Read-only, scoped audit access |
 
 Permission checks must be enforced by the backend, not only hidden in the user interface.
@@ -131,10 +147,11 @@ Permission checks must be enforced by the backend, not only hidden in the user i
 
 `Manage` includes create/update actions. `Scoped` means only assigned jobs, applications, or interviews. Backend policy is authoritative.
 
-| Action | Recruiter | Coordinator | Hiring manager | Interviewer | Offer approver | HR admin | Auditor |
+| Action | Recruiter | Coordinator | Hiring manager | Interviewer | Offer approver | HR config admin | Auditor |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | Create/edit requisition | Manage | No | Manage own | No | No | Manage | View |
 | Approve requisition | No | No | Approve own | No | No | Configure/override | View |
+| Change approved openings | Request | No | Request/approve if assigned | No | No | Manage with reason/approval | View |
 | Publish/close job | Manage approved | No | Request | No | No | Manage | View |
 | View candidate application | Scoped | Logistics fields | Scoped | Interview packet only | Offer packet only | Manage | Restricted view |
 | Move pipeline stage | Scoped | Scheduling stages | Recommend/approve | No | No | Manage/override | View |
@@ -145,16 +162,19 @@ Permission checks must be enforced by the backend, not only hidden in the user i
 | View compensation | If assigned and authorized | No | If authorized | No | Manage assigned | Configure/manage | Restricted view |
 | Draft offer | Manage | No | Recommend | No | No | Manage | View after close |
 | Approve offer | No | No | If approval rule assigns | No | Approve assigned | Configure/override | View |
+| Reserve/release/fill opening | Service action; request exception | No | View | No | No | Manage with named entitlement | View |
+| Mark Ready for Hire / handoff | Recommend | No | View | No | No | Manage with named entitlement | View |
+| Manage jurisdiction/ADS policy | No | No | No | No | No | Separate legal/privacy entitlement only | View approved evidence |
 | Export candidate data | Restricted | No | No by default | No | No | Approve/export | Approved audit export |
 | Manage users/roles | No | No | No | No | No | Manage | View history |
 | Configure retention/legal hold | No | No | No | No | No | Manage with dual control | View |
 | View audit log | Own actions | Own actions | Scoped | Own actions | Own actions | Manage | Read-only |
 
-Access to voluntary demographics, accommodation/medical information, background results, privacy-request identity evidence, and raw security logs requires separate named entitlements. Ordinary recruiter, hiring-manager, interviewer, offer-approver, or general HR-administrator status does not grant those entitlements automatically.
+Access to voluntary demographics, accommodation/medical information, background results, privacy-request identity evidence, automated-decision evidence, interview recordings/transcripts if ever enabled, compensation, jurisdiction-policy administration, hire-handoff correction, and raw security logs requires separate named entitlements. Ordinary recruiter, hiring-manager, interviewer, offer-approver, HR-configuration-administrator, Salesforce-administrator, or auditor status does not grant those entitlements automatically.
 
 ### 5.2 Decision governance
 
-- Every requisition, rejection, stage override, offer approval, offer withdrawal/rescission, export, record merge, and legal-hold action has a named accountable role.
+- Every requisition/opening change, rejection, stage override, offer approval, offer withdrawal/rescission, opening reservation/fill exception, contingency waiver, ready-for-hire approval, handoff correction, jurisdiction-policy release, automated-decision enablement, recording enablement, export, record merge, and legal-hold action has a named accountable role.
 - Overrides require a reason and elevated permission; the system never silently bypasses a required approval or scorecard.
 - The product owner approves organization-wide policy. HR owns hiring-process policy. Legal/privacy owns regulated notices and retention. Security owns access and incident controls. Engineering owns implementation and reliability.
 - No user may approve their own access escalation. Production administrator access is reviewed at least quarterly.
@@ -194,9 +214,11 @@ Access to voluntary demographics, accommodation/medical information, background 
 1. Recruiter prepares an offer from an approved template.
 2. Compensation and other terms route through configured approval rules.
 3. Candidate receives a secure offer link and can accept, decline, or ask a question.
-4. If required, background or reference steps occur only in their legally permitted stage and with appropriate consent.
-5. Accepted offer converts the application to hired and triggers a handoff package.
-6. The job closes automatically when approved headcount is filled, subject to recruiter confirmation.
+4. Acceptance records the exact offer version and reserves an approved opening; it does not by itself mark the candidate hired.
+5. If required, background, reference, occupational, or other approved contingencies occur only in their legally permitted stage and with purpose-specific authorization.
+6. After all contingencies clear, HR marks the application ready for hire and sends an idempotent handoff package to the approved HR/onboarding destination.
+7. HR reconciles the destination acknowledgement and completes the handoff; that completed handoff fills exactly one opening and converts the application to Hired.
+8. The requisition closes only when filled openings equal approved openings and no protected post-offer work remains, subject to recruiter confirmation and reviewed treatment of other active applicants.
 
 ## 7. Scope
 
@@ -219,7 +241,7 @@ Priority meanings:
 
 | ID | Capability | Priority | Pilot implementation |
 | --- | --- | --- | --- |
-| RS-001 | Secure HR identity, MFA, invite/deactivation, and backend RBAC | P0 | Approved application host and auth provider |
+| RS-001 | Secure HR identity, MFA, invite/deactivation, and Salesforce authorization | P0 | Salesforce SSO/MFA, identity lifecycle, minimum profile, permission-set groups, session controls, and audited deactivation |
 | RS-002 | Requisition creation, single approval, job publishing, pause, close, and archive | P0 | One configurable approval step |
 | RS-003 | Public job search/detail with pay range, workplace type, accommodations, privacy, and canonical URL | P0 | Production careers surface; synthetic version on Pages |
 | RS-004 | Candidate application, verified email/magic link, autosave, private resume upload, consent snapshot, and confirmation | P0 | One configurable application template per job |
@@ -240,6 +262,14 @@ Priority meanings:
 | RS-019 | Job-board syndication and inbound integration | P1 | Canonical job links in pilot |
 | RS-020 | Multi-brand, multi-country, multi-language, and multi-tenant capabilities | P2 | Out of v1 |
 | RS-021 | Validated explainable decision support with impact monitoring | P2 | No automated decision support in P0/P1 |
+| RS-022 | Opening/headcount allocation and fill controls | P0 | Every hire fills one approved opening; accepted offers reserve but do not fill openings |
+| RS-023 | Governed recruiting work items and activity timeline | P0 | Required tasks have owner, due date, state, context, SLA, completion evidence, and cancellation rules |
+| RS-024 | Post-offer contingencies and idempotent hire handoff | P0 | Accepted, contingencies-pending, ready-for-hire, handoff, and hired states are distinct and auditable |
+| RS-025 | Versioned jurisdiction-policy evaluation | P0 | Posting, screening, background, notice, consent, and retention rules evaluate against an effective policy snapshot |
+| RS-026 | Automated-decision-system inventory and control | P0 | No unapproved automated selection procedure; provider algorithms, inputs, outputs, validation, accommodation, and monitoring are inventoried |
+| RS-027 | Interview recording/transcription governance | P0 | Disabled by default; any later use requires all-party consent where applicable, restricted storage, purpose, access, and retention controls |
+| RS-028 | Candidate-facing status and communication preferences | P0 | Public statuses never expose internal deliberation; transactional, optional recruiting, suppression, and do-not-contact preferences are enforced |
+| RS-029 | Approval delegation, escalation, rejection, and resubmission | P1 | Requisition and offer approvals remain version-bound through absence, delegation, timeout, rejection, and material change |
 
 #### Salesforce implementation requirements
 
@@ -261,6 +291,11 @@ Priority meanings:
 | SFDC-014 | Durable integration and event reconciliation | P0 | Salesforce event bus is not the durable queue/audit store; replay and reconciliation tested |
 | SFDC-015 | Salesforce release and seasonal-upgrade operations | P0 | CI/CD, regression, rollback/fix-forward, runbooks, and ownership established |
 | SFDC-016 | Experience Cloud alternative assessment | P1 | License, identity, Contact/Person Account, sharing, guest, cost, and migration impact documented before adoption |
+| SFDC-017 | Formal Salesforce ERD and relationship invariants | P0 | Cardinality, optionality, lookup/master-detail choice, uniqueness, deletion protection, and hot-parent behavior are approved and tested |
+| SFDC-018 | Salesforce Activities and governed work-item architecture | P0 | Task/Event versus custom work-item responsibility, linking, sharing, retention, reporting, and synchronization are explicit |
+| SFDC-019 | Ownership, lookup, and share-skew controls | P0 | Queue/user ownership, hot requisitions, share-row multiplication, group churn, and archive ownership stay within tested budgets |
+| SFDC-020 | External Client App integration baseline | P0 | New integrations use environment-specific External Client Apps and least-privilege OAuth policies; legacy Connected Apps require an exception |
+| SFDC-021 | Complete recruiting metadata model | P0 | Openings, application templates/questions, assessments, interview rounds/availability, contingencies, preferences, policy snapshots, and hire handoff are deployable metadata |
 
 Every product story, design screen, test case, release note, and material change should reference at least one `RS-###` or `SFDC-###` requirement. A P0 item may be removed or materially weakened only through an approved PRD change that records owner, rationale, affected risks, and revised launch gate.
 
@@ -285,6 +320,9 @@ Every product story, design screen, test case, release note, and material change
 - Search and filters for title, department, location, workplace type, and employment type.
 - Required compensation range for every California-fillable job as a product guardrail.
 - No salary-history question in any system template.
+- One requisition creates one or more individually identifiable approved openings; opening count changes require permission, reason, and approval where configured.
+- A requisition may produce multiple posting records for location, audience, language, channel, or publication period while applications remain tied to the canonical requisition and originating posting/version.
+- Filled, reserved, frozen, canceled, and remaining openings are independently reportable; no aggregate counter is trusted without reconciliation to opening records.
 
 #### Candidate profiles and applications
 
@@ -297,18 +335,24 @@ Every product story, design screen, test case, release note, and material change
 - Candidate source and campaign attribution.
 - Candidate withdrawal and data-rights request entry points.
 - Immutable submitted-answer snapshot so later template edits do not rewrite history.
+- Each application requires exactly one candidate, one requisition, one immutable application-template version, and an application-attempt key.
+- Only one active application per candidate/requisition is allowed unless an approved reapplication policy creates a new attempt after prior attempts are terminal.
+- The candidate-facing status is mapped from internal state through versioned metadata and never exposes scorecards, restricted reasons, deliberation, background data, or other applicants.
+- Communication preferences distinguish required transactional notices from optional talent-marketing messages and enforce suppression, bounce, withdrawal, and do-not-contact states.
 
 #### Pipeline and workflow
 
 - Configurable pipeline per job, created from an organization template.
-- Default stages: New, Recruiter Review, Screening, Assessment, Interviews, Debrief, Offer, and Hired.
-- Terminal dispositions: Rejected, Withdrawn, Position Closed, Duplicate, and Hired.
+- Default stages: New, Recruiter Review, Screening, Assessment, Interviews, Debrief, Offer, Post-Offer Contingencies, Ready for Hire, HR Handoff, and Hired.
+- Terminal outcomes/dispositions: Rejected, Withdrawn, Position Closed, Duplicate, Offer Declined, Offer Expired, Offer Withdrawn/Rescinded, and Hired.
 - Drag-and-drop and explicit stage-change action, with the same server-side validation.
 - Bulk actions limited to low-risk operations; rejection always requires a reason and communication review.
 - Stage owner, due date, SLA indicator, last activity, and next action.
 - Application timeline containing every stage, message, interview, assessment, decision, and actor.
 - Rejection reasons drawn from a controlled, job-related list with optional restricted notes.
 - Talent-pool tagging only with appropriate notice/consent and retention policy.
+- Governed work items record subject/type, related requisition/application/interview/offer/case, owner or queue, due date, business-hours SLA, status, priority, completion evidence, cancellation reason, and originating rule.
+- Reassignment, stage exit, withdrawal, job closure, duplicate resolution, and user deactivation deterministically complete, cancel, or transfer affected work items without erasing history.
 
 #### Screening and assessments
 
@@ -318,6 +362,8 @@ Every product story, design screen, test case, release note, and material change
 - Assessment template versioning; an active candidate remains on the version assigned.
 - Optional blinded review that suppresses selected identity fields where operationally feasible.
 - Human review required for every recommendation; no automated final rejection, advancement, ranking, or hiring decision in pilot/v1.
+- Versioned question, competency, rubric, assessment-definition, assignment, submission, evaluator, score, accommodation, and provider-result records preserve exactly what was presented and evaluated.
+- Before enabling any provider or rule that screens, ranks, matches, scores, recommends, categorizes, targets, or analyzes an applicant, the automated-decision control workflow must determine legal scope, validation, human review, accessibility/accommodation, monitoring, notice, retention, and appeal/alternative-process requirements.
 
 #### Interview lifecycle
 
@@ -332,6 +378,9 @@ Every product story, design screen, test case, release note, and material change
 - Scorecard lock after submission, with an attributed amendment workflow.
 - Debrief view showing evidence by competency, missing feedback, risks, and decision record.
 - Accommodation requests routed separately to authorized HR staff; interviewers see only approved logistics they need.
+- Availability windows, proposed times, confirmed times, participant timezone, reschedule lineage, cancellation/no-show reason, provider calendar ID, invite version, and reconciliation state are stored explicitly.
+- `Interview_Session__c` is the canonical interview schedule. Calendar Events and provider invitations are synchronized projections with idempotency and conflict resolution.
+- Recording, transcription, biometric/voice/facial analysis, and emotion inference are disabled in pilot/v1. A later approved recording must capture participant-level consent, purpose, version, revocation handling, access, storage, transcript correction, and retention.
 
 #### Communications
 
@@ -357,7 +406,11 @@ Every product story, design screen, test case, release note, and material change
 - Secure candidate link to view, download, accept, decline, or ask a question.
 - Acceptance captures signer, timestamp, document version, and consent evidence.
 - Conditional-offer flag that gates background-check workflow.
-- Hired handoff export for downstream HR onboarding; onboarding itself is out of pilot/v1.
+- Idempotent, reconciled hire handoff for downstream HR/onboarding; onboarding execution itself is out of pilot/v1.
+- Offer lifecycle states include Draft, Pending Approval, Approved, Extended, Accepted, Declined, Expired, Withdrawn, Rescinded, and Superseded; only one active offer/version may be actionable for an application.
+- Accepted conditional offers move the application to post-offer contingencies rather than directly to Hired.
+- Opening reservation, contingency status, preliminary/final adverse-action status, ready-for-hire approval, handoff attempt, destination acknowledgement, and final opening fill are separately auditable.
+- Hire handoff uses a stable external ID, mapping/schema version, source snapshot hash, idempotency key, delivery state, retry history, destination identifier, reconciliation result, and cancellation/correction process.
 
 #### Reporting and operations
 
@@ -382,17 +435,19 @@ Every product story, design screen, test case, release note, and material change
 - **P2:** Multilingual candidate experience.
 - **P2:** Multi-brand, multi-country, and multi-tenant support.
 - **P2:** Validated decision-support features with bias, accessibility, explainability, and human-oversight controls.
+- **P2:** Approved interview recording/transcription only after jurisdiction, consent, privacy, security, accessibility, storage, and retention review.
 
 ### 7.5 Explicitly out of scope for pilot and v1
 
 - Payroll, benefits enrollment, performance management, and employee onboarding.
 - Autonomous AI screening, inferred personality, emotion recognition, face/voice analysis, or hidden candidate scoring.
 - Scraping candidate data from third-party sites.
+- Interview recording/transcription, facial-expression analysis, emotion recognition, voice analysis, or biometric inference unless activated through a separate approved PRD change.
 - Storing authentication secrets, resumes, candidate data, or offer documents in the Git repository or GitHub Pages build.
 - Publicly exposing the production HR workspace or any backend data.
 - Multi-company SaaS billing and tenant administration.
 
-## 8. Application state model
+## 8. Recruitment lifecycle state models
 
 The system separates workflow stage from terminal disposition so reporting does not confuse “where the candidate is” with “how the application ended.”
 
@@ -406,6 +461,9 @@ Draft application
   -> Interviews (one or more rounds)
   -> Debrief
   -> Offer
+  -> Post-Offer Contingencies
+  -> Ready for Hire
+  -> HR Handoff
   -> Hired
 
 From any active stage:
@@ -413,6 +471,11 @@ From any active stage:
   -> Withdrawn
   -> Position Closed
   -> Duplicate
+
+Offer-specific terminal outcomes:
+  -> Offer Declined
+  -> Offer Expired
+  -> Offer Withdrawn or Rescinded
 ```
 
 Rules:
@@ -421,9 +484,30 @@ Rules:
 - Reopening a terminal application requires elevated permission and an audit reason.
 - Job closure does not silently reject active applicants; HR must select and review communications.
 - A candidate may have multiple applications with separate state histories.
+- One application represents one candidate’s attempt for one requisition. A later permitted reapplication creates a new attempt and immutable response snapshot.
 - Configurable stages must map to stable reporting categories.
+- Offer acceptance reserves an opening but never changes the application directly to Hired.
+- `Ready for Hire` requires all configured contingencies to be cleared or formally waived by an authorized user with a reason.
+- `Hired` requires a successful, reconciled HR/onboarding handoff or an explicitly approved manual-hire acknowledgement.
+- Candidate-visible statuses are versioned mappings from internal states and never expose restricted deliberation or regulated-case details.
 
-### 8.1 Required exception handling
+### 8.1 Related record state machines
+
+| Record | Required states | Critical transition rules |
+| --- | --- | --- |
+| Requisition | Draft, Pending Approval, Rejected, Approved, Open, On Hold, Filled, Canceled, Archived | Material approved-field changes invalidate approval; Filled requires filled openings to equal approved openings and no blocking post-offer work |
+| Opening | Proposed, Approved, Open, Reserved, Frozen, Filled, Canceled | One opening can be reserved by at most one active accepted offer and filled by at most one completed hire; reservation expiry/release is explicit |
+| Job posting | Draft, Scheduled, Published, Paused, Expired, Unpublished, Closed, Archived | Only approved requisitions publish; every public version has effective dates, applied jurisdiction policy, canonical URL, and channel state |
+| Interview session | Draft, Availability Pending, Proposed, Tentative, Confirmed, In Progress, Completed, Rescheduled, Canceled, Candidate No-Show, Interviewer No-Show | Reschedule preserves the former schedule and invite/provider IDs; calendar projection never overrides canonical state without reconciliation |
+| Assessment assignment | Draft, Assigned, Started, Submitted, Under Review, Completed, Expired, Withdrawn, Accommodation Hold, Canceled | Definition/rubric version is immutable after assignment; provider result cannot automatically advance or reject in P0/P1 |
+| Offer | Draft, Pending Approval, Approval Rejected, Approved, Extended, Viewed, Accepted, Declined, Expired, Withdrawn, Rescinded, Superseded | Only the current approved version is actionable; material changes supersede the version and invalidate approval/links |
+| Contingency case | Not Required, Awaiting Authorization, Ordered, Pending, Review Required, Preliminary Adverse Action, Response/Dispute Window, Reassessment, Cleared, Failed, Waived, Canceled | Jurisdiction-policy snapshot controls sequence and minimum waiting period; no automatic rescission or hire |
+| Hire handoff | Not Ready, Ready, Queued, Sent, Acknowledged, Completed, Failed, Canceled, Correction Required | Idempotent destination processing and reconciliation required; only Completed fills the opening and marks Hired |
+| Recruiting work item | Open, In Progress, Blocked, Completed, Canceled, Superseded | Owner, due date, SLA, source rule, completion/cancellation evidence, and related business record are required |
+
+Every transition identifies allowed source/destination pairs, required permission/custom permission, prerequisite records, validation, side effects, business-audit event, candidate communication, work-item changes, idempotency behavior, and failure/recovery path. State labels used for reporting are stable metadata values rather than editable display labels.
+
+### 8.2 Required exception handling
 
 | Scenario | Required behavior |
 | --- | --- |
@@ -432,6 +516,7 @@ Rules:
 | Candidate changes email | Verify the new address, preserve the former identifier in restricted history, and invalidate outstanding magic links as appropriate. |
 | Candidate withdraws | Record the withdrawal timestamp and optional reason, cancel pending tasks/interviews, notify owners, and retain records under the applicable schedule. |
 | Candidate wants to reapply | Create a new application snapshot; do not reactivate or rewrite the former application. |
+| Candidate is transferred or invited to another job | Obtain any required candidate action/notice and create a separate application for the destination requisition; never move or relabel the original application. |
 | Job is paused | Hide new-application actions if configured, retain active applicants, stop nonessential automation, and show HR an action list. |
 | Job is canceled or closed with active applicants | Require disposition review and communication selection for every active application; no silent bulk rejection. |
 | Pipeline stage is skipped | Require permission and a reason; record which required tasks were waived. |
@@ -443,10 +528,16 @@ Rules:
 | Message delivery fails | Retry safely, surface failure to the owner, prevent duplicate sends, and provide a manual contact path. |
 | Integration is unavailable | Queue retryable work, show degraded state, and provide a documented manual fallback without losing the source action. |
 | Offer terms change | Create a new immutable offer version and invalidate previous approvals and acceptance links. |
+| Accepted offer has pending contingencies | Reserve one opening, keep the application in Post-Offer Contingencies, and prevent Hired or opening fill until clearance and handoff complete. |
+| Opening reservation expires or offer terminates | Release the reservation exactly once, retain history, recalculate remaining openings, and review candidate/job communications. |
+| Hire handoff fails or duplicates | Keep the application Ready for Hire/HR Handoff, retry with the same idempotency key, reconcile destination state, and block duplicate worker/opening creation. |
 | Offer is withdrawn or rescinded | Require elevated permission, documented reason, counsel-approved communication, and complete audit history. |
 | Candidate accepts after expiration | Do not auto-hire; route to recruiter review and offer reissue if approved. |
 | User leaves the company | Deactivate access immediately, preserve attributed history, reassign owned work, and revoke active sessions. |
 | Privacy deletion conflicts with retention/legal hold | Suspend deletion of affected records, document the legal basis and scope, delete eligible data, and communicate the outcome through the approved process. |
+| Applicable jurisdiction or policy changes mid-process | Preserve the former evaluation, run an effective-date impact review, apply the approved transition rule, and never silently rewrite historical notice/authorization evidence. |
+| Automated-decision capability is discovered in a provider | Disable candidate-affecting output, preserve evidence, open a compliance/vendor case, and require approval before re-enablement. |
+| Recording/transcription is enabled without valid consent | Stop capture, restrict/quarantine the artifact, notify privacy/security owners, assess deletion/incident duties, and prevent evaluation use. |
 
 Internal candidates, staffing-agency submissions, employee referrals, and former-employee rehires require dedicated visibility and conflict rules before their P1 activation.
 
@@ -456,14 +547,18 @@ Internal candidates, staffing-agency submissions, employee referrals, and former
 
 - Given an approved requisition with all required fields, an authorized recruiter can publish it and see the public page within five minutes.
 - A California-fillable job cannot publish without a numeric pay range, currency, pay period, location/workplace type, and hiring process summary.
+- Publishing stores the exact requisition/posting version, jurisdiction-policy version, employer-threshold facts, public content hash, channel, and effective dates used for the decision.
 - A user without publish permission cannot publish even by calling the API directly.
 - Unpublishing removes the job from search while preserving its canonical record and applicants.
+- A requisition cannot close as Filled until reconciled filled-opening count equals approved-opening count; active accepted offers or post-offer cases block automatic closure unless an approved exception applies.
 
 ### 9.2 Application
 
 - A candidate can complete the primary application on a mobile viewport using keyboard and assistive technology.
 - Progress autosaves without storing an uploaded resume in public browser storage.
 - Submission creates a timestamped answer snapshot and sends a confirmation.
+- Submission resolves exactly one candidate, requisition, application attempt, application-template version, originating posting/version, and applied notice/policy snapshot.
+- Concurrent or retried submission cannot create duplicate active applications or duplicate confirmation messages.
 - Required validation errors identify the affected field and do not erase other answers.
 - Voluntary demographic questions are clearly optional and stored separately from hiring review data.
 
@@ -481,6 +576,8 @@ Internal candidates, staffing-agency submissions, employee referrals, and former
 - Interviewers can submit only assigned scorecards.
 - Other interviewer ratings remain hidden until independent feedback is submitted or debrief is opened.
 - A decision cannot be finalized while required scorecards are missing unless an authorized user records an override reason.
+- Rescheduling preserves the prior schedule, participant responses, invite/provider identifiers, actor, reason, and candidate-notification result.
+- The system does not expose or enable recording/transcription controls in pilot/v1; an integration cannot silently enable provider recording.
 
 ### 9.5 Offers
 
@@ -488,6 +585,8 @@ Internal candidates, staffing-agency submissions, employee referrals, and former
 - Any compensation or material-term change invalidates prior approvals.
 - Candidate acceptance is bound to an immutable document version.
 - Only users with explicit compensation access can view compensation fields or offer documents.
+- Acceptance reserves one approved opening and moves the application to Post-Offer Contingencies or Ready for Hire according to the versioned hiring plan; it does not mark Hired.
+- Decline, expiration, withdrawal, rescission, supersession, and reservation release are idempotent and retain the complete version/approval/communication history.
 
 ### 9.6 Audit and privacy
 
@@ -521,6 +620,46 @@ Internal candidates, staffing-agency submissions, employee referrals, and former
 - Waiting periods and notice templates are configurable and approved by counsel; no adverse action may finalize while the response window or a timely dispute is open.
 - Provider identity, report/version, notices, delivery evidence, candidate response, decision-maker, rationale, and final action remain auditable under the approved retention schedule.
 
+### 9.10 Openings and hire handoff
+
+- Every approved headcount unit has one stable opening record; an aggregate headcount field is a reconciled summary, not the sole ledger.
+- At most one active accepted offer can reserve an opening, and at most one completed hire can fill it.
+- Opening changes and manual reservation/fill/release actions require permission, reason, audit, and any configured approval.
+- Ready-for-hire validation confirms the current accepted offer, required contingencies, candidate identity, start date, position/location, compensation authorization, opening reservation, and destination mapping.
+- Handoff submission is idempotent, versioned, retryable, reversible only through an approved correction/cancel workflow, and reconcilable to the destination worker/onboarding identifier.
+- A handoff failure never increments hired count, fills an opening, or closes a requisition.
+
+### 9.11 Activities, work items, and SLA control
+
+- Every required recruiting action has a governed work item with owner/queue, related record, type, status, priority, due date, business-hours calendar, source rule, and completion/cancellation evidence.
+- Ordinary Salesforce Tasks/Events may support personal productivity and calendars, but completion of a required process step is determined by the governed business record/work item.
+- Work-item creation and cancellation are idempotent across stage transitions, retries, job closure, candidate withdrawal, user deactivation, and rescheduling.
+- Overdue, blocked, unassigned, failed-automation, and breached-SLA work appears in owned operational views and reports.
+- Activity notes and attachments inherit the strictest classification, sharing, retention, export, and audit rules of the related candidate/application/case.
+
+### 9.12 Jurisdiction, notices, authorization, and policy evidence
+
+- Before publishing or initiating a regulated action, the service evaluates effective jurisdiction rules using employer facts, job/work location, action type, worker type, provider, and effective date.
+- The resulting policy snapshot is immutable and records input facts, matched rules, outcome, notice/template versions, required waiting periods, approver, and any documented exception.
+- Notice acknowledgement, affirmative consent, statutory authorization, communication preference, and contract acceptance are distinct evidence types and are never treated as interchangeable.
+- A policy change does not rewrite historical evidence; a controlled impact process determines treatment of in-flight applications.
+- Unknown or conflicting applicability blocks the affected action and opens an owned legal/privacy review rather than selecting a permissive default.
+
+### 9.13 Automated-decision-system governance
+
+- The registry covers employer-built and third-party resume screening, matching, ranking, targeting, assessments, tests, scoring, categorization, recommendations, interview analysis, and proxy/derived attributes.
+- Each entry identifies owner, provider/version, purpose, legal scope, inputs, protected/proxy risk, outputs, affected decisions, human-review design, override authority, accommodation/alternative process, validation, monitoring, retention, incident/disable control, and approval status.
+- P0/P1 prohibits automated rejection, advancement, ranking, candidate matching, knockout, facial/emotion/voice analysis, or decision recommendation unless a later PRD change expressly authorizes the exact procedure.
+- Provider marketing labels or claims of “assistive” use do not bypass the inventory; candidate-affecting computational output is reviewed according to the broadest applicable policy.
+- Automated-decision data and validation evidence follow applicable record-retention/legal-hold rules and remain reproducible by provider/model/rule version.
+
+### 9.14 Candidate-facing status and preferences
+
+- Candidate statuses are allow-listed mappings from internal states, written in plain language, and versioned with their associated explanation and expected next step.
+- Candidate APIs never expose internal disposition notes, scorecards, hiring-team debate, comparative ranking, background details, restricted-case existence, or other candidates.
+- Required transactional messages continue where legally/operationally necessary; optional talent marketing honors consent, unsubscribe, do-not-contact, channel, frequency, and suppression state.
+- Withdrawal, bounce, complaint, privacy request, identity change, and duplicate resolution update preferences deterministically without suppressing legally required notices.
+
 ## 10. Candidate experience principles
 
 1. **Clarity:** Show the role, pay range, work arrangement, steps, expected timing, and current status in plain language.
@@ -535,15 +674,18 @@ Internal candidates, staffing-agency submissions, employee referrals, and former
 These are product guardrails, not a substitute for employment counsel. Before production use, counsel must confirm the employer’s size, industry, government-contract status, hiring locations, retention schedule, notices, and exact workflows.
 
 - **Pay transparency:** Require the salary or hourly range on every job that may be filled in California. Do not collect salary history. California’s Labor Commissioner states that employers with at least 15 employees must include a pay scale in covered postings and interprets this to include positions that may be filled in California, in person or remotely. [California Equal Pay Act FAQ](https://www.dir.ca.gov/dlse/California_Equal_Pay_Act.htm)
-- **Fair chance:** Do not ask about conviction history or expose a background-check step before a conditional offer. Include individualized-assessment and preliminary/final notice workflows before adverse action when applicable. San Francisco’s ordinance applies to covered employers with five or more employees, and California has a related Fair Chance Act. [SF Fair Chance materials](https://www.sf.gov/resource--2023--citywide-labor-law-videos) · [California Fair Chance Act](https://calcivilrights.ca.gov/fair-chance-act/)
-- **Privacy notice:** Present a versioned notice at or before collection, record acknowledgement/version, inventory data uses and recipients, and support applicable access, correction, deletion, restriction, and opt-out workflows. The effective-2026 CCPA text expressly illustrates that covered businesses collecting job-applicant data must provide a Notice at Collection. [CCPA effective January 1, 2026](https://cppa.ca.gov/regulations/pdf/ccpa_statute_eff_20260101.pdf)
-- **Record retention:** Make retention configurable by record class, default California employment records to at least four years from record creation or employment action (whichever is later), and support legal holds. Counsel must validate longer obligations and deletion exceptions. [California CRD legislative summary for SB 807](https://calcivilrights.ca.gov/wp-content/uploads/sites/32/2021/12/2021-Legislative-Summary.pdf)
+- **Fair chance:** Do not ask about conviction history or expose a background-check step before a conditional offer. Include individualized assessment, preliminary notice, report delivery, response/dispute window, reassessment, and final notice before adverse action when applicable. The San Francisco policy configuration must support its current seven-day response rule, while California timing and accuracy-dispute rules may require different/longer periods; the engine applies the most protective matched rule. San Francisco’s ordinance applies to covered employers with five or more employees worldwide that are located or doing business in the City. [SF Fair Chance poster](https://media.api.sf.gov/documents/FCO_Poster_2025_11.2025_Update.pdf) · [California Fair Chance Act forms](https://calcivilrights.ca.gov/fair-chance-act/fca-forms/)
+- **Privacy notice and applicability:** Present a versioned notice at or before collection, record acknowledgement/version, inventory data uses and recipients, and support applicable access, correction, deletion, restriction, limit, sale/share opt-out, and authorized-agent workflows. Phase 0 must determine CCPA applicability from revenue, California personal-information volume, sale/share practices, entity relationships, and exemptions rather than employee count alone. The effective-2026 CCPA text expressly requires Notice at Collection at or before collection. [CCPA effective January 1, 2026](https://cppa.ca.gov/regulations/pdf/ccpa_statute_eff_20260101.pdf)
+- **Privacy risk assessment and ADMT:** If the employer is a covered business, determine whether candidate data processing requires a privacy risk assessment/cybersecurity audit and plan for applicable ADMT access, opt-out/appeal, pre-use notice, human review, and implementation dates. The CPPA’s completed regulations took effect January 1, 2026, with phased obligations. [CPPA 2026 regulations](https://cppa.ca.gov/regulations/ccpa_updates.html)
+- **Automated selection procedures:** Inventory employer and provider computational processes that screen resumes, target recruiting materials, score tests, categorize/recommend candidates, or analyze interviews. California’s employment regulations effective October 1, 2025 apply nondiscrimination, accommodation, validation, and recordkeeping principles to automated-decision systems that make or facilitate employment decisions. [California CRD automated-decision regulations](https://calcivilrights.ca.gov/2025/06/30/civil-rights-council-secures-approval-for-regulations-to-protect-against-employment-discrimination-related-to-artificial-intelligence/)
+- **Record retention:** Make retention configurable by record class, default California employment and applicable automated-decision records to at least four years from record creation or employment action (whichever is later), and support legal holds. Counsel must validate longer obligations and deletion exceptions. [California automated-decision regulations — final text](https://calcivilrights.ca.gov/wp-content/uploads/sites/32/2025/06/Final-Text-regulations-automated-employment-decision-systems.pdf)
 - **Nondiscrimination:** Use job-related criteria, consistent workflows, structured evidence, and access-controlled aggregate monitoring. California protects applicants from discrimination by covered employers, and federal selection procedures can create liability through intentional discrimination or unjustified disparate impact. [California CRD employment guidance](https://calcivilrights.ca.gov/Employment/) · [EEOC selection-procedure guidance](https://www.eeoc.gov/laws/guidance/employment-tests-and-selection-procedures)
 - **Disability and accommodations:** Do not ask disability-related or medical questions before a conditional offer except as legally permitted. Store accommodation/medical information separately and confidentially, and provide an accessible request process. [EEOC applicant guidance](https://www.eeoc.gov/disability-discrimination-and-employment-decisions)
 - **Background reports:** When a third-party consumer report informs a decision, require the approved disclosure/authorization and pre-adverse/final-adverse workflows, including required report and rights materials. State and local requirements may add steps. [FTC and EEOC background-check guidance](https://www.ftc.gov/business-guidance/resources/background-checks-what-employers-need-know)
 - **Work authorization:** Ask only standardized, counsel-approved questions about current U.S. work authorization and future sponsorship. Do not request citizenship details or Form I-9 documents during application; employment verification is a post-acceptance/hire process. [DOJ IER hiring guidance](https://www.justice.gov/crt/iers-frequently-asked-questions-faqs) · [USCIS employer responsibility](https://www.uscis.gov/sites/default/files/document/foia/Employer_Responsibility.pdf)
 - **Federal contractor/EEO reporting:** If federal-contractor or reporting thresholds apply, add approved Internet Applicant, demographic self-identification, disposition, outreach, and recordkeeping requirements before launch. [U.S. DOL applicant recordkeeping guidance](https://www.dol.gov/sites/dolgov/files/ofccp/CAGuides/files/Applicant-Recordkeeping-FAQ-WEB_080119_CONTR508c.pdf)
 - **Accessibility:** Design and test the candidate and HR experiences against WCAG 2.2 AA, including keyboard use, focus visibility, target size, error handling, accessible authentication, and reduced-motion support. [WCAG 2.2](https://www.w3.org/TR/WCAG22/)
+- **Interview recording:** Recording/transcription remains disabled by default. Any future recording of a confidential interview requires counsel-approved participant notice and consent, proof per participant/session, a nonrecorded alternative where required, restricted artifacts, and deletion/retention rules. California Penal Code section 632 addresses recording confidential communications without all-party consent. [California Penal Code § 632](https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=PEN&sectionNum=632)
 
 ## 12. Security, privacy, and trust requirements
 
@@ -554,7 +696,7 @@ These are product guardrails, not a substitute for employment counsel. Before pr
 | Public | Published jobs, employer brand content | Synthetic prototype may be served by GitHub Pages; production content uses approved hosting |
 | Internal | Interview plans, templates, aggregate operational metrics | Authenticated and role-scoped |
 | Confidential | Candidate profiles, resumes, scorecards, messages, references | Encrypted, least privilege, audited |
-| Highly restricted | Demographics, accommodations/medical data, background results, offers/compensation, identity documents | Segregated access, enhanced audit, no routine export |
+| Highly restricted | Demographics, accommodations/medical data, background results, offers/compensation, identity documents, approved interview recordings/transcripts, automated-decision inputs/outputs tied to a person | Segregated access, enhanced audit, no routine export |
 
 ### 12.2 Mandatory controls
 
@@ -570,6 +712,8 @@ These are product guardrails, not a substitute for employment counsel. Before pr
 - Encrypted backups with tested restoration and documented recovery targets.
 - Environment separation for development, test, and production.
 - Vendor inventory and data-processing review before enabling any integration.
+- Automated-decision/provider registry and kill switch before enabling any candidate-affecting computational output.
+- Recording/transcription disabled at application and meeting-provider configuration layers unless an approved feature flag and consent gate are active.
 - Incident response runbook with candidate notification assessment.
 - No PII, resumes, API keys, service-role keys, or production exports in Git history, GitHub Issues, Actions logs, or Pages artifacts.
 
@@ -585,6 +729,10 @@ The following is a product baseline pending counsel and privacy approval. “Del
 | Background workflow records and reports | Minimum required by approved employment/background-check schedule | Highly restricted; avoid retaining raw report longer than necessary where law permits |
 | Voluntary demographic data | Separate from decision data; retain only for approved reporting/recordkeeping period | Cohort controls; never visible to decision-makers |
 | Accommodation/medical information | Separate restricted record for the minimum approved period | Disclose only necessary logistics; confidential handling |
+| Interview recording/transcript | No collection in pilot/v1; if later approved, use the shortest counsel-approved period tied to recorded consent and purpose | Highly restricted; participant access/correction/deletion rules and litigation hold apply |
+| Automated-decision data and validation evidence | At least the applicable employment-record period; California baseline four years where covered | Preserve provider/model/rule version, inputs/outputs used, human review, validation, accommodation, monitoring, and decision outcome |
+| Opening, offer contingency, and hire-handoff evidence | Same approved employment-record schedule | Preserve reservation/fill lineage, destination acknowledgement, correction, and reconciliation |
+| Candidate communication preference and suppression | Active while needed to enforce preference plus approved evidence period | Required notices remain distinguishable from optional marketing; deletion must preserve minimal suppression evidence where lawful |
 | Privacy notices, consent/acknowledgement, and data requests | Underlying-record period or longer where required to prove compliance | Immutable notice version and fulfillment evidence |
 | Audit events | Six years proposed, subject to security/legal approval | Append-only logical model; tightly controlled access |
 | Security/session logs | One year proposed unless incident/legal hold requires longer | Minimize identifiers and exclude content fields |
@@ -603,6 +751,8 @@ Retention jobs must support preview, dual-control approval for destructive batch
 7. Notify the requester and close the case with timestamps, actors, scope, and evidence.
 
 Request deadlines, extension rules, appeal routes, and templates are configurable policy values approved before pilot; they are not hardcoded in frontend logic.
+
+Privacy-request discovery includes policy-evaluation snapshots, communication preferences, analytics/vendor identifiers, automated-decision records where applicable, recordings/transcripts if ever enabled, opening/handoff evidence, and every linked external file/provider. Notice acknowledgement is not treated as consent; consent, authorization, acceptance, and preference evidence are exported according to their distinct legal/business purpose.
 
 ## 13. Technical architecture
 
@@ -643,13 +793,14 @@ Public static bundles are inspectable by anyone. Therefore, hiding a route or co
 ### 13.4 Core entities
 
 - Organization, User, Role, Permission, Team, Department.
-- Requisition, Approval, Job, JobLocation, HiringPlan, PipelineStage.
-- Candidate, CandidateIdentity, Application, ApplicationAnswer, ConsentRecord.
-- Resume/FileAsset, TalentPool, Tag, Source.
-- Screen, Assessment, AssessmentSubmission, Rubric, Competency.
-- InterviewPlan, InterviewRound, InterviewSession, InterviewerAssignment, Scorecard.
-- Decision, Disposition, Offer, OfferVersion, OfferApproval, OfferResponse.
-- Message, MessageTemplate, DeliveryEvent, Notification.
+- Requisition, RequisitionApproval, PositionOpening, JobPosting, JobPostingVersion, JobLocation, HiringPlan, PipelineStage.
+- Candidate, CandidateIdentity, Application, ApplicationAttempt, ApplicationTemplateVersion, QuestionDefinition, ApplicationAnswer, Consent/AuthorizationRecord.
+- Resume/FileAsset, TalentPool, TalentPoolMembership, Tag, Source, SourceAttribution, Referral, AgencySubmission.
+- Screen, AssessmentDefinition/Version, AssessmentAssignment, AssessmentSubmission, Rubric/Version, Competency.
+- InterviewPlan, InterviewRound, AvailabilityWindow, InterviewSession, CalendarProjection, InterviewerAssignment, Scorecard.
+- Decision, Disposition, Offer, OfferVersion, OfferApproval, OfferResponse, ContingencyCase, OpeningReservation, HireHandoff.
+- RecruitingWorkItem, Task/Event projection, Message, MessageTemplate, DeliveryEvent, Notification, CommunicationPreference/Suppression.
+- JurisdictionRule, PolicyEvaluationSnapshot, AutomatedDecisionSystemRegistry, SelectionProcedureVersion.
 - AccommodationRequest, PrivacyRequest, RetentionRule, LegalHold.
 - AuditEvent and IntegrationEvent.
 
@@ -669,6 +820,7 @@ Every mutable business record should include stable ID, organization ID, created
 - Production data is never copied to local, Pages, pull-request previews, or test environments.
 - Database changes require reviewed migrations, backward-compatible rollout where practical, and tested rollback or recovery procedures.
 - Prototype builds fail if secret scanning or artifact inspection detects likely credentials or prohibited production data.
+- Every environment uses separate Salesforce External Client Apps, integration identities, OAuth policies, callback/audience values, provider tenants, public-job projections, and file namespaces.
 
 ### 13.6 Job discovery and indexing
 
@@ -691,6 +843,8 @@ Before any external integration is enabled, its architecture decision or specifi
 - Trigger, idempotency key, ordering behavior, rate limits, retry/backoff, timeout, and duplicate prevention.
 - Delivery states, reconciliation query/report, outage behavior, manual fallback, and disable/rollback steps.
 - Privacy role, subprocessors, retention/deletion propagation, data-location commitments, and incident notification terms.
+- Whether the provider performs targeting, matching, ranking, scoring, recommendation, categorization, transcription, recording, biometric/voice/facial analysis, or any other candidate-affecting computation; include a disable/kill-switch test.
+- Canonical state and conflict rules for calendar, offer, contingency, opening, and hire-handoff integrations; provider acknowledgement never substitutes for reconciliation.
 - Audit events, monitoring, alert owner, support escalation, test fixtures, and production acceptance evidence.
 
 An integration cannot become the only path for a P0 action until its failure and reconciliation flows have passed end-to-end testing.
@@ -708,6 +862,9 @@ The baseline architecture is:
 - Resume, assessment attachment, reference attachment, identity, background, and offer-document binaries use approved external private object storage. Salesforce stores opaque references and security metadata.
 - Salesforce calls email, calendar, storage, e-signature, background, and other providers using Named Credentials/External Credentials or publishes durable work for an external integration worker.
 - A durable Salesforce record and/or approved external queue accompanies every event-driven integration. Platform events are transport, not the permanent business record.
+- Individual `Position_Opening__c` records are the headcount ledger; offers reserve openings and completed hire handoffs fill them.
+- `Recruiting_Work_Item__c` is the governed ledger for required recruiting work. Standard Tasks/Events may project ordinary to-dos and calendar events without becoming the authoritative workflow state.
+- Versioned jurisdiction-policy and selection-procedure records control regulated actions and any future candidate-affecting computation.
 
 ```mermaid
 flowchart LR
@@ -778,27 +935,46 @@ Person Accounts are not enabled solely for this product because enabling them ch
 | --- | --- | --- |
 | `Recruiting_Settings__mdt` | Organization feature flags, policy references, integration routing, and nonsecret configuration | Deployed metadata; admins do not store secrets here |
 | `Pipeline_Stage__mdt`, `Disposition_Reason__mdt` | Stable reporting mappings, sequence, required tasks, and allowed transitions | Deployed/versioned metadata |
+| `Candidate_Status_Map__mdt`, `Work_Item_Type__mdt` | Candidate-safe status text and governed work-item behavior | Deployed/versioned metadata; legal/content owner approval where applicable |
+| `Jurisdiction_Rule__mdt` | Effective-dated posting, notice, consent, background, waiting-period, retention, and regulated-action rules | Deployed/versioned metadata; legal/privacy-controlled changes |
 | `Job_Requisition__c` | Headcount request, department, owner, manager, dates, status, and approval summary | Private; owner recruiter/HR queue; explicit approver sharing |
 | `Requisition_Approval__c` | Versioned approval request, approver, decision, timestamp, and invalidation | Controlled by/private to requisition participants |
+| `Position_Opening__c` | One approved headcount unit, position/budget reference, status, reservation, filled application, and reconciliation | Private; requisition team; fill/reservation through controlled service only |
 | `Job_Posting__c` | Approved public content, compensation, workplace type, canonical URL, publish/expiry state | Internal read broadly; external projection exposes only approved fields |
+| `Job_Posting_Version__c`, `Posting_Channel__c` | Immutable public content/policy snapshot and per-channel publication/delivery state | Internal controlled; only approved projection fields public |
 | `Hiring_Plan__c` | Pipeline, competencies, assessment/interview plan, and template version | Private to assigned recruiting/hiring team |
 | `Hiring_Team_Member__c` | Job/application participant, responsibility, access level, effective dates, and revocation state | Private; source record for derived application and interview sharing |
 | `Candidate__c` | Canonical candidate identity, contact fields, source summary, and lifecycle state | Private; recruiting-operations queue or assigned owner |
 | `Candidate_Identity__c` | External identity-provider subjects, verification, aliases, and revocation | Private; identity administrators only |
-| `Application__c` | Candidate-to-job record, current stage, owner, SLA, disposition, and next action | Private; derived hiring-team sharing |
+| `Communication_Preference__c`, `Suppression__c` | Channel/purpose preference, optional-marketing consent, bounce/complaint/do-not-contact, and minimal suppression evidence | Private; candidate support/recruiting operations; no hiring-decision use |
+| `Talent_Pool__c`, `Talent_Pool_Membership__c`, `Source_Attribution__c` | Approved P1 talent community, purpose/expiry, campaign/referral/agency/source lineage | Private; separate outreach entitlement and retention |
+| `Application__c` | Candidate-to-requisition junction, application attempt, originating posting, current stage, owner, SLA, disposition, and candidate-safe status | Private; derived hiring-team sharing |
+| `Application_Template__c`, `Application_Template_Version__c`, `Question_Definition__c` | Versioned application structure, conditionality, validation, purpose, classification, and policy use | Private/configuration controlled; deployed or governed activation |
 | `Application_Response__c` | Immutable submitted application snapshot plus reporting-safe indexed answers | Controlled by application; sensitive fields separated where required |
+| `Application_Answer__c` | Immutable per-question answer bound to template/question version and classification | Controlled by application; restricted answers separately entitled |
 | `Application_Stage_Event__c` | Append-only stage transition, actor, reason, source/destination, and override evidence | Private; application viewers; no routine edits/deletes |
 | `Recruiter_Screen__c` | Versioned structured screen rubric and evidence | Private; assigned recruiter/hiring manager |
-| `Assessment_Assignment__c` | Assessment type/version, due date, accommodation flag, state, and result summary | Private; restricted attachment reference |
+| `Competency__c`, `Rubric__c`, `Rubric_Version__c` | Job-related competency and anchored evaluation definitions | Private/configuration controlled; immutable after assignment/use |
+| `Assessment_Definition__c`, `Assessment_Version__c` | Assessment purpose, questions/instructions, rubric, provider, validation, and accommodation design | Private/configuration controlled; automated-decision review required |
+| `Assessment_Assignment__c`, `Assessment_Submission__c` | Assigned immutable version, due/accommodation state, submission, evaluator, result summary, and provider evidence | Private; restricted attachment/provider reference |
 | `Interview_Plan__c` | Ordered interview rounds, competencies, questions, and required scorecards | Private to hiring team |
+| `Interview_Round__c` | Ordered round, required sessions, entry/exit requirements, and plan version | Private to hiring team |
+| `Availability_Window__c` | Candidate/interviewer availability interval, timezone, source, validity, and revocation | Private; scheduling-only access |
 | `Interview_Session__c` | Scheduled session, timezone, mode, status, candidate communication, and logistics | Private; assignment-driven sharing |
+| `Calendar_Projection__c` | Provider event ID/version, invite hash, sync/reconciliation state, and reschedule lineage | Private; integration and coordinator access |
 | `Interviewer_Assignment__c` | Interviewer, role, acknowledgment, access window, and submission state | Private; assigned interviewer sees own assignment |
 | `Scorecard__c`, `Scorecard_Response__c` | Independent recommendation, anchored ratings, evidence, submission, lock, and amendments | Private; submitter-only until debrief rule opens access |
 | `Decision__c` | Debrief decision, evidence completeness, decision-maker, rationale, and override | Private; hiring decision group |
 | `Reference_Check__c` | Consent, referee metadata, request/completion state, restricted summary, and file reference | Private; specifically entitled HR users |
-| `Offer__c`, `Offer_Version__c`, `Offer_Approval__c` | Offer lifecycle, immutable terms/document hash, approvals, expiry, and response | Private; compensation entitlement; hierarchy access disabled where approved |
+| `Offer__c`, `Offer_Version__c`, `Offer_Approval__c`, `Offer_Response__c` | Offer lifecycle, immutable terms/document hash, approvals, expiry, candidate response, and supersession | Private; compensation entitlement; hierarchy access disabled where approved |
+| `Opening_Reservation__c` | Version-bound accepted-offer reservation, expiry/release, and one-opening constraint | Private; controlled offer/hire service only |
+| `Background_Check__c`, `Adverse_Action_Case__c`, `Contingency_Case__c` | Authorization/order, provider evidence, jurisdiction policy, response/dispute, reassessment, clearance/waiver/failure | Private; specifically entitled restricted HR/legal users |
+| `Hire_Handoff__c` | Ready-for-hire validation, mapping/schema version, idempotent destination delivery, acknowledgement, correction, and opening fill | Private; HR operations/integration users only |
 | `Communication__c`, `Delivery_Event__c` | Message purpose/template version, recipient reference, send state, provider ID, retry, and reply match | Private; body minimized or externalized |
+| `Recruiting_Work_Item__c` | Required action, related context, owner/queue, due/SLA, state, source rule, completion/cancellation evidence | Private; access derived from the related business record and assignment |
 | `Consent_Record__c` | Notice/authorization type, immutable version, purpose, timestamp, and evidence | Private; no update to historical evidence |
+| `Policy_Evaluation__c` | Immutable employer/job/action facts, matched effective rules, result, notices, waiting periods, and approved exception | Private; action participants plus legal/privacy audit |
+| `Automated_Decision_System__c`, `Selection_Procedure_Version__c` | Provider/rule registry, inputs/outputs, purpose, validation, human review, accommodation, monitoring, and approval/disable state | Private; legal/privacy/security and approved auditors; no recruiter editing |
 | `Restricted_HR_Case__c` | Accommodation, background, medical, privacy, or other restricted case metadata | Private; restricted queue; hierarchy access disabled where approved |
 | `Privacy_Request__c`, `Legal_Hold__c`, `Retention_Execution__c` | Data-rights workflow, hold scope, preview/approval/execution, and evidence | Private; privacy/legal entitlement and dual control |
 | `File_Reference__c` | Provider, opaque object key, classification, hash, size, MIME type, scan state, version, and retention class | Private; signed access generated externally |
@@ -807,19 +983,62 @@ Person Accounts are not enabled solely for this product because enabling them ch
 
 Data-model rules:
 
-- Candidate/application/job relationships use lookups with deletion protection rather than cascade deletion where retention or legal hold can differ.
+- Candidate/application/requisition/posting/opening relationships use lookups with deletion protection rather than cascade deletion where retention or legal hold can differ.
+- `Application__c` requires one `Candidate__c` and one `Job_Requisition__c`; the originating posting/version is required for portal submissions and nullable only for an approved direct/manual source.
+- A deterministic uniqueness key prevents more than one active application per candidate/requisition while allowing policy-approved later attempts with a new immutable attempt number.
+- `Position_Opening__c` is the headcount ledger. Each active reservation references one accepted offer version and one opening; each filled opening references one completed hire handoff/application.
+- Only one active offer and one active opening reservation may exist per application. Accepted, reserved, cleared, handoff-complete, and hired are different facts.
 - Each submitted application has an immutable application-response snapshot; later template changes never rewrite it.
 - Stable external IDs and idempotency keys exist for every externally created or synchronized record.
 - Candidate duplicate detection uses normalized verified identifiers plus human review. Candidate records are never auto-merged.
 - High-volume histories, message bodies, and aged audit data are archived to approved storage while retaining Salesforce operational summaries and legal-hold behavior.
 - Search/report fields are deliberately indexed or submitted for custom indexing based on query/load testing; free-text sensitive content is not used as an integration key.
 - Every field has a data dictionary entry covering business definition, owner, source, classification, field-level access, encryption decision, history/audit requirement, retention class, integration use, and reporting use.
+- Polymorphic Activity fields are not used as the only relationship or integration key; governed records have explicit typed lookups and stable external IDs.
+
+#### 14.4.1 Required relationship model
+
+```mermaid
+erDiagram
+    JOB_REQUISITION ||--|{ POSITION_OPENING : authorizes
+    JOB_REQUISITION ||--o{ JOB_POSTING : publishes
+    JOB_POSTING ||--|{ JOB_POSTING_VERSION : versions
+    JOB_REQUISITION ||--|| HIRING_PLAN : follows
+    JOB_REQUISITION ||--o{ HIRING_TEAM_MEMBER : assigns
+    CANDIDATE ||--o{ APPLICATION : submits
+    CANDIDATE ||--o{ CANDIDATE_IDENTITY : verifies
+    CANDIDATE ||--o{ COMMUNICATION_PREFERENCE : controls
+    JOB_REQUISITION ||--o{ APPLICATION : receives
+    JOB_POSTING_VERSION o|--o{ APPLICATION : originates
+    APPLICATION ||--o| APPLICATION_RESPONSE : snapshots_on_submission
+    APPLICATION_RESPONSE ||--o{ APPLICATION_ANSWER : contains
+    APPLICATION ||--o{ APPLICATION_STAGE_EVENT : transitions
+    APPLICATION ||--o{ RECRUITING_WORK_ITEM : requires
+    APPLICATION ||--o{ ASSESSMENT_ASSIGNMENT : receives
+    ASSESSMENT_ASSIGNMENT ||--o| ASSESSMENT_SUBMISSION : produces
+    APPLICATION ||--o{ INTERVIEW_SESSION : schedules
+    INTERVIEW_SESSION ||--|{ INTERVIEWER_ASSIGNMENT : assigns
+    INTERVIEWER_ASSIGNMENT ||--o| SCORECARD : submits
+    APPLICATION ||--o{ DECISION : records
+    APPLICATION ||--o{ OFFER : receives
+    OFFER ||--|{ OFFER_VERSION : versions
+    OFFER_VERSION ||--o{ OFFER_APPROVAL : approves
+    OFFER_VERSION ||--o| OFFER_RESPONSE : answers
+    OFFER_VERSION ||--o| OPENING_RESERVATION : reserves
+    POSITION_OPENING ||--o{ OPENING_RESERVATION : holds
+    APPLICATION ||--o{ CONTINGENCY_CASE : clears
+    APPLICATION ||--o| HIRE_HANDOFF : transfers
+    POSITION_OPENING ||--o{ HIRE_HANDOFF : fills
+```
+
+The solution design supplies the corresponding Salesforce API names, relationship field names, required/optional status, lookup versus master-detail choice, delete behavior, external IDs, unique constraints, ownership, sharing, indexing, expected maximum children per parent, and archive behavior. No implementation may infer these decisions solely from UI nesting.
 
 ### 14.5 Salesforce ownership, sharing, and authorization
 
 | Object family | OWD baseline | Ownership/access mechanism |
 | --- | --- | --- |
 | Requisitions and hiring plans | Private | Recruiter/queue ownership; explicit approver and hiring-team sharing |
+| Openings, reservations, and hire handoffs | Private | Requisition team plus specifically entitled HR operations/integration users |
 | Published job records | Public read-only to internal licensed users | External audiences receive a sanitized projection, not Salesforce guest access |
 | Candidates and applications | Private | Recruiting owner plus derived shares from `Hiring_Team_Member__c`/application assignment |
 | Interviews and assignments | Private | Time-bound Apex-managed sharing to assigned interviewers and coordinators |
@@ -828,6 +1047,8 @@ Data-model rules:
 | Restricted HR cases | Private | Restricted queues and named entitlements; hierarchy access disabled where approved |
 | Consent, privacy, legal hold, retention | Private | Privacy/legal administrators and approved auditors only |
 | Integration and audit events | Private | API-only services, operations, security, and read-only audit roles |
+| Work items and Activities | Private/restricted by type | Governed work-item access follows explicit assignment plus related-record access; Task/Event restriction rules and visibility tested separately |
+| Policy/automated-decision records | Private | Legal, privacy, security, platform owner, and approved read-only auditors |
 
 - Profiles provide minimum login/default access. Permission sets and permission-set groups grant persona capabilities; custom permissions gate consequential application actions.
 - Permission sets grant access rather than deny it, so every user’s aggregate profile, permission-set, group, package, and license assignment must be tested. [Salesforce permissions](https://developer.salesforce.com/docs/atlas.en-us.securityImplGuide.meta/securityImplGuide/permissions_about_users_access.htm)
@@ -836,19 +1057,27 @@ Data-model rules:
 - Lightning Data Service/UI API is preferred for standard record UI because it respects CRUD, field-level security, and sharing. Apex uses explicit sharing declarations and user-mode operations unless an approved system-mode service is required. [Lightning Data Service](https://developer.salesforce.com/docs/platform/lwc/guide/data-ui-api.html) · [Secure Apex](https://developer.salesforce.com/docs/platform/lwc/guide/apex-security)
 - Every approved system-mode operation documents why user mode is insufficient, validates input/record scope, applies least privilege, emits an audit event, and has negative authorization tests.
 - No candidate, interviewer, or integration access relies on page layout visibility, hidden components, client-side route guards, or obscured record IDs.
+- Standard Activity `WhoId` is not used for `Candidate__c`; Salesforce reserves `WhoId` for people such as Leads/Contacts, while approved custom objects participate through `WhatId` when Activities are enabled. Governed work therefore retains explicit candidate/application/requisition lookups. [Salesforce Activity relationship fields](https://help.salesforce.com/s/articleView?id=platform.tips_for_using_activity_formula_fields.htm&language=en_US&type=5) · [Activities for custom objects](https://help.salesforce.com/s/articleView?id=platform.tracking_activities_for_custom_objects.htm&language=en_US&type=5)
+- Candidate/application ownership is distributed across approved queues/users/archive owners. No single owner, queue, group, or hot requisition is allowed to exceed the tested skew threshold without an explicit large-data-volume design.
+- Capacity estimates include generated share rows from hiring-team membership, interviewer access, compensation/restricted cases, work items, and policy/audit access—not only business-object row counts.
 
 ### 14.6 Salesforce automation decision matrix
 
 | Domain | Primary mechanism | Architecture rule |
 | --- | --- | --- |
 | Requisition/offer approval orchestration | Screen/record-triggered Flow plus approval records | Version changes invalidate approvals; faults create owned operational work |
+| Opening reservation/fill | Apex domain service invoked after offer response and hire-handoff acknowledgement | Row lock, uniqueness, idempotency, and reconciliation prevent double reservation/fill |
 | Candidate application ingestion | Purpose-built Apex REST/service layer | Bulk-safe, idempotent, candidate-scoped, no general sObject exposure |
 | Stage transition and disposition | Apex domain service invoked by LWC/Flow | One authoritative transition validator and audit writer |
 | Required fields/simple validation | Validation rules and before-save Flow | No duplicate validation logic across UI and service layers |
-| Tasks, reminders, SLAs | Scheduled paths/Flow for simple cases; invocable Apex for business-hours/complex rules | Recalculation and cancellation behavior documented |
+| Governed work items, reminders, SLAs | Record/scheduled Flow for simple cases; Apex domain service for business-hours/complex rules | `Recruiting_Work_Item__c` is authoritative; Task mirroring is optional and idempotent |
 | Interview/scorecard access | Apex-managed sharing service | Grant and revoke access from assignment state; bulk-safe recalculation |
+| Interview/calendar synchronization | Apex/integration worker with durable event state | `Interview_Session__c` is canonical; provider Event projection uses version, idempotency, and reconciliation |
+| Jurisdiction-policy evaluation | Side-effect-free Apex policy service using effective-dated custom metadata | Persist immutable input/output snapshot before publish or regulated action; unknown/conflict blocks |
+| Automated-decision control | Registry/approval Flow plus provider kill switch | Candidate-affecting output disabled unless exact version is approved; every use is traceable |
 | Communications and provider work | After-commit event plus Queueable Apex/external worker | Durable `Integration_Event__c`, idempotency, retry, and reconciliation required |
 | Candidate merge | Restricted Apex service | Preview, conflict report, dual authorization where configured, no history loss |
+| Ready-for-hire and handoff | Apex domain service plus durable external worker | Validate contingencies/reservation, send idempotently, reconcile acknowledgement, complete the handoff, then fill the opening and mark Hired |
 | Retention/deletion | Scheduled/Batch Apex plus external deletion worker | Preview, legal-hold exclusion, dual control, reconciliation, and evidence |
 | Reporting snapshots/archive | Scheduled Flow/Apex or external data pipeline | Source counts reconcile; restricted data remains segregated |
 
@@ -858,7 +1087,7 @@ All automations must be bulk-safe, recursion-safe, idempotent where externally t
 
 ### 14.7 Salesforce integration architecture
 
-- Each external system uses its own External Client App/Connected App and dedicated Salesforce Integration user with API-only minimum access and purpose-specific permission sets.
+- Each new external system uses its own Salesforce External Client App and dedicated Salesforce Integration user with API-only minimum access and purpose-specific permission sets. Existing Connected Apps may continue only through a documented legacy exception; new Connected App creation is not the baseline because Salesforce restricts it from Spring ’26. [Salesforce External Client Apps](https://developer.salesforce.com/docs/platform/mobile-sdk/guide/connected-apps.html)
 - Server-to-server portal and worker access uses an approved OAuth flow such as client credentials, with credentials stored only in the external secret manager. All actions run as the configured integration user, so its permissions are deliberately narrow. [Salesforce OAuth integration-user pattern](https://developer.salesforce.com/blogs/2024/02/invoke-rest-apis-with-the-salesforce-integration-user-and-oauth-client-credentials)
 - Salesforce outbound calls use modern Named Credentials and External Credentials; endpoints or tokens are not hardcoded in Apex, Flow, custom metadata, or repository files. [Salesforce Named Credentials](https://developer.salesforce.com/docs/platform/named-credentials/guide/get-started.html)
 - Public job delivery uses a sanitized projection/cache. Candidate reads/writes use purpose-built service resources. Internal system integrations use REST, Bulk API 2.0, CDC, Platform Events, or scheduled reconciliation according to the approved integration pattern.
@@ -867,16 +1096,19 @@ All automations must be bulk-safe, recursion-safe, idempotent where externally t
 - Webhooks validate signatures, timestamps, replay/nonces, payload size, and provider allow-listing before updating business records.
 - API version is pinned per integration and upgraded through test/UAT rather than floating automatically.
 - Integration users, credentials, scopes, certificates, secrets, and callbacks are unique per environment and rotated under an owned procedure.
+- Hire/onboarding destinations return or expose a stable acknowledgement/worker identifier. `Hire_Handoff__c` reconciliation—not HTTP success alone—controls opening fill and Hired state.
+- Calendar providers never become the canonical interview state; sync compares provider version/ETag and `Calendar_Projection__c` before applying an approved change.
 
 ### 14.8 Files and highly sensitive content
 
-- Production resumes, assessment files, reference documents, background reports, offer PDFs, identity evidence, and accommodation/medical attachments are not stored as ordinary Salesforce Attachments.
+- Production resumes, assessment files, reference documents, background reports, offer PDFs, identity evidence, accommodation/medical attachments, and any later-approved interview recording/transcript are not stored as ordinary Salesforce Attachments.
 - The external storage service encrypts content, isolates environments, uses private buckets/containers, enforces retention, provides malware/content scanning, and generates short-lived audience-scoped URLs.
 - `File_Reference__c` contains only the opaque storage key, document classification, hash, file metadata, version, scan state, retention class, owner record, and provider deletion state.
 - A file remains unavailable until scan and validation succeed. A rejected or timed-out scan creates an owned exception without exposing content.
 - Downloads require current Salesforce/backend authorization at request time; copied signed URLs expire quickly and cannot bypass candidate/application/offer permissions.
 - File replacement creates a new version and preserves required evidence. Hashes bind immutable application/offer versions to their exact documents.
 - Salesforce Files may be used for public design assets and synthetic fixtures. Any future use for production candidate documents requires a Shield/encryption, file-sharing, version-retention, guest/external access, backup, deletion, storage-cost, and malware-scanning assessment.
+- Recording/transcription providers are disabled at tenant/meeting-template level for pilot/v1; absence of a recording object is verified through integration and provider configuration tests.
 
 ### 14.9 Salesforce audit, privacy, and retention
 
@@ -894,6 +1126,9 @@ No single layer is treated as complete. Platform Events are not audit storage, a
 - The Shield decision identifies which candidate, compensation, restricted-case, and file fields require Platform Encryption and tests effects on search, filters, reports, formulas, automation, and integrations.
 - Field Audit Trail selection is field-by-field and record-class-aware. Existing archived history encryption behavior is assessed before enabling or changing encryption.
 - Recruitment-specific consent remains in immutable `Consent_Record__c`. If the organization already operates Salesforce’s standard Individual/Contact Point consent model, an architecture decision defines the link without making Contact or Person Account the canonical candidate. [Salesforce consent data model](https://help.salesforce.com/s/articleView?id=sf.consent_data_model_mc_about.htm&language=en_US&type=5)
+- `Consent_Record__c` uses explicit evidence categories for notice acknowledgement, affirmative consent, statutory authorization, optional-marketing preference, recording consent, and offer/contract acceptance; a record cannot satisfy a different evidence category merely because it was accepted electronically.
+- `Policy_Evaluation__c` preserves the employer/job/action facts and effective rule versions applied at publish, collection, assessment, background/adverse-action, retention, and handoff time.
+- `Automated_Decision_System__c` and version records preserve provider/rule identity, validation, approved use, disable state, human review, accommodations, monitoring, and applicable employment/privacy evidence.
 - Retention rules are stored as versioned policy metadata and executed through preview, approval, batch, external deletion, and reconciliation records.
 - Legal hold is evaluated before Salesforce delete, archive, file delete, search deindex, integration deletion, and backup-expiry requests.
 - Salesforce soft delete/Recycle Bin is not considered completed privacy deletion. Approved deletion verifies primary records, child records, files/versions, indexes, archives, integrations, and external storage under the applicable policy.
@@ -913,6 +1148,8 @@ The initial five-year sizing envelope is a planning model to validate, not a pro
 | Communication/delivery metadata | Up to 1,000,000 | Store metadata and provider references; externalize large message bodies |
 | Integration/business audit events | 2,000,000+ before archive | Short active operational window plus durable external archive |
 | Resume and other candidate files | 100,000–300,000 binaries | External private storage; excluded from Salesforce file-capacity baseline |
+| Governed work items | 1,000,000+ before archive | Close/cancel deterministically; retain operational window and archive evidence |
+| Share rows | Derived from applications, hiring teams, interviews, work, offers, and restricted cases | Forecast multiplier per object/role; test recalculation and revocation |
 
 Salesforce storage varies by edition and license count, and data and file storage are allocated separately. Many custom records are estimated at approximately 2 KB before large field/body effects, so row multiplication is explicitly budgeted. [Salesforce data/file storage allocations](https://help.salesforce.com/s/articleView?id=limits.htm&language=en_US&type=5) · [Estimated record sizes](https://help.salesforce.com/s/articleView?id=000383664&language=en_US&type=1)
 
@@ -923,20 +1160,28 @@ Before pilot and at each scale step, the capacity model covers:
 - Synchronous SOQL/DML/CPU/heap, query rows, callouts, and transaction size.
 - Async Apex, scheduled jobs, Flow interviews, platform-event publish/delivery, and email/provider volume.
 - Report/dashboard query selectivity, sharing-calculation cost, search/index behavior, and concurrent HR activity.
+- Ownership/lookup skew for unassigned candidates, high-volume requisitions, large queues/groups, integration/audit owners, and archive owners.
+- Share-row creation/revocation volume from hiring-team membership, interviewer windows, work items, offers, and restricted cases.
 - Bulk import, job closure, stage update, reminder, retention, share recalculation, and integration-replay load.
 
 Operational alerts are configured at approved warning/critical thresholds, with 70%/80%/90% of purchased allocation as the initial review points unless Salesforce-specific behavior requires earlier action. Large datasets not needed for daily Salesforce work or reporting should be archived or maintained externally. [Salesforce Well-Architected reliability guidance](https://architect.salesforce.com/docs/architect/well-architected/guide/reliable)
+
+The initial skew design-review threshold is 10,000 same-object records owned by one user/queue or related through one hot lookup parent, consistent with Salesforce Well-Architected guidance; the approved production threshold may be lower after representative concurrency and sharing tests. No “parking” user or catch-all queue may silently accumulate the full candidate, application, work-item, integration-event, or archive population.
 
 ### 14.11 Salesforce reporting and analytics
 
 P0 standard report types include:
 
 - Requisitions with jobs and approvals.
+- Requisitions with approved/reserved/filled/frozen/canceled/remaining openings and reconciliation exceptions.
 - Jobs with applications, current stage, owner, SLA, and disposition.
 - Applications with stage events and time-in-stage.
 - Interviews with assignments, attendance, and required scorecard status.
 - Scorecard/debrief completeness without exposing restricted notes to unauthorized viewers.
 - Offers with approval/version/response and compensation access controls.
+- Post-offer contingencies and hire handoffs with reservation, readiness, delivery, acknowledgement, correction, and opening-fill state.
+- Governed work items with owner, due date, SLA, blocked/overdue state, source rule, and completion/cancellation reason.
+- Jurisdiction-policy evaluation and automated-decision registry compliance status without exposing candidate-restricted data to ordinary recruiting users.
 - Source, funnel, time-to-review, time-to-fill, time-to-hire, feedback SLA, communication SLA, and offer acceptance.
 - Data quality, failed automation/integration, stale work, retention, legal hold, and privacy-request operations.
 
@@ -963,21 +1208,22 @@ Reporting rules:
 - A namespaced unlocked package is the preferred starting model for new recruitment metadata; deviations require `ADR-SF-002`. Salesforce supports source-driven unlocked packages and versioned installation artifacts. [Salesforce package creation](https://developer.salesforce.com/docs/platform/salesforce-cli-reference/guide/cli_reference_package_create.html)
 - Direct untracked production customization is prohibited. Emergency changes are retrieved, reviewed, tested, and committed immediately through the hotfix process.
 - CI performs source formatting/linting, Salesforce Code Analyzer/security checks, LWC unit tests, Apex tests, Flow/metadata validation, permission-negative tests, secret scanning, dependency checks, and a Salesforce validation deployment.
-- Apex coverage percentage alone is not acceptance. Tests cover positive/negative authorization, bulk operations, limit behavior, idempotency, retries, sharing recalculation, stage invariants, versioning, legal holds, and regulated workflow blocks.
+- Apex coverage percentage alone is not acceptance. Tests cover positive/negative authorization, bulk operations, limit behavior, idempotency, retries, sharing recalculation, relationship/cardinality invariants, concurrent opening reservation/fill, stage invariants, versioning, legal holds, and regulated workflow blocks.
 - Scratch org definitions and sandbox setup scripts capture required features/settings. Scratch orgs are short-lived and do not contain production metadata/data unless deliberately pushed from source. [Salesforce scratch-org development](https://developer.salesforce.com/docs/platform/lwc/guide/get-started-sfdx-scratch-org.html)
 - Any sandbox copied from production is masked before general developer/test access. Masking method, unsupported object/field types, validation, and residual-data handling are documented. [Salesforce Data Mask guidance](https://help.salesforce.com/s/articleView?id=000396214&language=en_US&type=1)
 - Releases use immutable version/tag, deployment manifest, pre/post-deployment steps, data migration, feature flags, smoke tests, monitoring window, fix-forward/rollback plan, and release evidence.
 - Salesforce API versions are pinned. Preview sandbox/scratch testing and regression suites run against each seasonal Salesforce release before production upgrade impact is accepted.
+- External Client App metadata/policies, integration-user assignments, Named/External Credentials, post-install configuration, and per-environment callbacks/audiences have reproducible deployment and verification steps; secrets remain outside source/package data.
 - Secrets, user external credentials, auth tokens, certificates, environment IDs, candidate data, and production exports are never packaged or committed.
 
 ### 14.13 Salesforce administration and operations
 
 | Cadence | Required review |
 | --- | --- |
-| Continuous/daily | Failed/paused Flows, failed Apex/async jobs, `Integration_Event__c` backlog, candidate/email failures, file-scan exceptions, login/security alerts, and candidate-support queue |
-| Weekly | Overdue/stale recruiting work, sharing exceptions, audit anomalies, API/async/event/storage trends, reconciliation failures, and data-quality dashboard |
+| Continuous/daily | Failed/paused Flows, failed Apex/async jobs, `Integration_Event__c` backlog, overdue governed work, opening reservation/fill conflicts, hire-handoff failures, candidate/email failures, file-scan exceptions, login/security alerts, and candidate-support queue |
+| Weekly | Overdue/stale recruiting work, sharing exceptions, hot parent/owner/queue trends, audit anomalies, API/async/event/storage trends, policy-evaluation conflicts, provider kill-switch state, reconciliation failures, and data-quality dashboard |
 | Monthly | License/permission-set assignment, inactive users, integration identities, connected/external client apps, named credentials, capacity forecast, package/version drift, and critical vendor status |
-| Quarterly | Full access recertification, restricted entitlements, break-glass use, credential/certificate rotation plan, Shield/encryption review, retention sampling, restore exercise, incident tabletop, and seasonal-release readiness |
+| Quarterly | Full access recertification, restricted entitlements, break-glass use, credential/certificate rotation plan, External Client App/integration review, Shield/encryption review, retention sampling, automated-decision/provider inventory, recording-disabled verification, restore exercise, incident tabletop, and seasonal-release readiness |
 
 Operations requirements:
 
@@ -985,6 +1231,7 @@ Operations requirements:
 - SSO/MFA, login hours/IP/network policies as approved, session controls, deactivation SLA, and emergency/break-glass access with alerting and retrospective review.
 - Queue and record reassignment when a recruiter, interviewer, manager, approver, admin, or integration owner leaves or becomes unavailable.
 - Runbooks for failed Flow/Apex, locked records, sharing lag, integration outage, event replay, provider failure, storage/API limit pressure, email outage, file scanning, retention failure, restore, and Salesforce outage.
+- Runbooks for duplicate application attempts, double opening reservation/fill, stuck post-offer contingency, failed/duplicate hire handoff, jurisdiction-policy conflict, unapproved automated-decision output, and unauthorized recording/transcription.
 - Configuration drift checks compare production metadata/package versions with Git and approved post-deploy configuration.
 - Support personnel cannot use “login as” or broad administrator access to view candidate/offer/restricted records without approved purpose and audit evidence.
 
@@ -994,14 +1241,15 @@ Before importing any legacy spreadsheet, ATS, CRM, email, file, or shared-drive 
 
 1. Inventory source owners, record classes, quality, duplicates, prohibited fields, notices/consent, retention status, holds, and security restrictions.
 2. Approve source-to-Salesforce field/object mappings, picklist translations, identity matching, external IDs, ownership, sharing, and record dates.
-3. Remove or restrict salary-history, unstructured medical/background, irrelevant protected information, credentials, and other data not approved for migration.
-4. Run duplicate analysis without auto-merging; preserve source IDs and produce a human-review queue.
-5. Load synthetic/dry-run data into a nonproduction org and reconcile source/target counts, totals, owners, state, files, errors, and checksums.
-6. Import through a dedicated API-only migration identity using bulk-safe processes and quarantined error records.
-7. Migrate files to approved private storage, scan them, then create verified `File_Reference__c` records.
-8. Recalculate sharing, search/indexing, derived fields, and reporting snapshots after load.
-9. Obtain business, privacy, security, and technical sign-off before production cutover.
-10. Preserve migration manifests, rejected rows, transformations, reconciliation, deletion of temporary copies, and rollback/fix-forward evidence.
+3. Reconstruct requisition opening counts, candidate-to-requisition application attempts, offer/contingency state, and historical hire/opening allocation; quarantine rows that cannot satisfy the new invariants.
+4. Remove or restrict salary-history, unstructured medical/background, irrelevant protected information, credentials, and other data not approved for migration.
+5. Run duplicate analysis without auto-merging; preserve source IDs and produce a human-review queue.
+6. Load synthetic/dry-run data into a nonproduction org and reconcile source/target counts, opening/hire totals, owners, state, files, errors, and checksums.
+7. Import through a dedicated API-only migration identity using bulk-safe processes and quarantined error records.
+8. Migrate files to approved private storage, scan them, then create verified `File_Reference__c` records.
+9. Recalculate sharing, search/indexing, derived fields, candidate-safe status, opening counts, and reporting snapshots after load.
+10. Obtain business, privacy, security, and technical sign-off before production cutover.
+11. Preserve migration manifests, rejected rows, transformations, reconciliation, deletion of temporary copies, and rollback/fix-forward evidence.
 
 ### 14.15 Experience Cloud alternative
 
@@ -1021,17 +1269,22 @@ All authenticated Experience Cloud users require an appropriate external-user li
 
 ### 14.16 Salesforce acceptance gates
 
-- `SFDC-001` through `SFDC-015` are implemented and evidenced for pilot; `SFDC-016` is required only before any Experience Cloud adoption.
+- `SFDC-001` through `SFDC-015` and `SFDC-017` through `SFDC-021` are implemented and evidenced for pilot; `SFDC-016` is required only before any Experience Cloud adoption.
 - Org/edition/license/entitlement inventory and five-year capacity forecast are approved with procurement lead times.
 - Object/field dictionary, relationship diagram, ownership model, OWD, sharing logic, permission-set matrix, and restricted-entitlement tests are complete.
+- ERD tests prove candidate–requisition application cardinality, application-attempt uniqueness, one active offer/reservation, one hire per opening, no direct accepted-to-hired transition, and protected deletion behavior.
 - Candidate portal penetration tests confirm no direct privileged Salesforce access, cross-candidate access, general sObject enumeration, token leakage, or insecure record ID behavior.
 - Integration users are API-only, dedicated, least privilege, environment-specific, and traceable; Named/External Credentials contain outbound secrets.
+- New OAuth integrations use External Client Apps with approved policies, per-environment identities/credentials, and reproducible configuration verification.
 - Bulk/limit tests pass for imports, stage transitions, job closure, reminders, sharing recalculation, retention, and replay/reconciliation.
+- Concurrency/load tests pass for duplicate application submission, opening reserve/release/fill, high-volume requisition lookup load, work-item generation/cancellation, share creation/revocation, and duplicate hire handoff.
 - Salesforce and external file/audit/deletion paths pass end-to-end legal-hold, retention, data-request, and evidence tests.
 - Shield, Field Audit Trail, Event Monitoring, encryption, masking, CRM Analytics, archive, and storage decisions are documented with licensed/implemented controls or approved compensating controls.
 - UAT validates every HR persona, negative access case, candidate exception, report visibility, and administrator/support restriction.
 - CI/CD can reproduce the approved package/metadata version in a clean environment; production manual setup is documented and verified.
 - Seasonal-release, operations, support, incident, recovery, and platform-owner runbooks have named owners.
+- Standard Task/Event versus governed work-item behavior, visibility, retention, reporting, and calendar synchronization are accepted through positive, negative, retry, and reconciliation tests.
+- Jurisdiction policies, automated-decision/provider inventory, candidate-safe status mappings, optional-communication preferences, and recording-disabled provider configuration have approved evidence.
 
 ## 15. Design direction
 
@@ -1054,6 +1307,7 @@ All authenticated Experience Cloud users require an appropriate external-user li
 - Interview/assessment task
 - Offer
 - Privacy and accommodations
+- Communication preferences
 
 **HR navigation**
 
@@ -1066,6 +1320,7 @@ All authenticated Experience Cloud users require an appropriate external-user li
 - Templates
 - Settings
 - Audit
+- Compliance and policy controls
 
 ### 15.3 P0 screen inventory
 
@@ -1076,11 +1331,11 @@ All authenticated Experience Cloud users require an appropriate external-user li
 
 **Pilot candidate surface**
 
-- Careers landing, job search/list, job detail, privacy notice, application steps, resume upload, review/submit, confirmation, magic-link request, application status, withdrawal, availability, interview details, offer view/response, accommodations contact, privacy request, expired/invalid link, and support/error pages.
+- Careers landing, job search/list, job detail, privacy notice, application steps, resume upload, review/submit, confirmation, magic-link request, candidate-safe application status, withdrawal, communication preferences, availability, interview details, offer view/response, post-offer next steps, accommodations contact, privacy request, expired/invalid link, and support/error pages.
 
 **Pilot HR surface**
 
-- Sign-in/MFA/recovery, overview, requisition/job list, job editor/preview/approval, candidate list, candidate application/timeline, recruiter screen, pipeline action, interview plan/schedule, interviewer packet, scorecard, debrief, decision/disposition, offer draft/approval, communication preview/log, restricted privacy/accommodation case, users/roles, retention/legal hold, and audit view.
+- Sign-in/MFA/recovery, overview, requisition/job/opening list, job editor/preview/approval, candidate list, candidate application/timeline, governed work queue, recruiter screen, pipeline action, interview plan/round/availability/schedule, calendar reconciliation, interviewer packet, scorecard, debrief, decision/disposition, offer draft/approval, opening reservation, contingency/adverse-action case, ready-for-hire/handoff reconciliation, communication preview/log/preferences, restricted privacy/accommodation case, jurisdiction-policy evaluation, automated-decision/provider registry, users/roles, retention/legal hold, and audit view.
 
 ### 15.4 Required interface states
 
@@ -1101,12 +1356,14 @@ Candidate-facing language must be maintained in a versioned content inventory wi
 
 ## 16. Analytics and instrumentation
 
-Track events such as job viewed, application started, step completed, application submitted, stage changed, assessment assigned/submitted, interview requested/confirmed/completed, scorecard submitted, decision recorded, offer sent/viewed/responded, and candidate withdrawn.
+Track events such as job viewed, application started, step completed, application submitted, stage changed, governed work created/completed/breached, assessment assigned/submitted, interview requested/confirmed/rescheduled/completed, scorecard submitted, decision recorded, offer sent/viewed/responded, opening reserved/released/filled, contingency cleared/waived, handoff sent/acknowledged/completed/failed, candidate-safe status changed, and candidate withdrawn.
 
 Rules:
 
 - Use opaque internal IDs in analytics; do not send resumes, free-text notes, names, emails, answers, demographic values, or offer terms.
 - Document an owner and business purpose for every event.
+- Treat analytics identifiers and behavioral events as personal information where they can reasonably be linked to a candidate; include analytics vendors in notices, requests, retention, and sale/share assessment.
+- Do not enable advertising pixels, cross-context behavioral advertising, session replay, keystroke capture, or provider recording/transcription on candidate routes without a separately approved privacy/security decision and required preference handling.
 - Define funnel denominators and stage mappings before dashboard implementation.
 - Separate operational analytics from protected demographic reporting.
 - Suppress small cohorts and restrict demographic reports to authorized users.
@@ -1133,6 +1390,7 @@ The analytics specification must define before pilot:
 | Performance | Public job pages interactive within 3 seconds at p75 on a typical mobile connection; common HR views within 2 seconds after authentication |
 | Scalability | Initial target: 100 open jobs, 100,000 candidate/application records, and 100 concurrent HR users without redesign |
 | Reliability | Idempotent stage transitions and message sends; retryable integration events; no duplicate offer or rejection messages |
+| Data integrity | One active application attempt per candidate/requisition under policy; one active offer/reservation per application; one completed hire per opening; Hired only after reconciled handoff |
 | Recovery | Initial RPO 24 hours and RTO 8 hours; improve before enterprise use |
 | Accessibility | WCAG 2.2 AA release gate with automated and manual testing |
 | Browser support | Current and previous major versions of Chrome, Edge, Firefox, and Safari; current mobile Safari and Chrome |
@@ -1147,6 +1405,7 @@ The analytics specification must define before pilot:
 - Choose product name and employer branding.
 - Select the Salesforce org strategy, edition, licenses/add-ons, environments, Dev Hub, package/namespace model, and named platform owner.
 - Approve the Salesforce object model, sharing model, Flow/Apex automation matrix, capacity forecast, integration pattern, reporting model, and archive/recovery approach through architecture decision records.
+- Approve the ERD/cardinalities, opening/headcount invariants, activity/work-item split, state machines, jurisdiction-policy model, automated-decision/provider inventory process, and hire-handoff contract.
 - Select the candidate-portal host, external identity/BFF, private file storage and scanning, email, and observability providers through architecture decision records.
 - Define threat model, data map, retention schedule, and legal notice requirements.
 - Approve permission, requisition, disposition, offer, background, privacy, and accommodation policies.
@@ -1164,28 +1423,30 @@ The analytics specification must define before pilot:
 - Establish the Salesforce DX project and approved unlocked/source-driven package; deploy metadata only through CI/CD with documented rollback and reconciliation.
 - Implement HR SSO/MFA, permission-set groups, OWD/sharing, field-level controls, separate least-privilege integration users, external IdP/BFF, secrets, audit foundation, monitoring, backups, and deployment rollback.
 - Complete Salesforce org-impact, license, storage, API-limit, data-flow, authorization, system-mode Apex, threat-model, vendor, and logging reviews.
+- Provision External Client Apps, integration identities, jurisdiction metadata, governed work-item framework, policy/selection registries, and recording-disabled provider configuration.
 
 ### Phase 3 — P0 careers and application
 
-- Implement RS-002 through RS-004 on the candidate portal and purpose-built Salesforce APIs: requisitions/jobs, a sanitized public-job projection, crawlable production job pages, candidate identity/application, private resume handling, privacy notice, confirmation, and status access.
+- Implement RS-002 through RS-004, RS-022, RS-025, RS-026, and RS-028 on the candidate portal and purpose-built Salesforce APIs: requisitions/openings/jobs, policy-evaluated sanitized public-job projection, crawlable production pages, candidate identity/application attempt, private resume handling, notice evidence, confirmation, candidate-safe status, and preferences.
 - Persist canonical recruitment records in Salesforce and documents in approved private object storage; expose neither Salesforce credentials nor general Salesforce APIs to the browser.
 - Validate job discovery, structured data, application accessibility, abuse controls, and message delivery.
 
 ### Phase 4 — P0 ATS, interviews, decisions, and offers
 
-- Implement RS-005 through RS-010 in the native Salesforce Lightning application: application list/timeline, recruiter screen, fixed pipeline, interviews, scorecards, debrief, communication, decisions, dispositions, and offer workflow.
+- Implement RS-005 through RS-010, RS-023, RS-024, and RS-027 in the native Salesforce Lightning application: application list/timeline, governed work, recruiter screen, fixed pipeline, interviews/calendar projections, scorecards, debrief, communication, decisions, dispositions, offer/opening reservation, contingencies, ready-for-hire, and handoff workflow.
 - Exercise exception paths, record/field permissions, time-bound interviewer sharing, versioning, bulk behavior, governor-limit resilience, and idempotency.
 
 ### Phase 5 — P0 privacy, operations, and controlled pilot
 
 - Implement RS-011 and RS-012: restricted records, data-request case, retention/legal hold, audit coverage, and operational dashboard.
 - Configure Salesforce reports/dashboards, durable integration-event reconciliation, archive jobs, access reviews, Flow/Apex failure handling, and the approved Shield/Event Monitoring/Field Audit Trail baseline.
+- Validate jurisdiction-policy snapshots, automated-decision/provider registry and kill switches, recording-disabled enforcement, ownership/share-skew budgets, opening/hire reconciliation, and candidate-safe status/preference behavior.
 - Complete accessibility, Salesforce security, capacity/load, seasonal-release, backup/restore, incident, legal, privacy, email, and operational-readiness gates.
 - Run a time-boxed pilot with named HR users, limited jobs, daily support coverage, and weekly issue review.
 
 ### Phase 6 — Production v1 expansion
 
-- Prioritize and implement approved P1 requirements RS-013 through RS-019 based on pilot evidence.
+- Prioritize and implement approved P1 requirements RS-013 through RS-019 and RS-029 based on pilot evidence.
 - Repeat applicable launch gates for each new integration and regulated workflow.
 
 ### 18.1 Delivery and operational ownership
@@ -1195,12 +1456,14 @@ The analytics specification must define before pilot:
 | Product scope and acceptance | Product owner | Prioritized backlog, acceptance sign-off, change log |
 | Recruiting workflow | Head of HR / recruiting operations | Approved job, interview, decision, and offer policies |
 | Legal and privacy | Qualified counsel/privacy owner | Notices, retention schedule, regulated workflows, request process |
+| Jurisdiction and automated-decision governance | Legal/privacy and HR process owner | Effective policy metadata, provider/selection inventory, validation, approval/disable evidence |
 | Security | Named security owner | Threat model, access review, incident plan, vendor review |
 | Engineering | Engineering owner | Architecture decisions, implementation, CI/CD, reliability, recovery |
 | Salesforce platform | Salesforce product/platform owner | Org roadmap, license/capacity plan, architecture decisions, release approval |
 | Salesforce administration | Named Salesforce administrator | User lifecycle, permission-set groups, queues, configuration, access reviews |
 | Salesforce release engineering | Release/DevOps owner | Dev Hub, Salesforce DX, packaging, CI/CD, environment promotion, rollback |
 | Integrations and candidate portal | Integration owner | IdP/BFF, integration users, APIs/events, reconciliation, external file controls |
+| HR/onboarding handoff | HRIS/onboarding owner | Field mapping, identity matching, destination acceptance, correction/cancel, reconciliation |
 | Accessibility and content | Product/design owner | Screen inventory, content inventory, accessibility evidence |
 | Candidate support | Recruiting operations | Monitored contact, response SLA, escalation and outage scripts |
 | Production operations | Engineering and HR operations | Monitoring, on-call/escalation, runbooks, status communication |
@@ -1212,6 +1475,7 @@ No role is considered staffed merely because it appears in this table; a named p
 - Limit the initial pilot to named HR users, a documented maximum number of open jobs, and approved candidate cohorts.
 - Provide a monitored candidate-support address during stated Pacific Time support hours and an after-hours path for urgent interview/offer issues.
 - Review access, failed messages, overdue tasks, integration failures, privacy cases, and audit alerts on an assigned cadence.
+- Reconcile approved/reserved/filled openings, accepted offers, contingencies, ready-for-hire applications, handoff destinations, and candidate-safe status each day.
 - Monitor Salesforce storage, API consumption, async work, Flow/Apex failures, sharing anomalies, package/configuration drift, and seasonal-release advisories.
 - Use feature flags or configuration to disable incomplete P1 capabilities.
 - Maintain migration/import reconciliation for any spreadsheet-sourced jobs or candidates; no silent partial import.
@@ -1232,7 +1496,7 @@ No role is considered staffed merely because it appears in this table; a named p
 ### 19.2 Real-candidate pilot gates
 
 - All P0 flows pass end-to-end tests using non-production test identities.
-- Every P0 `RS-###` requirement and `SFDC-001` through `SFDC-015` has traceable acceptance evidence or a formally approved, time-bound exception; `SFDC-016` is evidenced before any Experience Cloud adoption.
+- Every P0 `RS-###` requirement, `SFDC-001` through `SFDC-015`, and `SFDC-017` through `SFDC-021` has traceable acceptance evidence or a formally approved, time-bound exception; `SFDC-016` is evidenced before any Experience Cloud adoption.
 - The frontend is no longer hosted on GitHub Pages and uses approved pilot/production hosting.
 - Salesforce is the canonical operational system of record, the HR workspace runs in native Lightning, and the candidate browser communicates only with the approved BFF and public-content boundary.
 - No critical/high security findings and no secrets or PII in repository/build artifacts.
@@ -1240,16 +1504,21 @@ No role is considered staffed merely because it appears in this table; a named p
 - OWD, role hierarchy, sharing rules/Apex-managed sharing, permission-set groups, custom permissions, field-level security, and time-bound interviewer access pass positive and negative tests.
 - All Apex entry points enforce record, object, and field access; any reviewed system-mode exception has a named owner and regression tests.
 - Separate least-privilege Salesforce integration identities, OAuth policies, credential rotation, IP/session controls, and per-environment secrets are verified.
+- Every new Salesforce API integration uses an approved External Client App; any legacy Connected App has a documented exception, owner, and migration decision.
 - Salesforce data/file storage, API, async, query, automation, event, reporting, and archive plans pass forecast and representative-load tests.
 - Durable integration reconciliation is proven across retries, duplicates, out-of-order delivery, event-retention expiry, and downstream outage.
+- Duplicate application submission, concurrent offer acceptance, opening reservation/release/fill, post-offer contingency, and hire-handoff replay tests prove the relationship/state invariants.
 - The approved Salesforce package is promoted through the defined sandbox path; metadata drift, rollback, backup restore, and post-deploy smoke tests are demonstrated.
 - Non-production orgs contain only generated or properly masked data, and production support access is logged and time-bound.
 - The Shield, Event Monitoring, Field Audit Trail, Data Mask, backup, archive, and analytics licensing decisions are documented, funded where selected, and reflected in controls.
 - WCAG 2.2 AA automated checks pass and manual keyboard/screen-reader testing is complete.
-- Pay-range, salary-history, fair-chance, accommodations, privacy-notice, retention, and adverse-action workflows are reviewed by qualified counsel.
+- Pay-range, salary-history, fair-chance, accommodations, privacy-notice/applicability, risk-assessment/ADMT applicability, automated selection procedures, interview recording, retention, and adverse-action workflows are reviewed by qualified counsel.
 - Email domain authentication and suppression/bounce handling are verified.
 - Backup restore and incident-response tabletop exercises are completed.
-- Audit history can reconstruct a sampled hire and rejection from submission through decision.
+- Audit history can reconstruct a sampled hire from application through opening reservation, contingencies, handoff acknowledgement, and opening fill, plus a sampled rejection/adverse-action case from submission through final communication.
+- Standard Activities/governed work-item ownership, visibility, SLA, cancellation, retention, reporting, and calendar projection pass positive/negative/retry tests.
+- Candidate-facing status mappings and communication preferences pass enumeration, privacy, suppression, withdrawal, bounce, and required-notice tests.
+- Provider configuration proves recording/transcription and unapproved candidate scoring/ranking/recommendation are disabled; kill-switch exercises are complete.
 - Candidate-facing privacy, accommodations, and support contacts are live and monitored.
 - Pilot HR users complete role-based training and approve workflow usability.
 - Every operating assumption marked `Unconfirmed` has been resolved or explicitly accepted by the accountable owner with documented impact.
@@ -1267,12 +1536,21 @@ No role is considered staffed merely because it appears in this table; a named p
 | Communication mistakes | Candidate harm and brand damage | Preview, approvals for sensitive templates, idempotency, delivery logs, cancel window where feasible |
 | Retention conflict | Premature deletion or over-retention | Record-class rules, legal holds, verified privacy workflows, counsel-approved schedule |
 | Integration failure | Missed interviews or messages | Delivery states, retries, reconciliation views, clear manual fallback |
+| Aggregate headcount without opening records | Double hire, over-hire, incorrect closure, and unauditable budget use | One `Position_Opening__c` per approved slot, serialized reservation/fill service, reconciliation, and exception dashboard |
+| Treating accepted offer as Hired | Candidate marked hired before contingencies or downstream acceptance | Separate accepted, contingencies, ready-for-hire, handoff, acknowledged, and hired states; only completed handoff fills opening |
+| Ambiguous candidate–job cardinality | Duplicate active applications, orphan histories, and incorrect reporting | Formal ERD, required lookups, deterministic attempt/uniqueness key, deletion protection, and migration quarantine |
+| Activity model ambiguity | Required work disappears in personal Tasks, exposes data, or diverges from interviews/calendar | Governed work-item ledger, explicit Task/Event projection rules, typed lookups, synchronization and reconciliation tests |
+| Jurisdiction policy applied from mutable configuration | Wrong notice, pay range, waiting period, consent, or retention rule | Effective-dated metadata, immutable `Policy_Evaluation__c`, unknown/conflict block, counsel-controlled releases |
+| Unapproved automated selection procedure | Discrimination, inaccessible process, regulatory exposure, and weak evidence | Broad provider/rule inventory, P0/P1 prohibition, validation/accommodation review, monitoring, durable version evidence, kill switch |
+| Unauthorized interview recording/transcription | Consent/privacy violation and sensitive-content exposure | Disabled-by-default tenant templates, feature gate, participant-level consent, restricted external storage, retention/deletion, verification tests |
 | Existing-org collision | Recruitment metadata, automation, security, or limits interfere with current Salesforce workloads | Prefer a dedicated org; otherwise require dependency inventory, namespace/package analysis, limit baseline, regression plan, and platform-owner approval |
 | Misconfigured Salesforce sharing or system-mode code | Candidate, compensation, demographic, or interview data is exposed | Private/restricted OWD, permission-set groups, explicit sharing service, user-mode enforcement where possible, negative authorization tests, recurring access review |
 | Irreversible Person Account activation | Permanent org-model and integration complexity | Keep candidates in `Candidate__c`; consider Person Accounts only through a separately approved architecture decision and org-impact assessment |
 | Governor, storage, API, or async limits | Failed submissions, stale workflows, or platform degradation | Five-year capacity model, representative load tests, bulk-safe automation, daily limit telemetry, archive thresholds, vendor capacity review |
+| Salesforce ownership/lookup/share skew | Locking, slow sharing recalculation, timeouts, and failed bulk updates | Partition owners/queues, hot-job limits, share-row forecast, archive owner strategy, representative skew/concurrency testing |
 | Flow/Apex automation sprawl | Recursion, ordering defects, unowned failures, and slow releases | One primary trigger strategy per object, decision matrix, domain ownership, fault routes, static analysis, bulk/idempotency tests |
 | Overprivileged integration identity | Broad data compromise through one credential | One least-privilege integration user per system/purpose, scoped OAuth, credential rotation, monitoring, rapid disable runbook |
+| Legacy Connected App dependency | New environment cannot reproduce OAuth setup or lacks current controls | External Client App baseline; legacy exception inventory, migration owner, environment verification, and retirement plan |
 | Treating platform events as a durable ledger | Lost updates after retention expiry or subscriber outage | Persist `Integration_Event__c` state, replay/reconcile by external ID, and treat events as transport rather than the source of truth |
 | Missing Salesforce add-on entitlement | Audit, masking, retention, or monitoring controls cannot meet policy | Resolve license matrix in Phase 0; map every required control to base platform, add-on, or external service before pilot |
 | Production PII copied to sandboxes | Privacy breach and excessive test-data exposure | Generated data by default; approved Salesforce Data Mask or controlled masking pipeline; restrict refresh/export and verify post-refresh controls |
@@ -1282,11 +1560,11 @@ No role is considered staffed merely because it appears in this table; a named p
 
 ## 21. Open decisions
 
-Open decisions do not block the synthetic prototype unless noted, but every item marked “Before pilot” blocks real-candidate collection.
+Open decisions do not block the synthetic prototype unless noted, but every item required in Phase 0, before pilot build, or before pilot blocks the affected real-candidate capability until resolved or formally accepted with documented impact.
 
 | ID | Decision | Accountable owner | Required by | Status |
 | --- | --- | --- | --- | --- |
-| OD-01 | Employer legal name/address, employee count, industry, jurisdictions, hiring volume, worker types, and federal-contractor status | Product owner / HR | Before pilot | Open |
+| OD-01 | Employer legal name/address, employee count, revenue/privacy threshold facts, sale/share practices, industry, jurisdictions, hiring volume, worker types, and federal-contractor status | Product owner / HR / privacy | Before pilot | Open |
 | OD-02 | Final product/employer brand, logo, public domain, support contacts, and careers copy | Product owner | Prototype content approval | Open |
 | OD-03 | Pilot/production frontend host and custom-domain model | Engineering/security | Before pilot build | Open |
 | OD-04 | Backend, authentication, database, storage, malware scanning, email, and observability providers | Engineering/security | Before pilot build | Open |
@@ -1299,12 +1577,20 @@ Open decisions do not block the synthetic prototype unless noted, but every item
 | OD-11 | Delivery budget, service plans, vendor procurement, and ongoing operating cost owner | Product owner | Before provider commitment | Open |
 | OD-12 | Dedicated recruitment Salesforce org versus an approved existing org, including edition, contractual data location, business continuity, and org-impact assessment | Salesforce platform owner / security | Phase 0 | Open |
 | OD-13 | Salesforce internal/integration/external-user license counts and add-ons for Shield, Event Monitoring, Field Audit Trail, Data Mask, storage/archive, backup, and analytics | Product owner / procurement / security | Phase 0 | Open |
-| OD-14 | Candidate-portal production host, external IdP, BFF technology, Salesforce client-app/OAuth pattern, and public-job projection/caching | Engineering / Salesforce architect / security | Before pilot build | Open |
+| OD-14 | Candidate-portal production host, external IdP, BFF technology, Salesforce External Client App/OAuth pattern, and public-job projection/caching | Engineering / Salesforce architect / security | Before pilot build | Open |
 | OD-15 | Dev Hub, sandbox strategy, Salesforce DX project, namespace/unlocked-package model, CI/CD, metadata ownership, and rollback process | Salesforce release owner | Phase 0 | Open |
 | OD-16 | Final Salesforce object/field data dictionary, external IDs, ownership, OWD, sharing, field-level security, encryption classification, indexing, and archive partitioning | Salesforce architect / HR / security | Before pilot build | Open |
 | OD-17 | Final Flow/Apex/async/event decision matrix, transaction boundaries, fault routing, retry rules, and performance/limit budgets | Salesforce architect / engineering | Before pilot build | Open |
 | OD-18 | Salesforce reports/dashboards, CRM Analytics decision, five-year capacity model, archive, backup/restore, RPO/RTO, and operational monitoring | Salesforce platform owner / operations | Before pilot | Open |
 | OD-19 | Whether Experience Cloud will be evaluated as a future candidate portal, including license, identity, sharing, guest-user, Person Account/Contact, and total-cost implications | Product owner / Salesforce architect | Before any Experience Cloud build | Open |
+| OD-20 | Final ERD/cardinality, application-attempt uniqueness, requisition-to-posting model, opening reservation/fill rules, one-active-offer rule, and deletion protection | Salesforce architect / HR / data owner | Phase 0 | Open |
+| OD-21 | Standard Salesforce Task/Event versus `Recruiting_Work_Item__c` responsibilities, Activity settings, calendar projection, typed relationships, visibility, reporting, and retention | Salesforce architect / recruiting operations / security | Phase 0 | Open |
+| OD-22 | Requisition, posting, opening, application, interview, assessment, offer, contingency, handoff, and work-item state machines and candidate-safe status mapping | Product owner / HR / Salesforce architect | Before pilot build | Open |
+| OD-23 | Applicable jurisdiction facts/rules, CCPA/risk-assessment/ADMT scope, policy metadata owner, notice/authorization taxonomy, and in-flight policy-change behavior | Legal / privacy / HR | Phase 0 | Open |
+| OD-24 | Complete assessment/interview metadata: template/question/answer, competency/rubric, provider validation, availability, calendar reconciliation, and accommodation design | HR / product / Salesforce architect | Before corresponding build | Open |
+| OD-25 | Post-offer contingency sequence, opening reservation expiry/release, Ready for Hire approval, HR/onboarding destination contract, correction/cancel, and final Hired milestone | HR / HRIS owner / legal / engineering | Before pilot build | Open |
+| OD-26 | Interview recording/transcription remains disabled or is pursued later; if pursued, participant consent, nonrecorded alternative, provider, storage, access, transcript correction, and retention | Legal / privacy / security / HR | Before any recording capability | Open |
+| OD-27 | Candidate optional-communication purposes, channels, consent, unsubscribe/do-not-contact, suppression evidence, and required-transactional-message exceptions | HR / privacy / candidate support | Before pilot | Open |
 
 ## 22. Definition of v1 product approval
 
@@ -1315,7 +1601,10 @@ This PRD is approved when the product owner confirms:
 - The prototype/P0/P1/P2 boundary and numbered release backlog.
 - GitHub Pages as a public synthetic-data prototype only, with approved hosting required for real candidate data.
 - Salesforce as the operational recruitment system of record, using custom recruitment objects led by `Candidate__c`, a native Lightning HR workspace, and purpose-built APIs behind an external candidate-portal BFF.
-- The approved Salesforce org/edition/license, data model, sharing model, Flow/Apex strategy, integration boundary, file-storage model, capacity/archive plan, DevOps/package model, reporting, audit, and recovery decisions.
+- The approved Salesforce org/edition/license, formal ERD/cardinalities, opening/headcount ledger, application-attempt invariants, sharing/ownership-skew model, Activity/work-item model, Flow/Apex strategy, External Client App boundary, file-storage model, capacity/archive plan, DevOps/package model, reporting, audit, and recovery decisions.
+- The separation of offer acceptance, opening reservation, post-offer contingencies, Ready for Hire, reconciled handoff, opening fill, and Hired.
+- Effective-dated jurisdiction policies and immutable evaluation evidence for publication, collection, background/adverse action, retention, and other regulated actions.
+- Automated-decision/provider inventory and recording/transcription baseline, including disabled-by-default controls and approval gates.
 - Human-led decisions and prohibition on autonomous candidate selection in pilot/v1.
 - Default decision rights, exception behavior, data-lifecycle baseline, and regulated-workflow requirements.
 - The Phase 0 open decisions, accountable roles, milestones, and named owners for resolving them.
@@ -1324,6 +1613,7 @@ This PRD is approved when the product owner confirms:
 
 | Version | Date | Summary |
 | --- | --- | --- |
+| 0.4 | August 24, 2026 | Added formal recruitment lifecycle state machines and Salesforce ERD; individual openings/headcount, application-attempt and offer/reservation invariants, governed work items/Activities, complete assessment/interview metadata, post-offer contingencies and hire handoff, candidate-safe status/preferences, jurisdiction-policy snapshots, current California automated-decision/privacy controls, recording/transcription governance, External Client App baseline, ownership/share-skew controls, expanded acceptance gates, risks, and decisions |
 | 0.3 | August 22, 2026 | Made Salesforce the operational system of record; added the native Lightning HR workspace, external candidate-portal/BFF boundary, custom object and sharing model, Flow/Apex governance, integration and file patterns, capacity, audit, licensing, DevOps, reporting, migration, operations, acceptance gates, risks, and decisions |
 | 0.2 | August 22, 2026 | Added hosting correction, operating assumptions, prioritized releases, permission governance, exception flows, regulated workflows, data lifecycle, SEO, operations, and launch gates |
 | 0.1 | August 22, 2026 | Initial end-to-end PRD for a San Francisco–based company recruitment system |
