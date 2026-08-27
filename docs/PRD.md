@@ -8,11 +8,11 @@
 | Initial market | San Francisco–based employer hiring in the United States |
 | Primary timezone | America/Los_Angeles |
 | Currency | USD |
-| Prototype deployment | Public GitHub Pages demonstration using synthetic data only |
+| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; HTTPS deployment verified August 27, 2026 |
 | Pilot/production candidate deployment | Approved external application host and backend-for-frontend; providers TBD |
 | Pilot/production HR deployment | Native Salesforce Lightning application |
 | Operational system of record | Salesforce custom recruitment application |
-| Implementation state | React/TypeScript/Vite synthetic prototype now includes a high-fidelity Salesforce Lightning-style internal shell, both product surfaces, all 12 contracted screen families, 12 switchable internal persona fixtures, populated end-to-end demo records, local automated/browser evidence, CI and Pages deployment configuration; Salesforce metadata, BFF/auth, provider integration and approved pilot environment do not exist |
+| Implementation state | React/TypeScript/Vite synthetic prototype now includes a high-fidelity Salesforce Lightning-style internal shell, both product surfaces, all 12 contracted screen families, 12 switchable internal persona fixtures, populated end-to-end demo records, passing local/CI/browser evidence and a verified HTTPS Pages deployment; Salesforce metadata, BFF/auth, provider integration and approved pilot environment do not exist |
 | Pilot contract state | Proposed control envelope in section 7.6; employer, legal, provider, Salesforce, and named-owner decisions remain unapproved until their `OD-##` records close |
 | Full-audit state | [v0.9 executable-artifact audit](AUDIT-v0.9.md) complete for local repository evidence; all 18 controlled findings remain Open pending accountable dated review, and real-candidate work remains blocked |
 | v1.3 change boundary | Public-safe wireframe release: application source, deterministic fixtures, tests, visual evidence, README, Pages deployment evidence and this PRD may change; no Salesforce metadata/org, production backend, authentication, provider write, real candidate data or pilot authorization is created |
@@ -3824,6 +3824,20 @@ Acceptance establishes the current documented baseline: researched scope, v0.8 a
 v1.3 is accepted as a **public synthetic wireframe** only when the exact reviewed commit passes the local artifact/type/component/build suite, desktop/mobile smoke suite, bounded visual inspection and GitHub Pages deployment verification; the 12 screen families remain reachable; the 12 internal personas and seed ledger above are present; no network/persistence/real-data capability is introduced; and the deployed URL and commit are recorded in repository documentation. A failed workflow, missing route, empty operational end, page-level mobile overflow, misleading Salesforce-org claim or unexplained fixture number keeps v1.3 unaccepted.
 
 Wireframe acceptance does not close any production `AUD-*`, `OD-*` or `BAL-*` item and does not authorize Salesforce implementation, procurement, real candidate processing or pilot launch. It permits the wireframe to serve as the shared design-review baseline for `ART-003` elaboration and accountable prototype review under `WP-02`.
+
+### 22.2 v1.3 deployment evidence snapshot
+
+| Evidence | Verified result |
+| --- | --- |
+| Public repository | [singhaditya21/Recruitment-System](https://github.com/singhaditya21/Recruitment-System); public visibility was required because the current GitHub plan does not support Pages for a private repository |
+| Pages URL | [https://singhaditya21.github.io/Recruitment-System/](https://singhaditya21.github.io/Recruitment-System/) |
+| Implementation source | Commit `4ef0b9ba573cbbc208c74c439a1ea594eaa44400` (`Build v1.3 recruitment wireframe and Pages release`) |
+| Pages workflow | Run `33090462431` succeeded after Pages enablement; build verification, Pages configuration, artifact upload and deployment completed |
+| CI workflow | Run `33090462433` succeeded for artifact audit, typecheck, 11 component/accessibility tests, production build and 8 desktop/mobile browser checks |
+| External response | HTTPS `200`; generated JS/CSS assets resolve under `/Recruitment-System/`; hash-route index and rendered `#/hr/action-center` were verified |
+| Public-content safety | Current history contains product documentation, source, deterministic synthetic fixtures and visual evidence; credential-pattern and common personal-email scans returned no matches before visibility changed |
+
+This snapshot accepts the deployable synthetic implementation boundary only. Moderated usability, manual keyboard/screen-reader review, accountable content/design sign-off and the existing `WP-02`/audit decision closures remain outstanding.
 
 ## 23. Change log
 

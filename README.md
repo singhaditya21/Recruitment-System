@@ -6,6 +6,8 @@ An end-to-end applicant tracking system for a San Francisco–based company, des
 
 [Open the Recruitment System wireframe](https://singhaditya21.github.io/Recruitment-System/)
 
+Deployment is live over HTTPS from the repository's `main` branch. [View the source repository](https://github.com/singhaditya21/Recruitment-System).
+
 - Candidate careers surface: `#/careers`
 - Internal recruitment console: `#/hr/action-center`
 - All people, jobs, applications, interviews, offers, messages, policies and audit events are fictional seeded data.
@@ -21,7 +23,7 @@ PRD v1.3 reconciles the full product contract with the executable synthetic wire
 
 Development is intended to begin with a public GitHub Pages prototype that uses synthetic data only, followed by a native Salesforce Lightning HR workspace and an externally hosted candidate portal through a secure backend-for-frontend. Candidate documents remain in approved private object storage. GitHub Pages will not handle real authentication, candidate data, resumes, interview feedback, offers, or audit records.
 
-Current repository state: the React/TypeScript/Vite wireframe, deterministic fixtures, Lightning-style internal shell, candidate experience, automated tests, visual evidence and delivery workflows are present. Salesforce metadata, the candidate BFF, authentication, provider integrations, approved product/policy decisions and moderated usability evidence are not present. The wireframe cannot process or persist real candidate information.
+Current repository state: the React/TypeScript/Vite wireframe, deterministic fixtures, Lightning-style internal shell, candidate experience, automated tests, visual evidence, CI and verified GitHub Pages deployment are present. Salesforce metadata, the candidate BFF, authentication, provider integrations, approved product/policy decisions and moderated usability evidence are not present. The wireframe cannot process or persist real candidate information.
 
 ## Run and verify v1.3
 
