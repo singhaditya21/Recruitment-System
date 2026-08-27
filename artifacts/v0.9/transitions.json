@@ -1,0 +1,21 @@
+{
+  "artifact": "ART-004",
+  "version": "0.9.0",
+  "transitions": [
+    { "id": "TRN-001", "from": "Draft", "to": "Submitted/New", "actor": "candidate", "safeStatus": "CSTAT-SUBMITTED", "guard": "current posting, required answers and verified synthetic email", "recovery": "same-key retry preserves draft" },
+    { "id": "TRN-002", "from": "New", "to": "Recruiter Review", "actor": "system", "safeStatus": "CSTAT-UNDER-REVIEW", "guard": "valid TRN-001 and approved plan", "recovery": "reconcile missing work without duplicate event" },
+    { "id": "TRN-003", "from": "Recruiter Review", "to": "Screening", "actor": "recruiter", "safeStatus": "CSTAT-UNDER-REVIEW", "guard": "review complete and no restricted blocker", "recovery": "attributed waiver or compensating event" },
+    { "id": "TRN-004", "from": "Screening", "to": "Interviews", "actor": "recruiter", "safeStatus": "CSTAT-ACTION-PENDING", "guard": "valid human rubric and recommendation", "recovery": "block on missing evidence" },
+    { "id": "TRN-005", "from": "Interviews", "to": "Debrief", "actor": "coordinator", "safeStatus": "CSTAT-UNDER-REVIEW", "guard": "sessions complete; scorecard state known", "recovery": "authorized waiver retains missing-evidence fact" },
+    { "id": "TRN-006", "from": "Debrief", "to": "Offer", "actor": "decision-maker", "safeStatus": "CSTAT-UNDER-REVIEW", "guard": "human decision, readiness and opening", "recovery": "reopen preserves original evidence" },
+    { "id": "TRN-007", "from": "Offer", "to": "Post-Offer Contingencies", "actor": "candidate", "safeStatus": "CSTAT-OFFER-ACCEPTED", "guard": "current approved offer and opening reservation", "recovery": "reservation conflict blocks" },
+    { "id": "TRN-008", "from": "Offer", "to": "Ready for Hire", "actor": "candidate", "safeStatus": "CSTAT-PREPARING-HIRE", "guard": "accepted offer with no contingencies", "recovery": "new blocker invalidates readiness" },
+    { "id": "TRN-009", "from": "Post-Offer Contingencies", "to": "Ready for Hire", "actor": "HR", "safeStatus": "CSTAT-PREPARING-HIRE", "guard": "all contingencies cleared or waived", "recovery": "review-required stays in stage" },
+    { "id": "TRN-010", "from": "Ready for Hire", "to": "HR Handoff", "actor": "HR", "safeStatus": "CSTAT-PREPARING-HIRE", "guard": "validated immutable handoff", "recovery": "retry with same idempotency key" },
+    { "id": "TRN-011", "from": "HR Handoff", "to": "Hired", "actor": "system", "safeStatus": "CSTAT-PROCESS-COMPLETE", "guard": "destination acknowledgement", "recovery": "conflict blocks Hired" },
+    { "id": "TRN-012", "from": "Any active", "to": "Rejected", "actor": "authorized human", "safeStatus": "CSTAT-NOT-SELECTED", "guard": "job-related disposition and reviewed message", "recovery": "reactivation preserves decision" },
+    { "id": "TRN-013", "from": "Any active", "to": "Withdrawn", "actor": "candidate", "safeStatus": "CSTAT-WITHDRAWN", "guard": "candidate or evidenced assisted action", "recovery": "reapply as a new attempt" },
+    { "id": "TRN-014", "from": "Any active", "to": "Position Closed", "actor": "recruiter", "safeStatus": "CSTAT-POSITION-CLOSED", "guard": "individual applicant review", "recovery": "no silent bulk close" },
+    { "id": "TRN-015", "from": "Any active", "to": "Duplicate", "actor": "identity reviewer", "safeStatus": "CSTAT-CONTACT-SUPPORT", "guard": "verified comparison and survivor record", "recovery": "never auto-merge" }
+  ]
+}

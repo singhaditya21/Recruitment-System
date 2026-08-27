@@ -1,0 +1,19 @@
+{
+  "artifact": "ART-003",
+  "version": "0.9.0",
+  "prototypeOnly": true,
+  "routes": [
+    { "id": "UI-CAN-001", "path": "/careers", "persona": "candidate", "label": "Careers and search", "requirements": ["RS-003", "RS-025"], "states": ["ready", "empty", "error", "stale"], "scenarioIds": ["SCN-001", "SCN-012"] },
+    { "id": "UI-CAN-002", "path": "/careers/jobs/:publicId", "persona": "candidate", "label": "Job detail and requirements", "requirements": ["RS-003", "RS-025", "RS-031", "RS-035"], "states": ["ready", "closed", "expired", "not-found"], "scenarioIds": ["SCN-001", "SCN-012"] },
+    { "id": "UI-CAN-003", "path": "/apply/:publicId/*", "persona": "candidate", "label": "Guided application", "requirements": ["RS-004", "RS-011", "RS-025", "RS-028", "RS-031"], "states": ["draft", "validation", "review", "submitting", "success", "stale", "recoverable-error"], "scenarioIds": ["SCN-001", "SCN-008"] },
+    { "id": "UI-CAN-004", "path": "/my-applications", "persona": "candidate", "label": "Candidate hub", "requirements": ["RS-004", "RS-007", "RS-010", "RS-011", "RS-028", "RS-031"], "states": ["ready", "empty", "action-due", "withdrawn", "support"], "scenarioIds": ["SCN-003", "SCN-011"] },
+    { "id": "UI-HR-001", "path": "/hr/action-center", "persona": "recruiter", "label": "Role action center", "requirements": ["RS-012", "RS-023", "RS-030", "RS-037"], "states": ["ready", "zero", "loading", "stale", "failed", "denied"], "scenarioIds": ["SCN-005", "SCN-009"] },
+    { "id": "UI-HR-002", "path": "/hr/jobs/:jobId", "persona": "recruiter", "label": "Job, opening and kickoff", "requirements": ["RS-002", "RS-003", "RS-022", "RS-025", "RS-035", "RS-036"], "states": ["draft", "review", "approved", "published", "paused", "closed", "blocked"], "scenarioIds": ["SCN-001", "SCN-012"] },
+    { "id": "UI-HR-003", "path": "/hr/applications/:applicationId", "persona": "recruiter", "label": "Application workspace", "requirements": ["RS-005", "RS-006", "RS-008", "RS-009", "RS-023", "RS-028", "RS-036", "RS-037"], "states": ["ready", "blocked", "confirmation", "conflict", "denied"], "scenarioIds": ["SCN-002", "SCN-008"] },
+    { "id": "UI-HR-004", "path": "/hr/interviews/:interviewId", "persona": "coordinator", "label": "Interview coordination", "requirements": ["RS-007", "RS-008", "RS-023", "RS-027"], "states": ["proposed", "confirmed", "rescheduled", "cancelled", "no-show", "provider-error"], "scenarioIds": ["SCN-003", "SCN-004"] },
+    { "id": "UI-HR-005", "path": "/hr/assignments/:assignmentId", "persona": "interviewer", "label": "Interviewer briefing and scorecard", "requirements": ["RS-007", "RS-009", "RS-027"], "states": ["assigned", "draft", "submitted", "locked", "late", "expired"], "scenarioIds": ["SCN-004", "SCN-005"] },
+    { "id": "UI-HR-006", "path": "/hr/decisions/:applicationId", "persona": "approver", "label": "Decision, offer and hire closeout", "requirements": ["RS-009", "RS-010", "RS-022", "RS-024", "RS-025"], "states": ["decision-needed", "approval-needed", "extended", "accepted", "contingency", "handoff", "reconciliation-error"], "scenarioIds": ["SCN-006", "SCN-007"] },
+    { "id": "UI-HR-007", "path": "/hr/automations", "persona": "operations", "label": "Workflow and automation operations", "requirements": ["RS-023", "RS-026", "RS-027", "RS-036", "RS-037", "RS-038", "RS-039"], "states": ["draft", "simulated", "active", "paused", "failed", "dead-letter"], "scenarioIds": ["SCN-009", "SCN-010"] },
+    { "id": "UI-HR-008", "path": "/hr/governance", "persona": "admin", "label": "Privacy, policy, security and audit", "requirements": ["RS-001", "RS-011", "RS-025", "RS-026", "RS-027", "RS-039"], "states": ["ready", "restricted", "empty", "denied", "incident"], "scenarioIds": ["SCN-011", "SCN-012"] }
+  ]
+}

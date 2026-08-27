@@ -1,0 +1,23 @@
+{
+  "artifact": "ART-007",
+  "version": "0.9.0",
+  "implementation": "non-networked contract stubs",
+  "defaultErrors": ["ERR-001", "ERR-002", "ERR-003", "ERR-004", "ERR-005", "ERR-006", "ERR-007", "ERR-008", "ERR-009", "ERR-010"],
+  "operations": [
+    { "id": "IFC-001", "method": "GET", "path": "/public/jobs", "actor": "anonymous candidate", "purpose": "search approved job projections", "prototype": "fixture-read", "writes": false },
+    { "id": "IFC-002", "method": "GET", "path": "/public/jobs/{publicId}", "actor": "anonymous candidate", "purpose": "read a current job projection", "prototype": "fixture-read", "writes": false },
+    { "id": "IFC-003", "method": "POST", "path": "/candidate/sessions/verify", "actor": "candidate", "purpose": "verify passwordless session", "prototype": "disabled-stub", "writes": false },
+    { "id": "IFC-004", "method": "PUT", "path": "/candidate/applications/{id}/draft", "actor": "candidate", "purpose": "save current draft", "prototype": "memory-only", "writes": false },
+    { "id": "IFC-005", "method": "POST", "path": "/candidate/applications/{id}/submit", "actor": "candidate", "purpose": "submit immutable application version", "prototype": "memory-only", "writes": false },
+    { "id": "IFC-006", "method": "GET", "path": "/candidate/applications", "actor": "candidate", "purpose": "read own safe projections", "prototype": "fixture-read", "writes": false },
+    { "id": "IFC-007", "method": "POST", "path": "/candidate/applications/{id}/withdraw", "actor": "candidate", "purpose": "withdraw own active attempt", "prototype": "memory-only", "writes": false },
+    { "id": "IFC-008", "method": "GET", "path": "/internal/work", "actor": "authorized HR user", "purpose": "read permission-safe work queue", "prototype": "fixture-read", "writes": false },
+    { "id": "IFC-009", "method": "POST", "path": "/internal/applications/{id}/transitions", "actor": "authorized recruiter", "purpose": "request governed transition", "prototype": "simulation-only", "writes": false },
+    { "id": "IFC-010", "method": "PUT", "path": "/internal/scorecards/{id}", "actor": "assigned interviewer", "purpose": "save or submit evidence", "prototype": "memory-only", "writes": false },
+    { "id": "IFC-011", "method": "POST", "path": "/internal/interviews/{id}/schedule", "actor": "coordinator", "purpose": "version canonical session", "prototype": "simulation-only", "writes": false },
+    { "id": "IFC-012", "method": "POST", "path": "/internal/offers/{id}/approval-attempts", "actor": "authorized recruiter", "purpose": "start immutable approval", "prototype": "simulation-only", "writes": false },
+    { "id": "IFC-013", "method": "POST", "path": "/internal/handoffs/{id}/deliver", "actor": "authorized HR", "purpose": "deliver idempotent handoff", "prototype": "simulation-only", "writes": false },
+    { "id": "IFC-014", "method": "POST", "path": "/internal/automation-runs/{id}/reconcile", "actor": "operations", "purpose": "retry/reconcile a permitted run", "prototype": "simulation-only", "writes": false },
+    { "id": "IFC-015", "method": "GET", "path": "/internal/audit/events", "actor": "restricted auditor", "purpose": "read minimized audit evidence", "prototype": "fixture-read", "writes": false }
+  ]
+}

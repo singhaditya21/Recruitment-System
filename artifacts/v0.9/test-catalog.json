@@ -1,0 +1,24 @@
+{
+  "artifact": "ART-010",
+  "version": "0.9.0",
+  "evidencePolicy": "Generated reports are reproducible evidence, not approval or moderated-human evidence.",
+  "tests": [
+    { "id": "TST-CON-001", "family": "contract", "scope": "all machine-readable artifact counts, IDs and links", "runner": "scripts/audit-artifacts.mjs", "gate": "prototype-build" },
+    { "id": "TST-CAN-001", "family": "component", "scope": "career search and result navigation", "runner": "vitest", "gate": "prototype-build" },
+    { "id": "TST-CAN-002", "family": "component", "scope": "job detail and application entry", "runner": "vitest/playwright", "gate": "prototype-build" },
+    { "id": "TST-CAN-003", "family": "component", "scope": "guided application validation, review and memory-only confirmation", "runner": "vitest/playwright", "gate": "prototype-build" },
+    { "id": "TST-CAN-004", "family": "component", "scope": "candidate-safe status and withdrawal confirmation", "runner": "vitest", "gate": "prototype-build" },
+    { "id": "TST-HR-001", "family": "component", "scope": "action-center priority explanation and source freshness", "runner": "vitest/playwright", "gate": "prototype-build" },
+    { "id": "TST-HR-002", "family": "contract", "scope": "job readiness and unknown-jurisdiction publication block", "runner": "vitest", "gate": "prototype-build" },
+    { "id": "TST-HR-003", "family": "component", "scope": "application context and governed transition preview", "runner": "vitest", "gate": "prototype-build" },
+    { "id": "TST-HR-004", "family": "component", "scope": "interview conflict recovery", "runner": "playwright", "gate": "prototype-build" },
+    { "id": "TST-HR-005", "family": "contract", "scope": "scorecard gap blocks human decision", "runner": "vitest", "gate": "prototype-build" },
+    { "id": "TST-HR-006", "family": "contract", "scope": "handoff failure remains not Hired", "runner": "vitest", "gate": "prototype-build" },
+    { "id": "TST-HR-007", "family": "component", "scope": "automation simulation, failure, kill switch and replay-safe key", "runner": "vitest/playwright", "gate": "prototype-build" },
+    { "id": "TST-HR-008", "family": "component", "scope": "restricted governance surface and safe denial", "runner": "vitest", "gate": "prototype-build" },
+    { "id": "TST-A11Y-001", "family": "accessibility", "scope": "candidate landmark, name, form and axe baseline", "runner": "axe-core/playwright", "gate": "prototype-build" },
+    { "id": "TST-A11Y-002", "family": "accessibility", "scope": "HR landmark, name, state and axe baseline", "runner": "axe-core/playwright", "gate": "prototype-build" },
+    { "id": "TST-USR-001", "family": "moderated-usability", "scope": "candidate tasks across first-time, keyboard-only and small-screen participants", "runner": "human", "gate": "prototype-acceptance", "status": "not-run" },
+    { "id": "TST-USR-002", "family": "moderated-usability", "scope": "recruiter, manager, interviewer and coordinator tasks", "runner": "human", "gate": "prototype-acceptance", "status": "not-run" }
+  ]
+}

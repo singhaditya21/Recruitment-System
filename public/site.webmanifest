@@ -1,0 +1,8 @@
+{
+  "name": "Recruitment System Synthetic Prototype",
+  "short_name": "Recruitment v0.9",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#f6f3ec",
+  "theme_color": "#173a35"
+}

@@ -1,0 +1,21 @@
+{
+  "artifact": "ART-014",
+  "version": "0.9.0",
+  "seed": "recruitment-v0.9-harbor-pine",
+  "syntheticOnly": true,
+  "reset": "Reload the browser; prototype state is memory-only.",
+  "scenarios": [
+    { "id": "SCN-001", "label": "Golden path", "expected": "Approved fictional job through one acknowledged hire", "focus": "happy-path" },
+    { "id": "SCN-002", "label": "Human rejection", "expected": "Rubric and reviewed message required; no autonomous decision", "focus": "human-control" },
+    { "id": "SCN-003", "label": "Candidate withdrawal", "expected": "Future interview work cancels without history loss", "focus": "cancellation" },
+    { "id": "SCN-004", "label": "Interview conflict", "expected": "Accessible rescheduling uses candidate timezone", "focus": "recovery" },
+    { "id": "SCN-005", "label": "Missing scorecard", "expected": "Decision blocked; attributed waiver preserves evidence gap", "focus": "blocker" },
+    { "id": "SCN-006", "label": "Offer supersession", "expected": "Material change invalidates old approval and link", "focus": "concurrency" },
+    { "id": "SCN-007", "label": "Handoff failure", "expected": "Not Hired until acknowledgement reconciles", "focus": "integration" },
+    { "id": "SCN-008", "label": "Possible duplicate", "expected": "Human identity review preserves both histories", "focus": "identity" },
+    { "id": "SCN-009", "label": "Message bounce", "expected": "Idempotent retry creates owned manual-contact work", "focus": "communication" },
+    { "id": "SCN-010", "label": "Out-of-order event", "expected": "No duplicate effect; conflict moves to reconciliation", "focus": "automation" },
+    { "id": "SCN-011", "label": "Negative access", "expected": "Restricted fields and record existence remain hidden", "focus": "authorization" },
+    { "id": "SCN-012", "label": "Unknown jurisdiction", "expected": "Publication blocked and legal/privacy review opened", "focus": "policy" }
+  ]
+}

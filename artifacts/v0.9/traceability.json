@@ -1,0 +1,20 @@
+{
+  "artifact": "ART-001",
+  "version": "0.9.0",
+  "source": "docs/PRD.md#156-v08-route-and-screen-contracts",
+  "release": "WP-02 synthetic prototype",
+  "rows": [
+    { "screenId": "UI-CAN-001", "requirements": ["RS-003", "RS-025"], "route": "/careers", "component": "CandidatePortal", "fixtures": ["SCN-001", "SCN-012"], "tests": ["TST-CAN-001", "TST-A11Y-001"] },
+    { "screenId": "UI-CAN-002", "requirements": ["RS-003", "RS-025", "RS-031", "RS-035"], "route": "/careers/jobs/:publicId", "component": "CandidatePortal", "fixtures": ["SCN-001", "SCN-012"], "tests": ["TST-CAN-002", "TST-A11Y-001"] },
+    { "screenId": "UI-CAN-003", "requirements": ["RS-004", "RS-011", "RS-025", "RS-028", "RS-031"], "route": "/apply/:publicId/*", "component": "CandidatePortal", "fixtures": ["SCN-001", "SCN-008"], "tests": ["TST-CAN-003", "TST-A11Y-001"] },
+    { "screenId": "UI-CAN-004", "requirements": ["RS-004", "RS-007", "RS-010", "RS-011", "RS-028", "RS-031"], "route": "/my-applications", "component": "CandidatePortal", "fixtures": ["SCN-003", "SCN-011"], "tests": ["TST-CAN-004", "TST-A11Y-001"] },
+    { "screenId": "UI-HR-001", "requirements": ["RS-012", "RS-023", "RS-030", "RS-037"], "route": "/hr/action-center", "component": "HrWorkspace", "fixtures": ["SCN-005", "SCN-009"], "tests": ["TST-HR-001", "TST-A11Y-002"] },
+    { "screenId": "UI-HR-002", "requirements": ["RS-002", "RS-003", "RS-022", "RS-025", "RS-035", "RS-036"], "route": "/hr/jobs/:jobId", "component": "HrWorkspace", "fixtures": ["SCN-001", "SCN-012"], "tests": ["TST-HR-002", "TST-A11Y-002"] },
+    { "screenId": "UI-HR-003", "requirements": ["RS-005", "RS-006", "RS-008", "RS-009", "RS-023", "RS-028", "RS-036", "RS-037"], "route": "/hr/applications/:applicationId", "component": "HrWorkspace", "fixtures": ["SCN-002", "SCN-008"], "tests": ["TST-HR-003", "TST-A11Y-002"] },
+    { "screenId": "UI-HR-004", "requirements": ["RS-007", "RS-008", "RS-023", "RS-027"], "route": "/hr/interviews/:interviewId", "component": "HrWorkspace", "fixtures": ["SCN-003", "SCN-004"], "tests": ["TST-HR-004", "TST-A11Y-002"] },
+    { "screenId": "UI-HR-005", "requirements": ["RS-007", "RS-009", "RS-027"], "route": "/hr/assignments/:assignmentId", "component": "HrWorkspace", "fixtures": ["SCN-004", "SCN-005"], "tests": ["TST-HR-005", "TST-A11Y-002"] },
+    { "screenId": "UI-HR-006", "requirements": ["RS-009", "RS-010", "RS-022", "RS-024", "RS-025"], "route": "/hr/decisions/:applicationId", "component": "HrWorkspace", "fixtures": ["SCN-006", "SCN-007"], "tests": ["TST-HR-006", "TST-A11Y-002"] },
+    { "screenId": "UI-HR-007", "requirements": ["RS-023", "RS-026", "RS-027", "RS-036", "RS-037", "RS-038", "RS-039"], "route": "/hr/automations", "component": "HrWorkspace", "fixtures": ["SCN-009", "SCN-010"], "tests": ["TST-HR-007", "TST-A11Y-002"] },
+    { "screenId": "UI-HR-008", "requirements": ["RS-001", "RS-011", "RS-025", "RS-026", "RS-027", "RS-039"], "route": "/hr/governance", "component": "HrWorkspace", "fixtures": ["SCN-011", "SCN-012"], "tests": ["TST-HR-008", "TST-A11Y-002"] }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "artifact": "ART-016",
+  "version": "0.9.0",
+  "invariants": [
+    { "id": "INV-001", "name": "Canonical business state", "prototypeCheck": "fixture state is authoritative; projections are labelled" },
+    { "id": "INV-002", "name": "Person/application separation", "prototypeCheck": "candidate and application IDs are distinct" },
+    { "id": "INV-003", "name": "Immutable submission", "prototypeCheck": "review snapshot precedes memory-only confirmation" },
+    { "id": "INV-004", "name": "Active-application uniqueness", "prototypeCheck": "one active fixture attempt per job/person pair" },
+    { "id": "INV-005", "name": "Single primary stage", "prototypeCheck": "each active application exposes one primary stage" },
+    { "id": "INV-006", "name": "Controlled transition", "prototypeCheck": "only TRN IDs appear as governed stage actions" },
+    { "id": "INV-007", "name": "Human employment decision", "prototypeCheck": "decision action requires explicit human confirmation" },
+    { "id": "INV-008", "name": "Evidence/version integrity", "prototypeCheck": "fixture versions are visible in detail panels" },
+    { "id": "INV-009", "name": "Offer/opening integrity", "prototypeCheck": "one accepted offer/reservation is represented" },
+    { "id": "INV-010", "name": "Hired requires handoff", "prototypeCheck": "failure scenario remains not Hired" },
+    { "id": "INV-011", "name": "Derived work is reproducible", "prototypeCheck": "why panels name source facts and freshness" },
+    { "id": "INV-012", "name": "Candidate-safe projection", "prototypeCheck": "candidate UI uses safe status and excludes internal evidence" },
+    { "id": "INV-013", "name": "Communication purpose", "prototypeCheck": "messages show purpose and suppression state" },
+    { "id": "INV-014", "name": "Replay-safe side effects", "prototypeCheck": "run view shows stable keys and duplicate handling" },
+    { "id": "INV-015", "name": "Effective policy evidence", "prototypeCheck": "unknown jurisdiction blocks publication" }
+  ],
+  "errors": [
+    { "id": "ERR-001", "name": "Validation", "recovery": "preserve input, identify field, allow correction" },
+    { "id": "ERR-002", "name": "Unauthenticated", "recovery": "safe session restart without record disclosure" },
+    { "id": "ERR-003", "name": "Forbidden or not found", "recovery": "generic safe response and support path" },
+    { "id": "ERR-004", "name": "Conflict or stale version", "recovery": "refresh authoritative facts before retry" },
+    { "id": "ERR-005", "name": "Rate or capacity limited", "recovery": "bounded retry with accessible wait guidance" },
+    { "id": "ERR-006", "name": "Dependency unavailable", "recovery": "owned fallback and no false completion" },
+    { "id": "ERR-007", "name": "File unsafe or pending", "recovery": "quarantine state and alternative support route" },
+    { "id": "ERR-008", "name": "Policy unknown or blocked", "recovery": "stop action and create attributed review" },
+    { "id": "ERR-009", "name": "Partial side effect", "recovery": "record attempt and reconcile idempotently" },
+    { "id": "ERR-010", "name": "Unexpected", "recovery": "correlation reference, safe copy and owned recovery" }
+  ]
+}

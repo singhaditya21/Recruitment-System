@@ -1,0 +1,96 @@
+import { readFile, readdir } from "node:fs/promises";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const artifactDir = new URL("../artifacts/v0.9/", import.meta.url);
+
+async function json(name) {
+  return JSON.parse(await readFile(new URL(name, artifactDir), "utf8"));
+}
+
+function assert(condition, message) {
+  if (!condition) throw new Error(message);
+}
+
+function assertSeries(items, prefix, count) {
+  const actual = items.map(({ id }) => id).sort();
+  const expected = Array.from({ length: count }, (_, index) => `${prefix}-${String(index + 1).padStart(3, "0")}`);
+  assert(JSON.stringify(actual) === JSON.stringify(expected), `${prefix} IDs are not contiguous: ${actual.join(", ")}`);
+}
+
+async function sourceFiles(directory) {
+  if (directory instanceof URL) directory = fileURLToPath(directory);
+  const entries = await readdir(directory, { withFileTypes: true });
+  const files = [];
+  for (const entry of entries) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) files.push(...await sourceFiles(path));
+    else if (/\.(ts|tsx)$/.test(entry.name)) files.push(path);
+  }
+  return files;
+}
+
+const [routes, transitions, automations, interfaces, scenarios, traceability, tests, content, registry, findings] = await Promise.all([
+  json("routes.json"),
+  json("transitions.json"),
+  json("automations.json"),
+  json("interfaces.json"),
+  json("scenarios.json"),
+  json("traceability.json"),
+  json("test-catalog.json"),
+  json("content-accessibility.json"),
+  json("invariants-errors.json"),
+  json("audit-findings.json"),
+]);
+
+assertSeries(routes.routes.filter(({ id }) => id.startsWith("UI-CAN")), "UI-CAN", 4);
+assertSeries(routes.routes.filter(({ id }) => id.startsWith("UI-HR")), "UI-HR", 8);
+assertSeries(transitions.transitions, "TRN", 15);
+assertSeries(automations.rules, "AUT", 15);
+assertSeries(interfaces.operations, "IFC", 15);
+assertSeries(scenarios.scenarios, "SCN", 12);
+assertSeries(registry.invariants, "INV", 15);
+assertSeries(registry.errors, "ERR", 10);
+assertSeries(findings.findings, "AUD", 18);
+
+const routeIds = new Set(routes.routes.map(({ id }) => id));
+const traceIds = new Set(traceability.rows.map(({ screenId }) => screenId));
+const accessibilityIds = new Set(content.screens.map(({ id }) => id));
+assert(routeIds.size === 12, "Expected 12 unique route contracts");
+assert([...routeIds].every((id) => traceIds.has(id)), "Every route must have an ART-001 trace row");
+assert([...routeIds].every((id) => accessibilityIds.has(id)), "Every route must have an ART-021 row");
+
+const scenarioIds = new Set(scenarios.scenarios.map(({ id }) => id));
+for (const route of routes.routes) {
+  assert(route.requirements.length > 0, `${route.id} has no requirement mapping`);
+  assert(route.states.length >= 4, `${route.id} needs at least four visible state contracts`);
+  assert(route.scenarioIds.every((id) => scenarioIds.has(id)), `${route.id} references an unknown scenario`);
+}
+
+const testIds = new Set(tests.tests.map(({ id }) => id));
+for (const row of traceability.rows) {
+  assert(row.tests.every((id) => testIds.has(id)), `${row.screenId} references an unknown test`);
+  assert(row.fixtures.every((id) => scenarioIds.has(id)), `${row.screenId} references an unknown fixture`);
+}
+
+assert(interfaces.operations.every(({ writes, prototype }) => writes === false && ["fixture-read", "memory-only", "simulation-only", "disabled-stub"].includes(prototype)), "Prototype interfaces must be non-writing local stubs");
+assert(scenarios.syntheticOnly === true, "Fixture pack must declare syntheticOnly");
+assert(tests.tests.filter(({ runner }) => runner === "human").every(({ status }) => status === "not-run"), "Human evidence must not be claimed before it exists");
+assert(content.manualAssistiveTechnologyStatus === "not-run", "Manual assistive-technology evidence must remain honest");
+assert(findings.findings.every(({ status }) => status === "Open"), "No finding can close without accountable dated review");
+
+const sourcePaths = await sourceFiles(new URL("../src/", import.meta.url));
+const source = (await Promise.all(sourcePaths.map((path) => readFile(path, "utf8")))).join("\n");
+const forbiddenRuntimePatterns = [
+  [/(?<![A-Za-z])fetch\s*\(/, "fetch call"],
+  [/XMLHttpRequest/, "XMLHttpRequest"],
+  [/new\s+WebSocket/, "WebSocket"],
+  [/localStorage\s*\./, "localStorage write/read"],
+  [/sessionStorage\s*\./, "sessionStorage write/read"],
+  [/@(gmail|yahoo|outlook|hotmail)\./i, "real email domain"],
+];
+for (const [pattern, label] of forbiddenRuntimePatterns) assert(!pattern.test(source), `Forbidden prototype capability found: ${label}`);
+assert(source.includes("example.test"), "Synthetic contact values must use the reserved .test domain");
+assert(source.includes("No real jobs"), "A persistent synthetic-data notice is required");
+
+console.log("Artifact audit passed: 12 routes, 12 scenarios, 15 transitions, 15 automations, 15 interfaces, 15 invariants, 10 error classes, 18 controlled findings.");

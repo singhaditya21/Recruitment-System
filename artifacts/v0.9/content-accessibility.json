@@ -1,0 +1,22 @@
+{
+  "artifact": "ART-021",
+  "version": "0.9.0",
+  "standard": "WCAG 2.2 AA target",
+  "automatedTestingIsFloorOnly": true,
+  "manualAssistiveTechnologyStatus": "not-run",
+  "commonCriteria": ["1.3.1", "1.4.3", "1.4.10", "2.1.1", "2.4.3", "2.4.7", "2.5.8", "3.3.1", "3.3.3", "4.1.2", "4.1.3"],
+  "screens": [
+    { "id": "UI-CAN-001", "contentKeys": ["prototype.notice", "careers.heading", "careers.search", "careers.empty", "projection.stale"], "manual": ["mobile reflow", "keyboard result navigation", "VoiceOver result count"], "status": "automated-baseline-only" },
+    { "id": "UI-CAN-002", "contentKeys": ["job.fictional", "job.pay", "job.accommodation", "job.privacy", "job.closed"], "manual": ["heading hierarchy", "link purpose", "400% reflow"], "status": "automated-baseline-only" },
+    { "id": "UI-CAN-003", "contentKeys": ["apply.progress", "apply.validation", "apply.review", "apply.success", "apply.recovery"], "manual": ["error summary focus", "field announcement", "mobile touch targets"], "status": "automated-baseline-only" },
+    { "id": "UI-CAN-004", "contentKeys": ["hub.safeStatus", "hub.nextAction", "hub.withdraw", "hub.support"], "manual": ["status announcement", "confirmation comprehension", "safe information boundary"], "status": "automated-baseline-only" },
+    { "id": "UI-HR-001", "contentKeys": ["work.why", "work.freshness", "work.overdue", "work.failed"], "manual": ["keyboard queue navigation", "dense zoom", "status update announcement"], "status": "automated-baseline-only" },
+    { "id": "UI-HR-002", "contentKeys": ["job.readiness", "job.blocker", "job.preview", "job.version"], "manual": ["blocker non-color meaning", "version comparison", "denied state"], "status": "automated-baseline-only" },
+    { "id": "UI-HR-003", "contentKeys": ["application.context", "transition.prerequisite", "transition.sideEffect", "transition.confirm"], "manual": ["persistent context", "dialog focus", "recovery comprehension"], "status": "automated-baseline-only" },
+    { "id": "UI-HR-004", "contentKeys": ["interview.timezone", "interview.conflict", "interview.reschedule", "interview.providerError"], "manual": ["timezone comprehension", "calendar alternatives", "live status"], "status": "automated-baseline-only" },
+    { "id": "UI-HR-005", "contentKeys": ["scorecard.independent", "scorecard.autosave", "scorecard.locked", "scorecard.late"], "manual": ["form grouping", "autosave announcement", "expired recovery"], "status": "automated-baseline-only" },
+    { "id": "UI-HR-006", "contentKeys": ["decision.human", "offer.version", "handoff.ack", "handoff.failed"], "manual": ["consequential confirmation", "restricted separation", "failure recovery"], "status": "automated-baseline-only" },
+    { "id": "UI-HR-007", "contentKeys": ["automation.simulation", "automation.paused", "automation.failure", "automation.killSwitch"], "manual": ["state non-color meaning", "kill-switch warning", "table alternatives"], "status": "automated-baseline-only" },
+    { "id": "UI-HR-008", "contentKeys": ["governance.restricted", "governance.policyUnknown", "governance.audit", "governance.incident"], "manual": ["safe denied copy", "restricted landmark", "export warning"], "status": "automated-baseline-only" }
+  ]
+}

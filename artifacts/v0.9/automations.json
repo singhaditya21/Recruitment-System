@@ -1,0 +1,22 @@
+{
+  "artifact": "ART-005",
+  "version": "0.9.0",
+  "execution": "simulation-only",
+  "rules": [
+    { "id": "AUT-001", "name": "Application confirmation", "trigger": "TRN-001 succeeds", "action": "queue confirmation and recruiter work", "guard": "current submission version", "idempotency": "applicationId:submissionVersion:confirmation", "cancel": "superseded submission" },
+    { "id": "AUT-002", "name": "Recruiter review work", "trigger": "application enters Recruiter Review", "action": "create owned review work", "guard": "approved plan and active owner", "idempotency": "applicationId:stageVersion:review", "cancel": "terminal stage" },
+    { "id": "AUT-003", "name": "Reserved — not pilot active", "trigger": "none", "action": "none", "guard": "must remain inactive", "idempotency": "not-applicable", "cancel": "not-applicable" },
+    { "id": "AUT-004", "name": "Interview scheduling work", "trigger": "interview requested", "action": "create coordinator work", "guard": "approved interview activity", "idempotency": "interviewId:version:schedule", "cancel": "declined or cancelled" },
+    { "id": "AUT-005", "name": "Interview projections", "trigger": "session confirmed/rescheduled/cancelled", "action": "simulate ICS and participant messages", "guard": "canonical session version", "idempotency": "sessionId:version:projection", "cancel": "supersede old projection" },
+    { "id": "AUT-006", "name": "Scorecard work", "trigger": "interview completes", "action": "create scorecard assignment/reminder", "guard": "attendance known", "idempotency": "assignmentId:sessionVersion", "cancel": "excused or reassigned interviewer" },
+    { "id": "AUT-007", "name": "Decision-ready work", "trigger": "required evidence complete", "action": "create human-decision-required work", "guard": "no blocker; application active", "idempotency": "applicationId:readinessVersion", "cancel": "evidence later invalidated" },
+    { "id": "AUT-008", "name": "Scorecard reminder", "trigger": "scorecard due/overdue", "action": "remind then escalate", "guard": "active unsubmitted assignment", "idempotency": "assignmentId:dueAt:reminder", "cancel": "submit, waive, reassign or cancel" },
+    { "id": "AUT-009", "name": "Approval attempt", "trigger": "job or offer submitted", "action": "create approval steps", "guard": "immutable current subject version", "idempotency": "subjectId:version:approval", "cancel": "material change" },
+    { "id": "AUT-010", "name": "Opening reservation", "trigger": "offer accepted", "action": "reserve one opening and create readiness work", "guard": "approved actionable offer", "idempotency": "openingId:offerVersion:reserve", "cancel": "offer termination releases once" },
+    { "id": "AUT-011", "name": "Terminal cleanup", "trigger": "withdrawal or terminal stage", "action": "cancel future optional work/messages", "guard": "current application version", "idempotency": "applicationId:terminalVersion:cleanup", "cancel": "required notices are retained" },
+    { "id": "AUT-012", "name": "Job pause/close treatment", "trigger": "job paused/closed/cancelled", "action": "stop optional automation and create treatment work", "guard": "authorized job transition", "idempotency": "jobId:version:treatment", "cancel": "revalidate scheduled sends" },
+    { "id": "AUT-013", "name": "Owner continuity", "trigger": "user deactivated or queue unavailable", "action": "reassign governed work", "guard": "fallback owner exists", "idempotency": "ownerId:deactivationVersion:reassign", "cancel": "block and alert when no fallback" },
+    { "id": "AUT-014", "name": "Communication eligibility", "trigger": "preference/notice/bounce/complaint changes", "action": "recalculate and suppress affected sends", "guard": "verified evidence and purpose", "idempotency": "personId:evidenceVersion:eligibility", "cancel": "transactional basis remains separate" },
+    { "id": "AUT-015", "name": "Integration reconciliation", "trigger": "result/event/checkpoint due", "action": "apply valid result or reconcile", "guard": "signature/schema/version valid", "idempotency": "source:eventId:operation", "cancel": "conflict creates owned work" }
+  ]
+}
