@@ -3905,8 +3905,10 @@ Failure of any item keeps v1.4 unaccepted but does not weaken the earlier produc
 | Canonical state | `ScenarioState` plus shared prototype context drives candidate status, application/interview/decision/offer/handoff/opening facts; scorecard resolution is cross-route and memory-only |
 | Record binding | Three job, five application, four interview and three assignment records back collection and parameterized routes |
 | Role behavior | 12 internal personas map to explicit screen scope, focus and queue; context persists until reset/refresh |
-| Automated checks | Artifact audit, TypeScript, component/journey tests including axe color contrast, production build and desktop/mobile Playwright checks are required before deployment |
-| Deployment | Pages URL remains [https://singhaditya21.github.io/Recruitment-System/](https://singhaditya21.github.io/Recruitment-System/); exact v1.4 commit and workflow run are recorded after successful deployment |
+| Implementation source | Commit `b1727771f093cad88357c836b729dc2ea92e5664` (`Build v1.4 semantic recruitment wireframe`) |
+| Automated checks | Local verification and CI run [`33096891983`](https://github.com/singhaditya21/Recruitment-System/actions/runs/33096891983) succeeded: 12-route/12-scenario artifact audit, TypeScript, 16 component/contract/accessibility tests with axe color contrast enabled, production build and 16 desktop/mobile Chromium journeys |
+| Visual evidence | Five reviewed desktop/mobile captures are versioned under `artifacts/screenshots/v1.4`; the 390 px action-center and candidate-hub compositions use labeled cards and have no page-level overflow |
+| Deployment | Pages run [`33096891987`](https://github.com/singhaditya21/Recruitment-System/actions/runs/33096891987) succeeded for the implementation commit; [https://singhaditya21.github.io/Recruitment-System/](https://singhaditya21.github.io/Recruitment-System/) returned HTTPS `200`, loaded the generated v1.4 JS/CSS assets, rendered HR and candidate hash routes at 390 px with zero page overflow and produced no browser console errors |
 
 ## 23. Change log
 
