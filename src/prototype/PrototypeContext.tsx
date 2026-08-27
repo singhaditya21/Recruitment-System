@@ -1,5 +1,6 @@
 import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
 import scenarioArtifact from "../../artifacts/v0.9/scenarios.json";
+import { demoPersonas, resolveScenarioState, type ScenarioState } from "../data/fixtures";
 
 type Scenario = (typeof scenarioArtifact.scenarios)[number];
 
@@ -7,6 +8,15 @@ type PrototypeContextValue = {
   scenario: Scenario;
   scenarios: Scenario[];
   setScenarioId: (id: string) => void;
+  scenarioState: ScenarioState;
+  personaId: string;
+  persona: (typeof demoPersonas)[number];
+  setPersonaId: (id: string) => void;
+  notice: string | null;
+  announce: (message: string) => void;
+  clearNotice: () => void;
+  scorecardResolved: boolean;
+  resolveScorecard: (message?: string) => void;
   resetKey: number;
   resetPrototype: () => void;
 };
@@ -15,18 +25,48 @@ const PrototypeContext = createContext<PrototypeContextValue | null>(null);
 
 export function PrototypeProvider({ children }: { children: ReactNode }) {
   const [scenarioId, setScenarioId] = useState("SCN-005");
+  const [personaId, setPersonaId] = useState<string>(demoPersonas[0].id);
+  const [notice, setNotice] = useState<string | null>(null);
+  const [scorecardResolved, setScorecardResolved] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const scenario = scenarioArtifact.scenarios.find((item) => item.id === scenarioId) ?? scenarioArtifact.scenarios[0];
+  const persona = demoPersonas.find((item) => item.id === personaId) ?? demoPersonas[0];
+  const rawScenarioState = resolveScenarioState(scenario.id);
+  const scenarioState = scorecardResolved && rawScenarioState.id === "SCN-005"
+    ? { ...rawScenarioState, missingScorecards: 0, applicationStage: "Debrief", decisionState: "Ready for decision" as const }
+    : rawScenarioState;
 
   const value = useMemo(
     () => ({
       scenario,
+      scenarioState,
       scenarios: scenarioArtifact.scenarios,
-      setScenarioId,
+      setScenarioId: (id: string) => {
+        setScenarioId(id);
+        setScorecardResolved(false);
+        setNotice(null);
+      },
+      personaId,
+      persona,
+      setPersonaId,
+      notice,
+      announce: setNotice,
+      clearNotice: () => setNotice(null),
+      scorecardResolved,
+      resolveScorecard: (message = "Scorecard submitted in memory. Application readiness is now recalculated.") => {
+        setScorecardResolved(true);
+        setNotice(message);
+      },
       resetKey,
-      resetPrototype: () => setResetKey((key) => key + 1),
+      resetPrototype: () => {
+        setScenarioId("SCN-005");
+        setPersonaId(demoPersonas[0].id);
+        setScorecardResolved(false);
+        setNotice("Prototype reset to the coherent missing-scorecard scenario.");
+        setResetKey((key) => key + 1);
+      },
     }),
-    [scenario, resetKey],
+    [notice, persona, personaId, resetKey, scenario, scenarioState, scorecardResolved],
   );
 
   return <PrototypeContext.Provider value={value}>{children}</PrototypeContext.Provider>;

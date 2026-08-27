@@ -1,8 +1,9 @@
 import { useMemo, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, BriefcaseBusiness, Building2, CheckCircle2, CircleHelp, Clock3, Copy, FileCheck2, Globe2, HeartHandshake, MapPin, Search, ShieldCheck, SlidersHorizontal, UserRound } from "lucide-react";
-import { candidateApplications, jobs, prototypeMeta, syntheticCandidate } from "../data/fixtures";
+import { ArrowLeft, ArrowRight, BriefcaseBusiness, Building2, CalendarDays, CheckCircle2, CircleHelp, Clock3, Copy, FileCheck2, Globe2, HeartHandshake, MessageCircle, MapPin, Search, ShieldCheck, SlidersHorizontal, UserRound } from "lucide-react";
+import { candidateApplications, jobs, syntheticCandidate } from "../data/fixtures";
 import { Freshness, Pill, PrototypeBanner, ScenarioControl, ScreenId, Stepper } from "./Common";
+import { usePrototype } from "../prototype/PrototypeContext";
 
 type CandidateScreen = "careers" | "job" | "apply" | "hub";
 
@@ -90,7 +91,7 @@ function CareersScreen() {
           <div className="empty-state" role="status"><Search size={28} /><h3>No demo roles match those filters</h3><p>Clear the search or choose another workplace. Your filters are not saved.</p><button className="secondary-button" onClick={() => { setQuery(""); setWorkplace("All workplaces"); }}>Clear filters</button></div>
         )}
       </section>
-      <ScenarioControl compact />
+      <ScenarioControl compact audience="candidate" />
     </CandidateShell>
   );
 }
@@ -134,7 +135,8 @@ function ApplyScreen() {
   const [confirmed, setConfirmed] = useState(false);
   const [error, setError] = useState("");
   const navigate = useNavigate();
-  const job = jobs[0];
+  const { publicId } = useParams();
+  const job = jobs.find((item) => item.publicId === publicId) ?? jobs[0];
   const steps = ["Profile", "Experience", "Declarations", "Review"];
 
   const next = () => {
@@ -203,19 +205,42 @@ function BeakerIcon() { return <div className="mini-beaker" aria-hidden="true">S
 function HubScreen() {
   const [withdrawn, setWithdrawn] = useState<string | null>(null);
   const [confirming, setConfirming] = useState<string | null>(null);
+  const [availabilityOpen, setAvailabilityOpen] = useState(false);
+  const [availabilitySent, setAvailabilitySent] = useState(false);
+  const [slot, setSlot] = useState("Thu Aug 28 · 9:30 AM PT");
+  const { id } = useParams();
+  const { scenarioState } = usePrototype();
+  const applications = candidateApplications.map((application) => application.id === "APP-DEMO-001" ? {
+    ...application,
+    safeStatus: scenarioState.candidateStatus,
+    detail: scenarioState.candidateDetail,
+    nextAction: scenarioState.candidateNextAction,
+    tone: scenarioState.offerState === "Accepted" ? "success" as const : scenarioState.decisionState === "Closed" ? "neutral" as const : scenarioState.policyBlocked ? "info" as const : "warning" as const,
+  } : application);
+  const selectedApplication = applications.find((application) => application.id === id);
+  const stageRank: Record<string, number> = { Submitted: 0, Withdrawn: 0, "Recruiter review": 1, Screening: 2, Interviews: 3, Debrief: 4, Closed: 4, Offer: 5, Handoff: 6 };
+  const currentRank = stageRank[scenarioState.applicationStage] ?? 1;
   return (
     <CandidateShell>
       <div className="candidate-page hub-page">
-        <div className="hub-welcome"><div><ScreenId>UI-CAN-004</ScreenId><p className="eyebrow">Candidate hub</p><h1>Welcome back, Maya</h1><p>Safe status, the next action and nothing from internal evaluation.</p></div><ScenarioControl compact /></div>
+        <div className="hub-welcome"><div><ScreenId>UI-CAN-004</ScreenId><p className="eyebrow">Candidate hub</p><h1>Welcome back, Maya</h1><p>Safe status, the next action and nothing from internal evaluation.</p></div><ScenarioControl compact audience="candidate" /></div>
+        {selectedApplication && <section className="candidate-detail-panel" aria-labelledby="candidate-detail-heading">
+          <div><NavLink className="text-button" to="/my-applications"><ArrowLeft size={16} /> All applications</NavLink><p className="eyebrow">Application {selectedApplication.id}</p><h2 id="candidate-detail-heading">{selectedApplication.jobTitle}</h2><Pill tone={selectedApplication.tone}>{selectedApplication.safeStatus}</Pill></div>
+          <div className="candidate-timeline"><span className="complete">Applied</span><span className={currentRank <= 1 ? "current" : "complete"}>Team review</span><span className={currentRank < 3 ? "future" : currentRank === 3 ? "current" : "complete"}>Interview</span><span className={scenarioState.offerState === "Accepted" ? "complete" : scenarioState.offerState === "Pending approval" ? "current" : "future"}>Offer</span></div>
+          <div className="candidate-message"><MessageCircle size={19} /><div><strong>Latest process update</strong><p>{selectedApplication.detail}</p><small>Today · synthetic message fixture</small></div></div>
+        </section>}
         <div className="hub-grid">
           <section aria-labelledby="applications-heading"><div className="section-heading split-heading"><div><h2 id="applications-heading">Your synthetic applications</h2><p>Only records scoped to this demo candidate appear.</p></div><Pill tone="info">2 fixtures</Pill></div>
-            <div className="application-list">{candidateApplications.map((application) => {
+            <div className="application-list">{applications.map((application) => {
               const isWithdrawn = withdrawn === application.id;
-              return <article className="candidate-application" key={application.id}><div className="application-status-bar"><Pill tone={isWithdrawn ? "neutral" : application.tone}>{isWithdrawn ? "Withdrawn · simulated" : application.safeStatus}</Pill><span>{application.updated}</span></div><h3>{application.jobTitle}</h3><p>{isWithdrawn ? "This demo state shows that future optional work would be cancelled while history remains." : application.detail}</p><div className="next-action"><span>Next action</span><strong>{isWithdrawn ? "None" : application.nextAction}</strong></div>{confirming === application.id ? <div className="inline-confirm" role="alert"><strong>Simulate withdrawal?</strong><span>This will change only this browser view.</span><div><button className="secondary-button" onClick={() => setConfirming(null)}>Keep active</button><button className="danger-button" onClick={() => { setWithdrawn(application.id); setConfirming(null); }}>Confirm demo withdrawal</button></div></div> : !isWithdrawn && <button className="text-button danger-text" onClick={() => setConfirming(application.id)}>Withdraw demo application</button>}</article>;
+              const isClosed = application.id === "APP-DEMO-001" && scenarioState.decisionState === "Closed";
+              const needsAvailability = application.id === "APP-DEMO-001" && application.nextAction.startsWith("Share");
+              return <article className="candidate-application" key={application.id}><div className="application-status-bar"><Pill tone={isWithdrawn ? "neutral" : application.tone}>{isWithdrawn ? "Withdrawn · simulated" : application.safeStatus}</Pill><span>{application.updated}</span></div><h3><NavLink to={`/my-applications/${application.id}`}>{application.jobTitle}</NavLink></h3><p>{isWithdrawn ? "This demo state shows that future optional work would be cancelled while history remains." : application.detail}</p><div className="next-action"><span>Next action</span><strong>{isWithdrawn ? "None" : availabilitySent && needsAvailability ? "Availability shared · demo" : application.nextAction}</strong></div>{!isWithdrawn && !isClosed && needsAvailability && <button className="primary-button" onClick={() => setAvailabilityOpen(true)}><CalendarDays size={16} /> Share demo availability</button>}{confirming === application.id ? <div className="inline-confirm" role="alert"><strong>Simulate withdrawal?</strong><span>This will change only this browser view.</span><div><button className="secondary-button" onClick={() => setConfirming(null)}>Keep active</button><button className="danger-button" onClick={() => { setWithdrawn(application.id); setConfirming(null); }}>Confirm demo withdrawal</button></div></div> : !isWithdrawn && !isClosed && <button className="text-button danger-text" onClick={() => setConfirming(application.id)}>Withdraw demo application</button>}</article>;
             })}</div>
           </section>
           <aside className="hub-aside"><div className="support-card"><CircleHelp size={24} /><h2>Need help?</h2><p>Questions about access, accommodations or the fictional process use a candidate-safe support path.</p><a href="mailto:prototype@example.test" className="secondary-button">Preview support</a></div><div className="privacy-card"><ShieldCheck size={21} /><div><strong>Your demo privacy controls</strong><span>No login, tracking, retention or external request is active.</span></div></div></aside>
         </div>
+        {availabilityOpen && <div className="modal-scrim" role="presentation"><section className="transition-modal candidate-modal" role="dialog" aria-modal="true" aria-labelledby="availability-title"><h2 id="availability-title">Share synthetic availability</h2><p>Choose one prepared slot. No calendar or message will be sent.</p><fieldset className="choice-group"><legend>Preferred interview time</legend>{["Thu Aug 28 · 9:30 AM PT", "Thu Aug 28 · 1:00 PM PT", "Fri Aug 29 · 11:00 AM PT"].map((item) => <label className={slot === item ? "selected" : ""} key={item}><input type="radio" name="candidate-slot" checked={slot === item} onChange={() => setSlot(item)} /><span><strong>{item}</strong><small>America/Los_Angeles</small></span></label>)}</fieldset><div className="modal-actions"><button className="secondary-button" onClick={() => setAvailabilityOpen(false)}>Cancel</button><button className="primary-button" onClick={() => { setAvailabilitySent(true); setAvailabilityOpen(false); }}>Save availability in demo</button></div></section></div>}
       </div>
     </CandidateShell>
   );

@@ -2,7 +2,7 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Draft v1.3 — Salesforce-style synthetic wireframe and implementation-alignment contract |
+| Status | Draft v1.4 — semantic operating wireframe and implementation-alignment contract |
 | Last updated | August 27, 2026 |
 | Product owner | Aditya Singh |
 | Initial market | San Francisco–based employer hiring in the United States |
@@ -12,10 +12,10 @@
 | Pilot/production candidate deployment | Approved external application host and backend-for-frontend; providers TBD |
 | Pilot/production HR deployment | Native Salesforce Lightning application |
 | Operational system of record | Salesforce custom recruitment application |
-| Implementation state | React/TypeScript/Vite synthetic prototype now includes a high-fidelity Salesforce Lightning-style internal shell, both product surfaces, all 12 contracted screen families, 12 switchable internal persona fixtures, populated end-to-end demo records, passing local/CI/browser evidence and a verified HTTPS Pages deployment; Salesforce metadata, BFF/auth, provider integration and approved pilot environment do not exist |
+| Implementation state | React/TypeScript/Vite synthetic prototype now includes a high-fidelity Salesforce Lightning-style internal shell, both product surfaces, all 12 contracted screen families, a canonical cross-route scenario state, route-bound seeded records, persistent role-scoped persona context, recoverable candidate/HR tasks, automated WCAG contrast checks and responsive record cards; Salesforce metadata, BFF/auth, provider integration and approved pilot environment do not exist |
 | Pilot contract state | Proposed control envelope in section 7.6; employer, legal, provider, Salesforce, and named-owner decisions remain unapproved until their `OD-##` records close |
 | Full-audit state | [v0.9 executable-artifact audit](AUDIT-v0.9.md) complete for local repository evidence; all 18 controlled findings remain Open pending accountable dated review, and real-candidate work remains blocked |
-| v1.3 change boundary | Public-safe wireframe release: application source, deterministic fixtures, tests, visual evidence, README, Pages deployment evidence and this PRD may change; no Salesforce metadata/org, production backend, authentication, provider write, real candidate data or pilot authorization is created |
+| v1.4 change boundary | Public-safe semantic wireframe release: application source, deterministic fixtures, tests, visual evidence, README, Pages deployment evidence and this PRD may change; no Salesforce metadata/org, production backend, authentication, provider write, real candidate data or pilot authorization is created |
 
 ## 1. Executive summary
 
@@ -106,6 +106,22 @@ v1.3 executes the public synthetic wireframe authority granted after v1.2. It do
 | What does this validate? | Product composition, navigation, information hierarchy, data-density, seeded journey continuity, responsive behavior and governed state explanations | It does not validate Salesforce technical feasibility, production content, real permissions, provider behavior, legal conclusions, user desirability or pilot readiness |
 
 The visual implementation follows the Lightning page grammar because the production HR workspace remains native Salesforce. The prototype must nevertheless use recruitment-domain language and must display “synthetic wireframe” and “not a Salesforce org” boundaries. “Replica” in this release means high-fidelity visual and interaction composition, not copying Salesforce source code, trademarks, tenant chrome, record IDs, metadata or customer data.
+
+### 1.5 v1.4 semantic operating brief
+
+v1.4 changes the wireframe from a set of individually plausible screens into a coherent operating model. It does not expand the product beyond the 12 contracted screen families and does not authorize production development. Its primary acceptance question is whether a reviewer can follow one synthetic hiring fact through every relevant candidate and internal projection without contradiction.
+
+| Product question | v1.4 implemented contract | Acceptance evidence |
+| --- | --- | --- |
+| What is the source of demo truth? | A canonical `ScenarioState` owns candidate-safe status, application stage, missing scorecard count, interview state, decision/offer/handoff states, opening reservation/fill counts and the policy gate | Changing `SCN-005`, `SCN-007` or `SCN-012` updates all affected routes from the same snapshot; derived views cannot carry independent conflicting flags |
+| Do record URLs identify real fixtures? | Job, application, interview, scorecard-assignment and decision routes resolve their path identifier against a seeded registry; collection routes present list views within the same canonical screen family | `APP-DEMO-004` renders Noah Williams rather than the Maya default; list-to-record navigation preserves the selected identifier |
+| Does persona switching change work? | Persona context persists across route navigation and changes visible navigation, action queue, metrics, focus statement and least-privilege denial behavior | Interviewer, coordinator, approver, privacy, configuration, HRIS and auditor views expose different bounded work; direct access outside scope fails safely |
+| Are controls honest? | Search returns route-bound fixtures; launcher/help/setup/notification affordances open bounded previews; primary work rows navigate to their authoritative record; utilities explain their simulated result; unavailable production actions are disabled or explicitly preview-only | No visible control silently implies an email, calendar, HRIS, Salesforce, file or configuration write |
+| Can blocked work recover? | The application transition preview links to the missing assignment and offers reminder/waiver simulations; scorecard submission recalculates readiness across the action center, assignment list and application record | Completing `ASN-DEMO-001` removes the overdue action and moves `APP-DEMO-001` from Interviews to Debrief in memory |
+| Is candidate context safe and useful? | Candidate scenario labels contain no internal edge-case or evaluation language; the hub provides application detail, process timeline, latest safe update, next action, availability preview and confirmed withdrawal recovery | Candidate copy never exposes scorecard ratings, decision reasons, internal stage names, other candidates or employee-only owners |
+| Is dense content usable beyond desktop? | Mobile list/table rows become labeled record cards, the utility bar no longer overlays content, focus indication is visible, minimum supporting text is raised and automated color contrast is enabled | 390 px browser checks show no page-level horizontal overflow and automated axe checks include `color-contrast` |
+
+The semantic graph is deliberately bounded but complete across all 12 inherited scenario identifiers. `SCN-001/002/003` project golden-path, human-close and withdrawal outcomes without creating an offer or hire accidentally. `SCN-004` demonstrates a candidate-safe availability request while the internal interview record owns the scheduling conflict. `SCN-005` is the default evidence-blocked state: Maya’s interview is complete, one scorecard is missing, Debrief/decision are blocked, no offer exists and no opening is reserved. `SCN-006` exposes a revised-offer review without treating the superseded version as current. `SCN-007` is the accepted-offer/handoff-failure state: evidence is complete, the offer is accepted, one opening is reserved, handoff reconciliation failed and Hired remains false. `SCN-008/009/010` keep possible-duplicate, message-delivery and out-of-order-event blockers internal while showing safe active-process copy to the candidate. `SCN-011` demonstrates access boundaries without changing candidate truth. `SCN-012` is the unknown-policy state: publication and downstream regulated action remain blocked and the candidate receives only a safe “details under review” projection.
 
 ## 2. Problem statement
 
@@ -3059,7 +3075,33 @@ Seed completeness rules:
 | Pages deployment | Workflow deploys the exact reviewed commit; public URL returns the app and all hash routes remain navigable | GitHub Pages stays synthetic-only and cannot become pilot hosting |
 | PRD reconciliation | Every material new shell, persona, seed group, table or interaction is represented in this section and change log | A wireframe discovery that changes scope/data/authority still requires the appropriate `OD/BAL` decision |
 
-Known v1.3 gaps remain explicit: there is no real authentication/authorization, server persistence, Salesforce object/field model, Lightning component implementation, API/BFF, documents, provider integration, analytics collection, production accessibility audit, moderated research, security review, legal approval or live operating evidence. The persona switcher is a design review control and must never be reused as a production impersonation pattern.
+Known v1.4 gaps remain explicit: there is no real authentication/authorization, server persistence, Salesforce object/field model, Lightning component implementation, API/BFF, documents, provider integration, analytics collection, production accessibility audit, moderated research, security review, legal approval or live operating evidence. Persona scoping is now behaviorally meaningful in the prototype, but the switcher remains a design-review control and must never be reused as a production impersonation or permission pattern.
+
+### 15.13 v1.4 canonical projection and task matrix
+
+The wireframe must derive the following projections from one scenario snapshot. A local component may hold ephemeral presentation state—an open dialog, selected slot, draft text or active tab—but may not create a second source of truth for a recruitment fact.
+
+| Canonical fact | Candidate projection | Recruiter / coordinator projection | Hiring / decision projection | Job / operations projection |
+| --- | --- | --- | --- | --- |
+| `applicationStage` | Candidate-safe status and process milestone; never the raw internal reason | Record header, timeline, recent-application list, pipeline adjustment and owned next work | Decision readiness entry state | Automation trigger eligibility and audit explanation |
+| `missingScorecards` | “Team is finishing its process”; no count, owner or rating | Scorecard blocker, assignment link, overdue work item and recovery actions | Human-decision blocked/ready state; offer creation remains unavailable while blocked | Reminder eligibility; no automatic advancement |
+| `interviewState` | Interview complete or candidate action request only | Today list, interview record and scheduling task | Evidence expectation; attendance is not evidence | Calendar projection remains preview-only |
+| `offerState` | Candidate response/status only after an authorized offer exists | Application/decision phase and owned approval/response work | Immutable offer version, approval and response facts | Opening reservation is derived from accepted active offer, never a separately edited dashboard count |
+| `handoffState` | Safe onboarding/handoff update with support path | Reconciliation work and current owner | Ready for Hire versus Hired separation | Idempotency key, payload hash, destination acknowledgement and failed-run ownership |
+| `openingReserved` / `openingFilled` | No internal headcount ledger | Job opening reconciliation | Offer/hire invariant checks | Authoritative approved → reserved → filled counts |
+| `policyBlocked` | Application remains active or job details are under review; no legal inference | Explicit owner, error code and safe next action | Decision/offer action stays blocked if applicable | Publication readiness is false; unknown never defaults to allowed |
+
+Required v1.4 role behaviors are:
+
+- Recruiter: jobs, applications, interview coordination, scorecards and decision readiness; sees the broad recruiting queue but not governance or automation administration.
+- Recruiting Coordinator: candidate wait, scheduling and message recovery; no offer or governance access.
+- Hiring Manager: requisition plan, application evidence, assigned scorecards and human decision; no automation or privacy administration.
+- Interviewer: assigned interviews and independent scorecards only; does not see other offer, compensation or governance work.
+- Offer Approver: owned offer decision work only; no accommodation, other scorecards or platform configuration.
+- Candidate Support: minimized candidate-safe application/message context; no evidence or decision details.
+- Integrity, Configuration, Platform, Privacy/Legal, HRIS and Auditor personas: each receives the smallest relevant action/governance/automation surface stated by `personaOperatingModels`; unsupported direct routes must render a safe denial rather than silently exposing the page.
+
+Every actionable v1.4 control must satisfy one of four states: navigate to an authoritative fixture; update shared in-memory semantic state; open a labeled read-only/simulation preview; or be disabled with visible reason. Decorative chevrons, ambiguous global search, production-looking writes without confirmation and generated-evidence claims are prohibited. Prefilled scorecard evidence must be labeled as synthetic fixture text inside a human-entry field, remain editable until submission and become locked after the in-memory submit action.
 
 ## 16. Analytics and instrumentation
 
@@ -3839,10 +3881,38 @@ Wireframe acceptance does not close any production `AUD-*`, `OD-*` or `BAL-*` it
 
 This snapshot accepts the deployable synthetic implementation boundary only. Moderated usability, manual keyboard/screen-reader review, accountable content/design sign-off and the existing `WP-02`/audit decision closures remain outstanding.
 
+### 22.3 Definition of v1.4 semantic wireframe acceptance
+
+v1.4 is accepted as a **semantic operating wireframe** only when all v1.3 public-safety and deployment conditions continue to pass and the following are evidenced on the exact deployed commit:
+
+1. `SCN-005` presents one coherent missing-scorecard state across candidate hub, action center, job/opening, application, interview, scorecard and decision projections: interview complete, one scorecard missing, no offer, no reservation and no handoff.
+2. `SCN-007` presents one coherent accepted-offer/handoff-failure state: candidate acceptance is visible safely, the opening is reserved, the handoff needs reconciliation and Hired remains false.
+3. `SCN-012` blocks publication for unknown policy applicability and uses a non-alarming candidate-safe projection.
+4. Collection and record routes use the requested fixture identifiers; list links do not fall through to a hard-coded person, job, interview or assignment.
+5. Persona selection persists in React memory across navigation, changes the navigation/work projection and denies at least one unsupported direct-route access safely.
+6. Submitting the synthetic missing scorecard recalculates application readiness across routes without refresh or network activity.
+7. Candidate scenario controls contain no internal scenario identifiers, missing-evidence labels, ratings, decision reasons or other-candidate data.
+8. Search, work-item drill-down, list controls, top-bar affordances, utility controls and core page actions either operate, explain their preview effect or visibly disable; no control implies an external write.
+9. Automated axe checks run with color contrast enabled; desktop and 390 px browser journeys have no page-level overflow; responsive data sets use labeled record cards instead of clipped desktop tables.
+10. PRD, README, release metadata, component tests, browser checks, CI and Pages evidence identify the same v1.4 commit and retain the synthetic/no-auth/no-persistence boundary.
+
+Failure of any item keeps v1.4 unaccepted but does not weaken the earlier production gates. Passing v1.4 is design and semantic evidence for `WP-02`; it remains neither a Salesforce feasibility result nor permission to process real candidate data.
+
+### 22.4 v1.4 evidence snapshot
+
+| Evidence | Current result |
+| --- | --- |
+| Canonical state | `ScenarioState` plus shared prototype context drives candidate status, application/interview/decision/offer/handoff/opening facts; scorecard resolution is cross-route and memory-only |
+| Record binding | Three job, five application, four interview and three assignment records back collection and parameterized routes |
+| Role behavior | 12 internal personas map to explicit screen scope, focus and queue; context persists until reset/refresh |
+| Automated checks | Artifact audit, TypeScript, component/journey tests including axe color contrast, production build and desktop/mobile Playwright checks are required before deployment |
+| Deployment | Pages URL remains [https://singhaditya21.github.io/Recruitment-System/](https://singhaditya21.github.io/Recruitment-System/); exact v1.4 commit and workflow run are recorded after successful deployment |
+
 ## 23. Change log
 
 | Version | Date | Summary |
 | --- | --- | --- |
+| 1.4 | August 27, 2026 | Converted the public wireframe into a semantic operating model without adding production capability or new screen families: introduced one cross-route scenario state for candidate/application/interview/scorecard/decision/offer/handoff/opening/policy facts; route-bound job/application/interview/assignment/decision registries and list views; persistent persona scope with role-specific navigation, queues and safe denial; functioning synthetic record search and explicit top-bar/utility previews; recoverable application blocker actions and cross-route scorecard resolution; candidate-safe scenario labels, application detail/timeline/update and availability preview; honest human-entered scorecard evidence; labeled mobile record cards, non-overlaying utilities, larger support text, visible focus and enabled automated color-contrast testing; retained memory-only/no-network behavior and every production/pilot gate |
 | 1.3 | August 27, 2026 | Implemented the approved public-safe wireframe and reconciled it into the PRD: replaced the internal custom dashboard shell with a high-fidelity Salesforce Lightning-style React composition while remaining explicitly not a Salesforce org; preserved the separate employer-branded candidate portal and all 12 contracted screen families; added 12 switchable internal persona fixtures, seeded recent-application/interview/privacy tables and deterministic coverage across jobs, applications, queues, interviews, scorecards, decisions, offers, handoff, communications, automations, providers, policy, access and audit; added responsive/overflow, persona, privacy and visual evidence requirements; retained memory-only/no-network behavior and every production/pilot gate |
 | 1.2 | August 27, 2026 | PRD-only approval, configuration and human-decision assurance release with no development changes: added an executive decision brief and five-view review architecture; defined 44 canonical `TERM-*` entries, 20 `CFG-*` authority classes, 12 finite `WAV-*` classes, 12 `HDA-*` meaningful-human-decision clauses, 8 `REV-*` candidate process-error classes, 12 `RES-*` research/sampling clauses and 10 expiring `DEBT-*` classes; added the complete two-surface/12-screen-family/13-persona/48-data-group/92-object-family (111 expanded concepts) matrix with explicit unresolved atomic-page and physical-object/field boundaries; extended the companion register through `ART-027`, launch evidence through `EVD-012`, and assigned all 18 existing ballots exactly once across four accountable `WS-*` workshops without adding or approving any `OD-*` decision |
 | 1.1 | August 26, 2026 | PRD-only product-constitution and pilot-learning release with no development changes: defined 8 `FIT-*` design-center clauses and non-fit boundaries, 8 ordered `PRI-*` trade-off principles, 12 falsifiable `HYP-*` product hypotheses, 12 `RGT-*` candidate rights, 12 `BAS-*` current-state baseline families and an explicit economic model; added 10 adoption/value profiles to create 32 total `MET-*` measures; introduced 5-stage `RMP-*` pilot cohorts, 6 `OUT-*` stop/repeat/narrow/extend/expand decisions, 12 `ADP-*` adoption/cutover duties, 10 `EXP-*` controlled-expansion clauses and 10 `EXT-*` exit/portability obligations; added `ART-022/023` and bound every new contract to the existing 39 decisions/18 ballots without claiming approval or implementation evidence |

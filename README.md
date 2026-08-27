@@ -1,6 +1,6 @@
 # Recruitment System
 
-An end-to-end applicant tracking system for a San Francisco–based company, designed around Salesforce as the future operational system of record. The v1.3 GitHub Pages release is a public-safe, high-fidelity Lightning-style wireframe—not a Salesforce org.
+An end-to-end applicant tracking system for a San Francisco–based company, designed around Salesforce as the future operational system of record. The v1.4 GitHub Pages release is a public-safe, high-fidelity Lightning-style semantic operating wireframe—not a Salesforce org.
 
 ## Public wireframe
 
@@ -19,13 +19,13 @@ Deployment is live over HTTPS from the repository's `main` branch. [View the sou
 - [v0.9 Executable Artifact and Synthetic Prototype Audit](docs/AUDIT-v0.9.md)
 - [v0.8 Full Product and Delivery Audit](docs/AUDIT-v0.8.md)
 
-PRD v1.3 reconciles the full product contract with the executable synthetic wireframe. The implementation covers 12 candidate/HR screen contracts, 12 internal persona views plus the candidate persona, 12 edge-case scenarios, seeded operational records at every product end, machine-readable transition/automation/interface/invariant/error registries, traceability, automated accessibility checks, desktop/mobile browser journeys, CI and GitHub Pages deployment.
+PRD v1.4 reconciles the full product contract with an executable semantic wireframe. One canonical scenario snapshot now drives candidate-safe status, application stage, interviews, scorecard readiness, decision state, offer/handoff state and opening counts across routes. Route parameters resolve real seeded records; persona context persists and materially changes navigation, queues and least-privilege access; primary controls work, explain their preview behavior or are visibly disabled; the candidate hub and HR application/scorecard journeys include recoverable next actions. The implementation retains all 12 candidate/HR screen families, 13 personas, 12 scenarios, machine-readable contracts, automated accessibility tests, desktop/mobile browser journeys, CI and Pages deployment.
 
 Development is intended to begin with a public GitHub Pages prototype that uses synthetic data only, followed by a native Salesforce Lightning HR workspace and an externally hosted candidate portal through a secure backend-for-frontend. Candidate documents remain in approved private object storage. GitHub Pages will not handle real authentication, candidate data, resumes, interview feedback, offers, or audit records.
 
 Current repository state: the React/TypeScript/Vite wireframe, deterministic fixtures, Lightning-style internal shell, candidate experience, automated tests, visual evidence, CI and verified GitHub Pages deployment are present. Salesforce metadata, the candidate BFF, authentication, provider integrations, approved product/policy decisions and moderated usability evidence are not present. The wireframe cannot process or persist real candidate information.
 
-## Run and verify v1.3
+## Run and verify v1.4
 
 ```bash
 pnpm install --frozen-lockfile

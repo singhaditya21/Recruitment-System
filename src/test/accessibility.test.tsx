@@ -6,11 +6,7 @@ import App from "../App";
 async function expectNoAxeViolations(hash: string) {
   window.location.hash = hash;
   const { container } = render(<App />);
-  const results = await axe.run(container, {
-    rules: {
-      "color-contrast": { enabled: false },
-    },
-  });
+  const results = await axe.run(container);
   expect(results.violations.map(({ id, nodes }) => ({ id, nodes: nodes.length }))).toEqual([]);
 }
 

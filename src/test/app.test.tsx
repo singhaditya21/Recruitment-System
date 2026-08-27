@@ -32,6 +32,17 @@ describe("candidate prototype journeys", () => {
     await user.click(screen.getByRole("button", { name: /Continue/ }));
     expect(screen.getByRole("heading", { name: "Review the immutable snapshot" })).toBeInTheDocument();
   });
+
+  it("offers a candidate-safe availability task without exposing the internal conflict", async () => {
+    const user = userEvent.setup();
+    open("#/my-applications/APP-DEMO-001");
+    await user.selectOptions(screen.getByRole("combobox", { name: "Choose synthetic scenario" }), "SCN-004");
+    expect(screen.queryByText(/Interview conflict/i)).not.toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Share demo availability" }));
+    const dialog = screen.getByRole("dialog", { name: "Share synthetic availability" });
+    await user.click(within(dialog).getByRole("button", { name: "Save availability in demo" }));
+    expect(screen.getByText("Availability shared · demo")).toBeInTheDocument();
+  });
 });
 
 describe("HR prototype controls", () => {
@@ -64,9 +75,35 @@ describe("HR prototype controls", () => {
   it("seeds restricted privacy operations without enabling execution", async () => {
     const user = userEvent.setup();
     open("#/hr/governance");
+    await user.selectOptions(screen.getByRole("combobox", { name: "View as demo persona" }), "USR-PRV-001");
     await user.click(screen.getByRole("tab", { name: "Privacy requests" }));
     const table = screen.getByRole("table", { name: "Synthetic privacy requests" });
     expect(within(table).getByText("PRV-DEMO-014")).toBeInTheDocument();
     expect(within(table).getAllByRole("row")).toHaveLength(4);
+  });
+
+  it("binds application routes to the requested synthetic record", () => {
+    open("#/hr/applications/APP-DEMO-004");
+    expect(screen.getByRole("heading", { name: "Noah Williams", level: 1 })).toBeInTheDocument();
+    expect(screen.getByText(/Recruiting Operations Partner · Scheduling/)).toBeInTheDocument();
+  });
+
+  it("persists persona scope across workspace navigation", async () => {
+    const user = userEvent.setup();
+    open("#/hr/action-center");
+    await user.selectOptions(screen.getByRole("combobox", { name: "View as demo persona" }), "USR-INT-001");
+    await user.click(screen.getByRole("link", { name: "Scorecards" }));
+    expect(screen.getByRole("combobox", { name: "View as demo persona" })).toHaveValue("USR-INT-001");
+    expect(screen.getByRole("heading", { name: "Scorecards", level: 1 })).toBeInTheDocument();
+  });
+
+  it("recalculates application readiness after an in-memory scorecard submission", async () => {
+    const user = userEvent.setup();
+    open("#/hr/assignments/ASN-DEMO-001");
+    await user.click(screen.getByRole("button", { name: "Submit scorecard" }));
+    await user.click(screen.getByRole("link", { name: "Applications" }));
+    await user.click(screen.getByRole("link", { name: /Maya Chen/ }));
+    expect(screen.getByText("Scorecards complete")).toBeInTheDocument();
+    expect(screen.getByText("Debrief").closest("li")).toHaveTextContent("Current");
   });
 });

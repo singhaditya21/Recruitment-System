@@ -1,4 +1,4 @@
-name: v1.3 wireframe verification
+name: v1.4 semantic wireframe verification
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: v1.3-wireframe-verification-output
+          name: v1.4-wireframe-verification-output
           path: |
             dist
             playwright-report

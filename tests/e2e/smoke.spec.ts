@@ -1,4 +1,10 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
+
+async function openHrNavigation(page: Page, name: string) {
+  const toggle = page.getByRole("button", { name: "Toggle navigation" });
+  if (await toggle.isVisible()) await toggle.click();
+  await page.getByRole("link", { name, exact: true }).click();
+}
 
 test("candidate can complete the synthetic application journey", async ({ page }) => {
   await page.goto("/#/careers");
@@ -38,4 +44,39 @@ test("HR console keeps the Lightning shell and seeded records contained", async 
   await expect(page.getByLabel("View as demo persona")).toHaveValue("USR-REC-001");
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
   expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test("route-bound search opens the requested application record", async ({ page }) => {
+  await page.goto("/#/hr/action-center");
+  await page.getByRole("textbox", { name: "Search synthetic recruitment workspace" }).fill("Noah");
+  await page.getByRole("option", { name: /Noah Williams · APP-DEMO-004/ }).click();
+  await expect(page.getByRole("heading", { name: "Noah Williams", level: 1 })).toBeVisible();
+  await expect(page.getByText(/Recruiting Operations Partner · Scheduling/)).toBeVisible();
+});
+
+test("scorecard completion recalculates the shared application state", async ({ page }) => {
+  await page.goto("/#/hr/assignments/ASN-DEMO-001");
+  await page.getByRole("button", { name: "Submit scorecard" }).click();
+  await openHrNavigation(page, "Applications");
+  await page.getByRole("link", { name: /Maya Chen/ }).click();
+  await expect(page.getByText("Scorecards complete")).toBeVisible();
+  await expect(page.locator(".stage-timeline li.current")).toContainText("Debrief");
+});
+
+test("persona scope persists and changes the available workspace", async ({ page }) => {
+  await page.goto("/#/hr/action-center");
+  await page.getByLabel("View as demo persona").selectOption("USR-INT-001");
+  await openHrNavigation(page, "Scorecards");
+  await expect(page.getByLabel("View as demo persona")).toHaveValue("USR-INT-001");
+  await expect(page.getByRole("heading", { name: "Scorecards", level: 1 })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Governance" })).toHaveCount(0);
+});
+
+test("candidate availability remains safe and recoverable", async ({ page }) => {
+  await page.goto("/#/my-applications/APP-DEMO-001");
+  await page.getByRole("combobox", { name: "Choose synthetic scenario" }).selectOption("SCN-004");
+  await expect(page.getByText(/Interview conflict/i)).toHaveCount(0);
+  await page.getByRole("button", { name: "Share demo availability" }).click();
+  await page.getByRole("button", { name: "Save availability in demo" }).click();
+  await expect(page.getByText("Availability shared · demo")).toBeVisible();
 });
