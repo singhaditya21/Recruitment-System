@@ -26,7 +26,7 @@ The repository is still not production- or pilot-ready. Salesforce/BFF/IdP/provi
 | No Salesforce/BFF/IdP/API/event implementation | Proposed contracts added; implementation remains absent by design | OpenAPI, AsyncAPI, Salesforce mapping and ADR | Technology/provider decisions, deployable services/metadata, environments and tests |
 | Threat/privacy/SLO/observability/backup/incident/cutover evidence absent | Baseline plans added; exercised evidence remains absent | security/privacy/operations documents | Accountable reviews, selected stack, telemetry and completed drills |
 | Manual accessibility/usability/legal/security/pilot evidence incomplete | Explicit evidence plan added; status remains not run | `PILOT-EVIDENCE-PLAN.md` | Actual representative sessions, defects/closure and dated approvals |
-| Main unprotected/security automation limited | Repository automation materially improved; branch protection still to verify/enable | CODEOWNERS, Dependabot, CodeQL/dependency review, PR template, SECURITY.md | GitHub protection rules, required reviews/checks and successful workflow evidence |
+| Main unprotected/security automation limited | Remediated: `main` is protected with strict CI/CodeQL, CODEOWNER review, admin enforcement, linear history, conversation resolution and force-push/deletion prevention; dependency graph/alerts, security updates, secret scanning/push protection, Dependabot, CodeQL/dependency review, PR checklist and security policy are enabled | GitHub protection API, successful release checks and green dependency-review reruns | Maintain accountable review and act on security/dependency alerts |
 | PRD traceability stale/mismatched | Remediated for v1.7 counts and `UI-HR-009/010`; old releases remain historical | PRD 1.6/15.15/16.4/22.9–22.10; `MATRIX-v1.7.md` | Accountable ballots remain unapproved and must not be silently changed |
 
 ## Layered maturity
@@ -40,7 +40,7 @@ The repository is still not production- or pilot-ready. Salesforce/BFF/IdP/provi
 | Production application/data/integrations | M0 — absent | No Salesforce metadata/org, BFF, IdP, file/provider services or production data |
 | Security/privacy/reliability operations | M2 — baseline planned | Threat/data/SLO/incident/cutover plans exist; no selected-stack validation or exercises |
 | Human/legal/pilot assurance | M1 — planned | Evidence plan exists; sessions, approvals and pilot data do not |
-| Repository governance | M3 — configured | CI/Pages/security/dependency/CODEOWNER controls exist; branch rule and successful release runs require verification |
+| Repository governance | M4 — configured and verified | CI/Pages/CodeQL passed on `9c85f20`; protection and repository security settings were verified through GitHub APIs |
 
 ## Remaining priority register
 
@@ -54,7 +54,7 @@ The repository is still not production- or pilot-ready. Salesforce/BFF/IdP/provi
 8. Implement production telemetry and execute load/limit, dependency degradation, incident, backup/restore, cutover/rollback and privacy re-deletion exercises.
 9. Run manual assistive-technology and moderated persona journeys; resolve findings and secure content/accessibility acceptance.
 10. Obtain employment/legal/privacy approval for jurisdictions, notices, selection procedures, retention, accommodation, offers and providers.
-11. Enable/verify main-branch protection with required PR review, required CI/security checks, conversation resolution and force-push/deletion prevention.
+11. Maintain the protected-branch/security settings and review the generated official-action upgrade PRs without bypassing required checks.
 12. Run bounded nonproduction rehearsal and controlled pilot gates; record one approved outcome rather than inferring readiness from the wireframe.
 
 ## Readiness conclusion
