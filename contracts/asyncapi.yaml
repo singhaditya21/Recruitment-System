@@ -1,0 +1,44 @@
+asyncapi: 3.0.0
+info:
+  title: Recruitment System canonical event envelope
+  version: 0.1.0-proposed
+  description: Proposed semantic contract only; no broker, webhook receiver or publisher exists here.
+channels:
+  recruitmentEvents:
+    address: recruitment.events.v1
+    messages:
+      recruitmentEvent:
+        $ref: "#/components/messages/RecruitmentEvent"
+operations:
+  publishRecruitmentEvent:
+    action: send
+    channel: { $ref: "#/channels/recruitmentEvents" }
+    messages: [{ $ref: "#/channels/recruitmentEvents/messages/recruitmentEvent" }]
+  consumeRecruitmentEvent:
+    action: receive
+    channel: { $ref: "#/channels/recruitmentEvents" }
+    messages: [{ $ref: "#/channels/recruitmentEvents/messages/recruitmentEvent" }]
+components:
+  messages:
+    RecruitmentEvent:
+      name: RecruitmentEvent
+      payload:
+        type: object
+        additionalProperties: false
+        required: [eventId, eventType, schemaVersion, aggregateType, aggregateId, aggregateVersion, occurredAt, observedAt, actor, purpose, correlationId, causationId, idempotencyKey, payload]
+        properties:
+          eventId: { type: string, format: uuid }
+          eventType: { type: string, examples: [application.stage.changed] }
+          schemaVersion: { type: integer, minimum: 1 }
+          aggregateType: { type: string }
+          aggregateId: { type: string }
+          aggregateVersion: { type: integer, minimum: 1 }
+          occurredAt: { type: string, format: date-time }
+          observedAt: { type: string, format: date-time }
+          actor: { type: string }
+          purpose: { type: string }
+          correlationId: { type: string }
+          causationId: { type: string }
+          idempotencyKey: { type: string }
+          classification: { type: string, enum: [public, internal, confidential, restricted] }
+          payload: { type: object, additionalProperties: true }

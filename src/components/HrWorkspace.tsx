@@ -1,59 +1,523 @@
 import { useMemo, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
-import { Activity, AlertOctagon, AppWindow, ArrowRight, BarChart3, Bell, Bot, BriefcaseBusiness, CalendarDays, Check, CheckCircle2, CircleHelp, ClipboardCheck, FileCheck2, FileText, Filter, Gauge, Grid3X3, Hand, History, Inbox, LayoutDashboard, Link2, ListChecks, Menu, MessageSquareText, MoreHorizontal, PanelBottom, PauseCircle, PlayCircle, RefreshCcw, Scale, Search, Send, Settings2, ShieldAlert, ShieldCheck, Sparkles, UsersRound, Workflow, X, XCircle } from "lucide-react";
-import { actionItems, applicationActivity, applicationDocuments, applicationMessages, applicationRecords, applicationTasks, assignmentRecords, auditEvents, automationRuleDetails, automationRuns, demoPersonas, interviewRecords, jobs, offerApprovalSteps, personaOperatingModels, pipeline, privacyRequests, relatedApplications, scorecard, syntheticCandidate, type HrScreenKey } from "../data/fixtures";
-import { ExplainPanel, Freshness, IntegrityNotice, Metric, Pill, PrototypeBanner, ScenarioControl, ScreenId } from "./Common";
+import {
+  Activity,
+  AlertOctagon,
+  AppWindow,
+  ArrowRight,
+  BarChart3,
+  Bell,
+  Bot,
+  BriefcaseBusiness,
+  CalendarDays,
+  Check,
+  CheckCircle2,
+  CircleHelp,
+  ClipboardCheck,
+  Database,
+  FileBarChart2,
+  FileCheck2,
+  FileText,
+  Filter,
+  Gauge,
+  Grid3X3,
+  Hand,
+  History,
+  Inbox,
+  LayoutDashboard,
+  Link2,
+  ListChecks,
+  LockKeyhole,
+  Menu,
+  MessageSquareText,
+  MoreHorizontal,
+  PanelBottom,
+  PauseCircle,
+  PlayCircle,
+  RefreshCcw,
+  Scale,
+  Search,
+  Send,
+  Settings2,
+  ShieldAlert,
+  ShieldCheck,
+  Sparkles,
+  UsersRound,
+  Workflow,
+  X,
+  XCircle,
+} from "lucide-react";
+import {
+  actionItems,
+  applicationActivity,
+  applicationDocuments,
+  applicationMessages,
+  applicationRecords,
+  applicationTasks,
+  assignmentRecords,
+  auditEvents,
+  automationRuleDetails,
+  automationRuns,
+  demoPersonas,
+  interviewRecords,
+  jobs,
+  offerApprovalSteps,
+  personaOperatingModels,
+  pipeline,
+  privacyRequests,
+  relatedApplications,
+  scorecard,
+  syntheticCandidate,
+  type HrScreenKey,
+} from "../data/fixtures";
+import {
+  ExplainPanel,
+  Freshness,
+  IntegrityNotice,
+  Metric,
+  Pill,
+  PrototypeBanner,
+  ScenarioControl,
+  ScreenId,
+} from "./Common";
 import { usePrototype } from "../prototype/PrototypeContext";
 import { AnalyticsDashboard } from "./AnalyticsDashboard";
 import { ObjectDataStudio } from "./ObjectDataStudio";
+import { ObjectWorkspace } from "./ObjectWorkspace";
+import { ReportWorkspace } from "./ReportWorkspace";
+import {
+  displayCandidateForRole,
+  roleDataScopes,
+  visibleApplicationsForRole,
+  visibleAssignmentsForRole,
+  visibleInterviewsForRole,
+  visibleJobsForRole,
+} from "../data/access";
 
 type HrScreen = HrScreenKey;
 
 const hrNav = [
-  { to: "/hr/action-center", label: "Action center", screen: "actions" as const, icon: LayoutDashboard },
-  { to: "/hr/analytics", label: "Analytics", screen: "analytics" as const, icon: BarChart3 },
-  { to: "/hr/jobs", label: "Jobs", screen: "job" as const, icon: BriefcaseBusiness },
-  { to: "/hr/applications", label: "Applications", screen: "application" as const, icon: UsersRound },
-  { to: "/hr/interviews", label: "Interviews", screen: "interview" as const, icon: CalendarDays },
-  { to: "/hr/assignments", label: "Scorecards", screen: "scorecard" as const, icon: ClipboardCheck },
-  { to: "/hr/decisions", label: "Offers & handoff", screen: "decision" as const, icon: FileCheck2 },
-  { to: "/hr/automations", label: "Automation ops", screen: "automations" as const, icon: Bot },
-  { to: "/hr/governance", label: "Governance", screen: "governance" as const, icon: ShieldCheck },
+  {
+    to: "/hr/action-center",
+    label: "Action center",
+    screen: "actions" as const,
+    icon: LayoutDashboard,
+  },
+  {
+    to: "/hr/analytics",
+    label: "Analytics",
+    screen: "analytics" as const,
+    icon: BarChart3,
+  },
+  {
+    to: "/hr/reports",
+    label: "Reports",
+    screen: "reports" as const,
+    icon: FileBarChart2,
+  },
+  {
+    to: "/hr/objects",
+    label: "Objects",
+    screen: "objects" as const,
+    icon: Database,
+  },
+  {
+    to: "/hr/jobs",
+    label: "Jobs",
+    screen: "job" as const,
+    icon: BriefcaseBusiness,
+  },
+  {
+    to: "/hr/applications",
+    label: "Applications",
+    screen: "application" as const,
+    icon: UsersRound,
+  },
+  {
+    to: "/hr/interviews",
+    label: "Interviews",
+    screen: "interview" as const,
+    icon: CalendarDays,
+  },
+  {
+    to: "/hr/assignments",
+    label: "Scorecards",
+    screen: "scorecard" as const,
+    icon: ClipboardCheck,
+  },
+  {
+    to: "/hr/decisions",
+    label: "Offers & handoff",
+    screen: "decision" as const,
+    icon: FileCheck2,
+  },
+  {
+    to: "/hr/automations",
+    label: "Automation ops",
+    screen: "automations" as const,
+    icon: Bot,
+  },
+  {
+    to: "/hr/governance",
+    label: "Governance",
+    screen: "governance" as const,
+    icon: ShieldCheck,
+  },
 ] as const;
 
-const actionTargets: Record<string, string> = { "WORK-101": "/hr/applications/APP-DEMO-001", "WORK-102": "/hr/interviews/INT-DEMO-004", "WORK-103": "/hr/applications/APP-DEMO-009", "WORK-104": "/hr/decisions/APP-DEMO-011", "WORK-105": "/hr/decisions/APP-DEMO-001" };
+const actionTargets: Record<string, string> = {
+  "WORK-101": "/hr/applications/APP-DEMO-001",
+  "WORK-102": "/hr/interviews/INT-DEMO-004",
+  "WORK-103": "/hr/applications/APP-DEMO-009",
+  "WORK-104": "/hr/decisions/APP-DEMO-011",
+  "WORK-105": "/hr/decisions/APP-DEMO-001",
+};
 
-function HrShell({ title, eyebrow, screenId, screen, children, actions }: { title: string; eyebrow: string; screenId: string; screen: HrScreen; children: React.ReactNode; actions?: React.ReactNode }) {
+const actionApplicationIds: Record<string, string> = {
+  "WORK-101": "APP-DEMO-001",
+  "WORK-102": "APP-DEMO-004",
+  "WORK-103": "APP-DEMO-009",
+  "WORK-104": "APP-DEMO-011",
+  "WORK-105": "APP-DEMO-001",
+};
+
+function workSubjectForRole(role: string, item: (typeof actionItems)[number]) {
+  const application = applicationRecords.find(
+    (record) => record.id === actionApplicationIds[item.id],
+  );
+  if (!application || !item.subject.includes(" · ")) return item.subject;
+  const context = item.subject.split(" · ").slice(1).join(" · ");
+  return `${displayCandidateForRole(role, application)} · ${context}`;
+}
+
+function HrShell({
+  title,
+  eyebrow,
+  screenId,
+  screen,
+  children,
+  actions,
+}: {
+  title: string;
+  eyebrow: string;
+  screenId: string;
+  screen: HrScreen;
+  children: React.ReactNode;
+  actions?: React.ReactNode;
+}) {
   const [mobileMenu, setMobileMenu] = useState(false);
   const [query, setQuery] = useState("");
   const [topPanel, setTopPanel] = useState<string | null>(null);
-  const { personaId, persona, setPersonaId, notice, announce, clearNotice } = usePrototype();
+  const { personaId, persona, setPersonaId, notice, announce, clearNotice } =
+    usePrototype();
   const operatingModel = personaOperatingModels[persona.id];
   const allowed = operatingModel.screens.includes(screen);
-  const resolvedTitle = title.startsWith("Good morning") ? `Good morning, ${persona.name.split(" ")[0]}` : title;
+  const resolvedTitle = title.startsWith("Good morning")
+    ? `Good morning, ${persona.name.split(" ")[0]}`
+    : title;
   const results = useMemo(() => {
     if (query.trim().length < 2) return [];
     const needle = query.toLowerCase();
     return [
-      ...applicationRecords.map((row) => ({ label: `${row.candidate} · ${row.id}`, detail: row.job, to: `/hr/applications/${row.id}` })),
-      ...jobs.map((row) => ({ label: `${row.title} · ${row.id}`, detail: row.team, to: `/hr/jobs/${row.id}` })),
-      ...interviewRecords.map((row) => ({ label: `${row.candidate} · ${row.id}`, detail: row.type, to: `/hr/interviews/${row.id}` })),
-    ].filter((row) => `${row.label} ${row.detail}`.toLowerCase().includes(needle)).slice(0, 6);
-  }, [query]);
-  const toggle = (panel: string) => setTopPanel((current) => current === panel ? null : panel);
-  return <div className="hr-app lightning-replica">
-    <PrototypeBanner />
-    <header className="lightning-global-header">
-      <button className="launcher-button" aria-label="Open app launcher" aria-expanded={topPanel === "launcher"} onClick={() => toggle("launcher")}><Grid3X3 size={21} /></button>
-      <NavLink to="/hr/action-center" className="lightning-cloud" aria-label="Recruitment home"><span>R</span></NavLink>
-      <div className="global-search-wrap"><label className="global-search"><Search size={16} /><span className="sr-only">Search synthetic recruitment workspace</span><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search synthetic records..." /></label>{results.length > 0 && <div className="search-results" role="listbox" aria-label="Synthetic record search results">{results.map((result) => <NavLink role="option" to={result.to} key={result.to} onClick={() => setQuery("")}><strong>{result.label}</strong><span>{result.detail}</span></NavLink>)}</div>}</div>
-      <div className="topbar-actions"><span className="fixture-status"><i /> Synthetic data ready</span><button className="lightning-icon-button" aria-label="Help" aria-expanded={topPanel === "help"} onClick={() => toggle("help")}><CircleHelp size={19} /></button><button className="lightning-icon-button" aria-label="Setup" aria-expanded={topPanel === "setup"} onClick={() => toggle("setup")}><Settings2 size={19} /></button><button className="lightning-icon-button" aria-label="Notifications" aria-expanded={topPanel === "notifications"} onClick={() => toggle("notifications")}><Bell size={19} /><span className="notification-count">3</span></button><div className="persona-avatar" title={`${persona.name} · ${persona.role}`}>{persona.initials}</div></div>
-      {topPanel && <div className="top-popover" role="dialog" aria-label={`${topPanel} preview`}><button className="modal-close" aria-label={`Close ${topPanel} preview`} onClick={() => setTopPanel(null)}><X size={18} /></button>{topPanel === "launcher" ? <><strong>Recruitment applications</strong><NavLink to="/hr/action-center">Talent Operations Console</NavLink><NavLink to="/careers">Candidate site</NavLink></> : topPanel === "help" ? <><strong>Wireframe help</strong><p>Use scenario and persona controls to inspect coherent synthetic operating states.</p></> : topPanel === "setup" ? <><strong>Setup is preview-only</strong><p>Configuration changes are unavailable on public GitHub Pages.</p></> : <><strong>3 owned demo alerts</strong><p>Scorecard overdue · candidate waiting · integration review.</p></>}</div>}
-    </header>
-    <section className="lightning-app-bar" aria-label="Recruitment application navigation"><button className="mobile-menu" aria-label="Toggle navigation" aria-expanded={mobileMenu} onClick={() => setMobileMenu((open) => !open)}><Menu size={20} /></button><div className="app-identity"><span className="object-icon object-icon-recruitment"><AppWindow size={20} /></span><div><strong>Recruitment</strong><small>Talent Operations Console</small></div></div><nav className={`lightning-tabs ${mobileMenu ? "open" : ""}`} aria-label="Primary HR workspace">{hrNav.filter((item) => operatingModel.screens.includes(item.screen)).map(({ to, label, icon: Icon }) => <NavLink to={to} key={to} onClick={() => setMobileMenu(false)}><Icon size={14} />{label}</NavLink>)}</nav><label className="persona-switcher"><span>View as</span><select value={personaId} onChange={(event) => setPersonaId(event.target.value)} aria-label="View as demo persona">{demoPersonas.map((item) => <option value={item.id} key={item.id}>{item.name} · {item.role}</option>)}</select></label></section>
-    <div className="hr-shell"><main className="hr-main" id="main-content"><div className="lightning-breadcrumbs"><NavLink to="/hr/action-center">Recruitment</NavLink><span>/</span><span>{eyebrow}</span><span className="wireframe-disclaimer">Synthetic wireframe · not a Salesforce org</span></div><div className="hr-page-heading"><div className="record-heading-main"><span className="object-icon"><AppWindow size={22} /></span><div><div className="heading-meta"><span className="eyebrow">{eyebrow}</span><ScreenId>{screenId}</ScreenId></div><h1>{resolvedTitle}</h1><span className="record-subtitle">{persona.role} · {persona.access} · {persona.id}</span></div></div>{allowed && actions && <div className="page-actions">{actions}</div>}</div>{!allowed ? <section className="panel access-denied" role="alert"><ShieldAlert size={28} /><div><h2>Access denied safely</h2><p>{persona.role} does not have this workspace in the least-privilege simulation.</p><p>Current scope: {operatingModel.focus}.</p></div><NavLink className="primary-button" to="/hr/action-center">Return to allowed work</NavLink></section> : children}</main><footer className="lightning-utility-bar" aria-label="Workspace utilities"><button onClick={() => announce("Notes opened as a read-only fixture preview.")}><PanelBottom size={15} /> Notes <span>2</span></button><button onClick={() => announce("History is represented by the synthetic audit ledger.")}><History size={15} /> History</button><button onClick={() => announce("Candidate Support preview opened. No message was sent.")}><MessageSquareText size={15} /> Candidate Support <span>1</span></button><NavLink to="/hr/automations"><Activity size={15} /> Integration Health <i /></NavLink><NavLink to="/careers"><Sparkles size={15} /> Candidate Site</NavLink></footer></div>
-    {notice && <div className="workspace-toast" role="status"><CheckCircle2 size={18} /><span>{notice}</span><button aria-label="Dismiss notification" onClick={clearNotice}><X size={17} /></button></div>}
-  </div>;
+      ...visibleApplicationsForRole(persona.role).map((row) => ({
+        label: displayCandidateForRole(persona.role, row),
+        detail: `${row.job} · ${row.id}`,
+        to: `/hr/applications/${row.id}`,
+      })),
+      ...visibleJobsForRole(persona.role).map((row) => ({
+        label: `${row.title} · ${row.id}`,
+        detail: row.team,
+        to: `/hr/jobs/${row.id}`,
+      })),
+      ...visibleInterviewsForRole(persona.role).map((row) => ({
+        label: displayCandidateForRole(persona.role, row),
+        detail: `${row.type} · ${row.id}`,
+        to: `/hr/interviews/${row.id}`,
+      })),
+    ]
+      .filter((row) =>
+        `${row.label} ${row.detail}`.toLowerCase().includes(needle),
+      )
+      .slice(0, 6);
+  }, [persona.role, query]);
+  const toggle = (panel: string) =>
+    setTopPanel((current) => (current === panel ? null : panel));
+  return (
+    <div className="hr-app lightning-replica">
+      <PrototypeBanner />
+      <header className="lightning-global-header">
+        <button
+          className="launcher-button"
+          aria-label="Open app launcher"
+          aria-expanded={topPanel === "launcher"}
+          onClick={() => toggle("launcher")}
+        >
+          <Grid3X3 size={21} />
+        </button>
+        <NavLink
+          to="/hr/action-center"
+          className="lightning-cloud"
+          aria-label="Recruitment home"
+        >
+          <span>R</span>
+        </NavLink>
+        <div className="global-search-wrap">
+          <label className="global-search">
+            <Search size={16} />
+            <span className="sr-only">
+              Search synthetic recruitment workspace
+            </span>
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search synthetic records..."
+            />
+          </label>
+          {results.length > 0 && (
+            <div
+              className="search-results"
+              role="listbox"
+              aria-label="Synthetic record search results"
+            >
+              {results.map((result) => (
+                <NavLink
+                  role="option"
+                  to={result.to}
+                  key={result.to}
+                  onClick={() => setQuery("")}
+                >
+                  <strong>{result.label}</strong>
+                  <span>{result.detail}</span>
+                </NavLink>
+              ))}
+            </div>
+          )}
+        </div>
+        <div className="topbar-actions">
+          <span className="fixture-status">
+            <i /> Synthetic data ready
+          </span>
+          <button
+            className="lightning-icon-button"
+            aria-label="Help"
+            aria-expanded={topPanel === "help"}
+            onClick={() => toggle("help")}
+          >
+            <CircleHelp size={19} />
+          </button>
+          <button
+            className="lightning-icon-button"
+            aria-label="Setup"
+            aria-expanded={topPanel === "setup"}
+            onClick={() => toggle("setup")}
+          >
+            <Settings2 size={19} />
+          </button>
+          <button
+            className="lightning-icon-button"
+            aria-label="Notifications"
+            aria-expanded={topPanel === "notifications"}
+            onClick={() => toggle("notifications")}
+          >
+            <Bell size={19} />
+            <span className="notification-count">3</span>
+          </button>
+          <div
+            className="persona-avatar"
+            title={`${persona.name} · ${persona.role}`}
+          >
+            {persona.initials}
+          </div>
+        </div>
+        {topPanel && (
+          <div
+            className="top-popover"
+            role="dialog"
+            aria-label={`${topPanel} preview`}
+          >
+            <button
+              className="modal-close"
+              aria-label={`Close ${topPanel} preview`}
+              onClick={() => setTopPanel(null)}
+            >
+              <X size={18} />
+            </button>
+            {topPanel === "launcher" ? (
+              <>
+                <strong>Recruitment applications</strong>
+                <NavLink to="/hr/action-center">
+                  Talent Operations Console
+                </NavLink>
+                <NavLink to="/careers">Candidate site</NavLink>
+              </>
+            ) : topPanel === "help" ? (
+              <>
+                <strong>Wireframe help</strong>
+                <p>
+                  Use scenario and persona controls to inspect coherent
+                  synthetic operating states.
+                </p>
+              </>
+            ) : topPanel === "setup" ? (
+              <>
+                <strong>Setup is preview-only</strong>
+                <p>
+                  Configuration changes are unavailable on public GitHub Pages.
+                </p>
+              </>
+            ) : (
+              <>
+                <strong>3 owned demo alerts</strong>
+                <p>
+                  Scorecard overdue · candidate waiting · integration review.
+                </p>
+              </>
+            )}
+          </div>
+        )}
+      </header>
+      <section
+        className="lightning-app-bar"
+        aria-label="Recruitment application navigation"
+      >
+        <button
+          className="mobile-menu"
+          aria-label="Toggle navigation"
+          aria-expanded={mobileMenu}
+          onClick={() => setMobileMenu((open) => !open)}
+        >
+          <Menu size={20} />
+        </button>
+        <div className="app-identity">
+          <span className="object-icon object-icon-recruitment">
+            <AppWindow size={20} />
+          </span>
+          <div>
+            <strong>Recruitment</strong>
+            <small>Talent Operations Console</small>
+          </div>
+        </div>
+        <nav
+          className={`lightning-tabs ${mobileMenu ? "open" : ""}`}
+          aria-label="Primary HR workspace"
+        >
+          {hrNav
+            .filter((item) => operatingModel.screens.includes(item.screen))
+            .map(({ to, label, icon: Icon }) => (
+              <NavLink to={to} key={to} onClick={() => setMobileMenu(false)}>
+                <Icon size={14} />
+                {label}
+              </NavLink>
+            ))}
+        </nav>
+        <label className="persona-switcher">
+          <span>View as</span>
+          <select
+            value={personaId}
+            onChange={(event) => setPersonaId(event.target.value)}
+            aria-label="View as demo persona"
+          >
+            {demoPersonas.map((item) => (
+              <option value={item.id} key={item.id}>
+                {item.name} · {item.role}
+              </option>
+            ))}
+          </select>
+        </label>
+      </section>
+      <div className="hr-shell">
+        <main className="hr-main" id="main-content">
+          <div className="lightning-breadcrumbs">
+            <NavLink to="/hr/action-center">Recruitment</NavLink>
+            <span>/</span>
+            <span>{eyebrow}</span>
+            <span className="wireframe-disclaimer">
+              Synthetic wireframe · not a Salesforce org
+            </span>
+          </div>
+          <div className="hr-page-heading">
+            <div className="record-heading-main">
+              <span className="object-icon">
+                <AppWindow size={22} />
+              </span>
+              <div>
+                <div className="heading-meta">
+                  <span className="eyebrow">{eyebrow}</span>
+                  <ScreenId>{screenId}</ScreenId>
+                </div>
+                <h1>{resolvedTitle}</h1>
+                <span className="record-subtitle">
+                  {persona.role} · {persona.access} · {persona.id}
+                </span>
+              </div>
+            </div>
+            {allowed && actions && (
+              <div className="page-actions">{actions}</div>
+            )}
+          </div>
+          {!allowed ? (
+            <section className="panel access-denied" role="alert">
+              <ShieldAlert size={28} />
+              <div>
+                <h2>Access denied safely</h2>
+                <p>
+                  {persona.role} does not have this workspace in the
+                  least-privilege simulation.
+                </p>
+                <p>Current scope: {operatingModel.focus}.</p>
+              </div>
+              <NavLink className="primary-button" to="/hr/action-center">
+                Return to allowed work
+              </NavLink>
+            </section>
+          ) : (
+            children
+          )}
+        </main>
+        <footer
+          className="lightning-utility-bar"
+          aria-label="Workspace utilities"
+        >
+          <button
+            onClick={() =>
+              announce("Notes opened as a read-only fixture preview.")
+            }
+          >
+            <PanelBottom size={15} /> Notes <span>2</span>
+          </button>
+          <button
+            onClick={() =>
+              announce("History is represented by the synthetic audit ledger.")
+            }
+          >
+            <History size={15} /> History
+          </button>
+          <button
+            onClick={() =>
+              announce("Candidate Support preview opened. No message was sent.")
+            }
+          >
+            <MessageSquareText size={15} /> Candidate Support <span>1</span>
+          </button>
+          <NavLink to="/hr/automations">
+            <Activity size={15} /> Integration Health <i />
+          </NavLink>
+          <NavLink to="/careers">
+            <Sparkles size={15} /> Candidate Site
+          </NavLink>
+        </footer>
+      </div>
+      {notice && (
+        <div className="workspace-toast" role="status">
+          <CheckCircle2 size={18} />
+          <span>{notice}</span>
+          <button aria-label="Dismiss notification" onClick={clearNotice}>
+            <X size={17} />
+          </button>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function ActionCenter() {
@@ -63,86 +527,1476 @@ function ActionCenter() {
   const [savedView, setSavedView] = useState("My urgent work");
   const navigate = useNavigate();
   const { scenario, scenarioState, persona, resetPrototype } = usePrototype();
-  const byRole: Record<string, string[]> = { Recruiter: ["WORK-101", "WORK-102", "WORK-103", "WORK-104", "WORK-105"], "Recruiting Coordinator": ["WORK-102", "WORK-103"], "Hiring Manager": ["WORK-101", "WORK-104"], Interviewer: ["WORK-101"], "Offer Approver": ["WORK-104"], "Candidate Support": ["WORK-102", "WORK-103"], "HRIS Operator": ["WORK-105"] };
-  let roleItems = actionItems.filter((item) => (byRole[persona.role] ?? actionItems.map((row) => row.id)).includes(item.id));
-  if (scenarioState.missingScorecards === 0) roleItems = roleItems.filter((item) => item.id !== "WORK-101");
-  if (scenarioState.handoffState !== "Reconciliation failed") roleItems = roleItems.filter((item) => item.id !== "WORK-105");
-  if (savedView === "Scheduling and communication") roleItems = roleItems.filter((item) => ["WORK-102", "WORK-103"].includes(item.id));
-  if (savedView === "Approvals and handoff") roleItems = roleItems.filter((item) => ["WORK-104", "WORK-105"].includes(item.id));
-  if (savedView === "SLA breaches") roleItems = roleItems.filter((item) => item.tone === "danger");
-  if (filter === "Needs me") roleItems = roleItems.slice(0, Math.max(1, Math.ceil(roleItems.length / 2)));
-  const selected = roleItems.find((item) => item.id === selectedId) ?? roleItems[0] ?? actionItems[0];
-  return <HrShell title="Good morning, Alex" eyebrow="Action center" screenId="UI-HR-001" screen="actions" actions={<><button className="secondary-button" onClick={resetPrototype}><RefreshCcw size={16} /> Reset fixtures</button><button className="primary-button" onClick={() => navigate(actionTargets[selected.id])}><Inbox size={16} /> Triage next</button></>}>
-    <div className="workspace-intro"><div><p>Start with owned work, its governing fact and a recoverable next action.</p><strong>{personaOperatingModels[persona.id].queue} · {personaOperatingModels[persona.id].focus}</strong></div><label className="saved-view"><span>Saved operational view</span><select value={savedView} onChange={(event) => setSavedView(event.target.value)}><option>My urgent work</option><option>Scheduling and communication</option><option>Approvals and handoff</option><option>SLA breaches</option></select></label><Freshness>Action projection · reconciled 3 min ago</Freshness></div><ScenarioControl />
-    <section className="metric-grid" aria-label="Action center summary"><Metric value={String(roleItems.length)} label="Visible actions" detail={`${roleItems.filter((item) => item.tone === "danger").length} urgent`} tone="danger" /><Metric value={persona.role === "Recruiting Coordinator" ? "2" : "1"} label="Candidates waiting" detail="Oldest 18 hours" tone="warning" /><Metric value={String(scenarioState.missingScorecards)} label="Missing evidence" detail={scenarioState.missingScorecards ? "Decision blocker" : "Evidence complete"} tone={scenarioState.missingScorecards ? "info" : "success"} /><Metric value={scenarioState.handoffState === "Reconciliation failed" ? "1" : "0"} label="Failed handoffs" detail="Owned by HRIS queue" tone={scenarioState.handoffState === "Reconciliation failed" ? "danger" : "success"} /></section>
-    <div className="action-layout"><section className="panel work-panel" aria-labelledby="work-heading"><div className="panel-heading"><div><h2 id="work-heading">Priority work</h2><span>Role-scoped governed work items</span></div><div className="segmented-control" aria-label="Work filter">{["Needs me", "My queue", "All visible"].map((item) => <button className={filter === item ? "active" : ""} onClick={() => setFilter(item)} key={item}>{item}</button>)}</div></div><div className="work-list">{roleItems.map((item) => <button className={`work-row ${selected.id === item.id ? "selected" : ""}`} key={item.id} onClick={() => setSelectedId(item.id)}><span className={`work-signal signal-${item.tone}`} /><span className="work-main"><span><Pill tone={item.tone}>{item.label}</Pill><small>{item.age}</small></span><strong>{item.subject}</strong><small>{item.owner}</small></span><ArrowRight size={17} /></button>)}</div></section><aside className="panel work-detail" aria-label="Selected work details"><div className="panel-heading"><div><span className="eyebrow">Selected work</span><h2>{selected.id}</h2></div><Pill tone={selected.tone}>{selected.label}</Pill></div><h3>{selected.subject}</h3><ExplainPanel source={selected.source}>{selected.why}</ExplainPanel><dl className="fact-list"><div><dt>Scenario</dt><dd>{scenario.id} · {scenario.label}</dd></div><div><dt>Owner</dt><dd>{selected.owner}</dd></div><div><dt>Age / due</dt><dd>{selected.age}</dd></div><div><dt>Role scope</dt><dd>{persona.role}</dd></div></dl><button className="primary-button full-button" onClick={() => navigate(actionTargets[selected.id])}>Open authoritative record <ArrowRight size={16} /></button></aside></div>
-    <section className="panel pipeline-panel"><div className="panel-heading"><div><h2>Pipeline pulse</h2><span>Maya is currently in {scenarioState.applicationStage}</span></div><Freshness>Application facts · 4 min ago</Freshness></div><div className="pipeline-bars">{pipeline.map((item, index) => <div key={item.stage}><div className="pipeline-label"><span>{item.stage}</span><strong>{item.stage === "Interview" && scenarioState.applicationStage !== "Interviews" ? item.count - 1 : item.count}</strong><small>{item.change}</small></div><div className="bar-track"><span style={{ width: `${100 - index * 15}%` }} /></div></div>)}</div></section>
-    <div className="home-record-grid"><section className="panel"><div className="panel-heading"><div><h2>Recently updated applications</h2><span>Route-bound list view · 5 records</span></div><button className="text-button" aria-pressed={compact} onClick={() => setCompact((value) => !value)}><Filter size={15} /> {compact ? "Show details" : "Compact list"}</button></div><div className={`lightning-data-table ${compact ? "compact-table" : ""}`} role="table" aria-label="Recently updated applications"><div className="table-row table-head" role="row"><span role="columnheader">Application</span><span role="columnheader">Candidate</span><span role="columnheader">Job</span><span role="columnheader">Stage</span><span role="columnheader">Owner</span><span role="columnheader">Updated</span></div>{applicationRecords.map((item) => <div className="table-row" role="row" key={item.id}><span role="cell" data-label="Application"><NavLink to={`/hr/applications/${item.id}`}>{item.id}</NavLink></span><strong role="cell" data-label="Candidate">{item.candidate}</strong><span role="cell" data-label="Job">{item.job}</span><span role="cell" data-label="Stage"><Pill tone={item.tone}>{item.id === "APP-DEMO-001" ? scenarioState.applicationStage : item.stage}</Pill></span><span role="cell" data-label="Owner">{item.owner}</span><span role="cell" data-label="Updated">{item.updated}</span></div>)}</div></section><section className="panel today-panel"><div className="panel-heading"><div><h2>Today's interviews</h2><span>Candidate-timezone aware</span></div><CalendarDays size={18} /></div>{interviewRecords.map((item) => { const state = item.id === "INT-DEMO-001" ? scenarioState.interviewState : item.state; return <div className="session-row" key={item.id}><strong>{item.time.split(" · ").at(-1)}</strong><div><NavLink to={`/hr/interviews/${item.id}`}>{item.candidate}</NavLink><small>{item.type} · {item.interviewer}</small></div><Pill tone={state === "Conflict" ? "danger" : state === "Complete" ? "success" : item.tone}>{state}</Pill></div>; })}</section></div>
-  </HrShell>;
+  const visibleApplications = visibleApplicationsForRole(persona.role);
+  const visibleInterviews = visibleInterviewsForRole(persona.role);
+  const byRole: Record<string, string[]> = {
+    Recruiter: ["WORK-101", "WORK-102", "WORK-103", "WORK-104", "WORK-105"],
+    "Recruiting Coordinator": ["WORK-102", "WORK-103"],
+    "Hiring Manager": ["WORK-101", "WORK-104"],
+    Interviewer: ["WORK-101"],
+    "Offer Approver": ["WORK-104"],
+    "Candidate Support": ["WORK-102", "WORK-103"],
+    "HRIS Operator": ["WORK-105"],
+  };
+  let roleItems = actionItems.filter((item) =>
+    (byRole[persona.role] ?? actionItems.map((row) => row.id)).includes(
+      item.id,
+    ),
+  );
+  if (scenarioState.missingScorecards === 0)
+    roleItems = roleItems.filter((item) => item.id !== "WORK-101");
+  if (scenarioState.handoffState !== "Reconciliation failed")
+    roleItems = roleItems.filter((item) => item.id !== "WORK-105");
+  if (savedView === "Scheduling and communication")
+    roleItems = roleItems.filter((item) =>
+      ["WORK-102", "WORK-103"].includes(item.id),
+    );
+  if (savedView === "Approvals and handoff")
+    roleItems = roleItems.filter((item) =>
+      ["WORK-104", "WORK-105"].includes(item.id),
+    );
+  if (savedView === "SLA breaches")
+    roleItems = roleItems.filter((item) => item.tone === "danger");
+  if (filter === "Needs me")
+    roleItems = roleItems.slice(
+      0,
+      Math.max(1, Math.ceil(roleItems.length / 2)),
+    );
+  const selected =
+    roleItems.find((item) => item.id === selectedId) ??
+    roleItems[0] ??
+    actionItems[0];
+  return (
+    <HrShell
+      title="Good morning, Alex"
+      eyebrow="Action center"
+      screenId="UI-HR-001"
+      screen="actions"
+      actions={
+        <>
+          <button className="secondary-button" onClick={resetPrototype}>
+            <RefreshCcw size={16} /> Reset fixtures
+          </button>
+          <button
+            className="primary-button"
+            onClick={() => navigate(actionTargets[selected.id])}
+          >
+            <Inbox size={16} /> Triage next
+          </button>
+        </>
+      }
+    >
+      <div className="workspace-intro">
+        <div>
+          <p>
+            Start with owned work, its governing fact and a recoverable next
+            action.
+          </p>
+          <strong>
+            {personaOperatingModels[persona.id].queue} ·{" "}
+            {personaOperatingModels[persona.id].focus}
+          </strong>
+        </div>
+        <label className="saved-view">
+          <span>Saved operational view</span>
+          <select
+            value={savedView}
+            onChange={(event) => setSavedView(event.target.value)}
+          >
+            <option>My urgent work</option>
+            <option>Scheduling and communication</option>
+            <option>Approvals and handoff</option>
+            <option>SLA breaches</option>
+          </select>
+        </label>
+        <Freshness>Action projection · reconciled 3 min ago</Freshness>
+      </div>
+      <ScenarioControl />
+      <section className="metric-grid" aria-label="Action center summary">
+        <Metric
+          value={String(roleItems.length)}
+          label="Visible actions"
+          detail={`${roleItems.filter((item) => item.tone === "danger").length} urgent`}
+          tone="danger"
+        />
+        <Metric
+          value={persona.role === "Recruiting Coordinator" ? "2" : "1"}
+          label="Candidates waiting"
+          detail="Oldest 18 hours"
+          tone="warning"
+        />
+        <Metric
+          value={String(scenarioState.missingScorecards)}
+          label="Missing evidence"
+          detail={
+            scenarioState.missingScorecards
+              ? "Decision blocker"
+              : "Evidence complete"
+          }
+          tone={scenarioState.missingScorecards ? "info" : "success"}
+        />
+        <Metric
+          value={
+            scenarioState.handoffState === "Reconciliation failed" ? "1" : "0"
+          }
+          label="Failed handoffs"
+          detail="Owned by HRIS queue"
+          tone={
+            scenarioState.handoffState === "Reconciliation failed"
+              ? "danger"
+              : "success"
+          }
+        />
+      </section>
+      <div className="action-layout">
+        <section className="panel work-panel" aria-labelledby="work-heading">
+          <div className="panel-heading">
+            <div>
+              <h2 id="work-heading">Priority work</h2>
+              <span>Role-scoped governed work items</span>
+            </div>
+            <div className="segmented-control" aria-label="Work filter">
+              {["Needs me", "My queue", "All visible"].map((item) => (
+                <button
+                  className={filter === item ? "active" : ""}
+                  onClick={() => setFilter(item)}
+                  key={item}
+                >
+                  {item}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="work-list">
+            {roleItems.map((item) => (
+              <button
+                className={`work-row ${selected.id === item.id ? "selected" : ""}`}
+                key={item.id}
+                onClick={() => setSelectedId(item.id)}
+              >
+                <span className={`work-signal signal-${item.tone}`} />
+                <span className="work-main">
+                  <span>
+                    <Pill tone={item.tone}>{item.label}</Pill>
+                    <small>{item.age}</small>
+                  </span>
+                  <strong>{workSubjectForRole(persona.role, item)}</strong>
+                  <small>{item.owner}</small>
+                </span>
+                <ArrowRight size={17} />
+              </button>
+            ))}
+          </div>
+        </section>
+        <aside className="panel work-detail" aria-label="Selected work details">
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">Selected work</span>
+              <h2>{selected.id}</h2>
+            </div>
+            <Pill tone={selected.tone}>{selected.label}</Pill>
+          </div>
+          <h3>{workSubjectForRole(persona.role, selected)}</h3>
+          <ExplainPanel source={selected.source}>{selected.why}</ExplainPanel>
+          <dl className="fact-list">
+            <div>
+              <dt>Scenario</dt>
+              <dd>
+                {scenario.id} · {scenario.label}
+              </dd>
+            </div>
+            <div>
+              <dt>Owner</dt>
+              <dd>{selected.owner}</dd>
+            </div>
+            <div>
+              <dt>Age / due</dt>
+              <dd>{selected.age}</dd>
+            </div>
+            <div>
+              <dt>Role scope</dt>
+              <dd>{persona.role}</dd>
+            </div>
+          </dl>
+          <button
+            className="primary-button full-button"
+            onClick={() => navigate(actionTargets[selected.id])}
+          >
+            Open authoritative record <ArrowRight size={16} />
+          </button>
+        </aside>
+      </div>
+      <section className="panel pipeline-panel">
+        <div className="panel-heading">
+          <div>
+            <h2>Pipeline pulse</h2>
+            <span>
+              {displayCandidateForRole(persona.role, applicationRecords[0])} is
+              currently in {scenarioState.applicationStage}
+            </span>
+          </div>
+          <Freshness>Application facts · 4 min ago</Freshness>
+        </div>
+        <div className="pipeline-bars">
+          {pipeline.map((item, index) => (
+            <div key={item.stage}>
+              <div className="pipeline-label">
+                <span>{item.stage}</span>
+                <strong>
+                  {item.stage === "Interview" &&
+                  scenarioState.applicationStage !== "Interviews"
+                    ? item.count - 1
+                    : item.count}
+                </strong>
+                <small>{item.change}</small>
+              </div>
+              <div className="bar-track">
+                <span style={{ width: `${100 - index * 15}%` }} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+      <div className="home-record-grid">
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Recently updated applications</h2>
+              <span>
+                Role-scoped list view · {visibleApplications.length} records
+              </span>
+            </div>
+            <button
+              className="text-button"
+              aria-pressed={compact}
+              onClick={() => setCompact((value) => !value)}
+            >
+              <Filter size={15} /> {compact ? "Show details" : "Compact list"}
+            </button>
+          </div>
+          <div
+            className={`lightning-data-table ${compact ? "compact-table" : ""}`}
+            role="table"
+            aria-label="Recently updated applications"
+          >
+            <div className="table-row table-head" role="row">
+              <span role="columnheader">Application</span>
+              <span role="columnheader">Candidate</span>
+              <span role="columnheader">Job</span>
+              <span role="columnheader">Stage</span>
+              <span role="columnheader">Owner</span>
+              <span role="columnheader">Updated</span>
+            </div>
+            {visibleApplications.map((item) => (
+              <div className="table-row" role="row" key={item.id}>
+                <span role="cell" data-label="Application">
+                  <NavLink to={`/hr/applications/${item.id}`}>
+                    {item.id}
+                  </NavLink>
+                </span>
+                <strong role="cell" data-label="Candidate">
+                  {displayCandidateForRole(persona.role, item)}
+                </strong>
+                <span role="cell" data-label="Job">
+                  {item.job}
+                </span>
+                <span role="cell" data-label="Stage">
+                  <Pill tone={item.tone}>
+                    {item.id === "APP-DEMO-001"
+                      ? scenarioState.applicationStage
+                      : item.stage}
+                  </Pill>
+                </span>
+                <span role="cell" data-label="Owner">
+                  {item.owner}
+                </span>
+                <span role="cell" data-label="Updated">
+                  {item.updated}
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+        <section className="panel today-panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Today's interviews</h2>
+              <span>
+                {visibleInterviews.length} role-visible · candidate-timezone
+                aware
+              </span>
+            </div>
+            <CalendarDays size={18} />
+          </div>
+          {visibleInterviews.map((item) => {
+            const state =
+              item.id === "INT-DEMO-001"
+                ? scenarioState.interviewState
+                : item.state;
+            return (
+              <div className="session-row" key={item.id}>
+                <strong>{item.time.split(" · ").at(-1)}</strong>
+                <div>
+                  <NavLink to={`/hr/interviews/${item.id}`}>
+                    {displayCandidateForRole(persona.role, item)}
+                  </NavLink>
+                  <small>
+                    {item.type} · {item.interviewer}
+                  </small>
+                </div>
+                <Pill
+                  tone={
+                    state === "Conflict"
+                      ? "danger"
+                      : state === "Complete"
+                        ? "success"
+                        : item.tone
+                  }
+                >
+                  {state}
+                </Pill>
+              </div>
+            );
+          })}
+        </section>
+      </div>
+    </HrShell>
+  );
 }
 
-function RecordList({ kind }: { kind: "jobs" | "applications" | "interviews" | "assignments" | "decisions" }) {
-  const { scenarioState } = usePrototype();
+function RecordList({
+  kind,
+}: {
+  kind: "jobs" | "applications" | "interviews" | "assignments" | "decisions";
+}) {
+  const { scenarioState, persona } = usePrototype();
+  const scopedApplications = visibleApplicationsForRole(persona.role);
   const config = {
-    jobs: { title: "Jobs & openings", eyebrow: "Jobs list", screenId: "UI-HR-002", screen: "job" as const, rows: jobs.map((item) => ({ id: item.id, primary: item.title, secondary: item.team, state: item.status, to: `/hr/jobs/${item.id}` })) },
-    applications: { title: "Applications", eyebrow: "Application list", screenId: "UI-HR-003", screen: "application" as const, rows: applicationRecords.map((item) => ({ id: item.id, primary: item.candidate, secondary: item.job, state: item.id === "APP-DEMO-001" ? scenarioState.applicationStage : item.stage, to: `/hr/applications/${item.id}` })) },
-    interviews: { title: "Interviews", eyebrow: "Interview list", screenId: "UI-HR-004", screen: "interview" as const, rows: interviewRecords.map((item) => ({ id: item.id, primary: item.candidate, secondary: item.type, state: item.id === "INT-DEMO-001" ? scenarioState.interviewState : item.state, to: `/hr/interviews/${item.id}` })) },
-    assignments: { title: "Scorecards", eyebrow: "Assignment list", screenId: "UI-HR-005", screen: "scorecard" as const, rows: assignmentRecords.map((item) => ({ id: item.id, primary: item.candidate, secondary: item.interviewer, state: item.id === "ASN-DEMO-001" && scenarioState.missingScorecards === 0 ? "Submitted" : item.state, to: `/hr/assignments/${item.id}` })) },
-    decisions: { title: "Offers & handoff", eyebrow: "Decision list", screenId: "UI-HR-006", screen: "decision" as const, rows: applicationRecords.filter((item) => ["APP-DEMO-001", "APP-DEMO-011"].includes(item.id)).map((item) => ({ id: item.id, primary: item.candidate, secondary: item.job, state: item.id === "APP-DEMO-001" ? scenarioState.decisionState : "Offer approval", to: `/hr/decisions/${item.id}` })) },
+    jobs: {
+      title: "Jobs & openings",
+      eyebrow: "Jobs list",
+      screenId: "UI-HR-002",
+      screen: "job" as const,
+      rows: visibleJobsForRole(persona.role).map((item) => ({
+        id: item.id,
+        primary: item.title,
+        secondary: item.team,
+        state: item.status,
+        to: `/hr/jobs/${item.id}`,
+      })),
+    },
+    applications: {
+      title: "Applications",
+      eyebrow: "Application list",
+      screenId: "UI-HR-003",
+      screen: "application" as const,
+      rows: scopedApplications.map((item) => ({
+        id: item.id,
+        primary: displayCandidateForRole(persona.role, item),
+        secondary: item.job,
+        state:
+          item.id === "APP-DEMO-001"
+            ? scenarioState.applicationStage
+            : item.stage,
+        to: `/hr/applications/${item.id}`,
+      })),
+    },
+    interviews: {
+      title: "Interviews",
+      eyebrow: "Interview list",
+      screenId: "UI-HR-004",
+      screen: "interview" as const,
+      rows: visibleInterviewsForRole(persona.role).map((item) => ({
+        id: item.id,
+        primary: displayCandidateForRole(persona.role, item),
+        secondary: item.type,
+        state:
+          item.id === "INT-DEMO-001"
+            ? scenarioState.interviewState
+            : item.state,
+        to: `/hr/interviews/${item.id}`,
+      })),
+    },
+    assignments: {
+      title: "Scorecards",
+      eyebrow: "Assignment list",
+      screenId: "UI-HR-005",
+      screen: "scorecard" as const,
+      rows: visibleAssignmentsForRole(persona.role).map((item) => ({
+        id: item.id,
+        primary: displayCandidateForRole(persona.role, item),
+        secondary: item.interviewer,
+        state:
+          item.id === "ASN-DEMO-001" && scenarioState.missingScorecards === 0
+            ? "Submitted"
+            : item.state,
+        to: `/hr/assignments/${item.id}`,
+      })),
+    },
+    decisions: {
+      title: "Offers & handoff",
+      eyebrow: "Decision list",
+      screenId: "UI-HR-006",
+      screen: "decision" as const,
+      rows: scopedApplications
+        .filter((item) => ["APP-DEMO-001", "APP-DEMO-011"].includes(item.id))
+        .map((item) => ({
+          id: item.id,
+          primary: displayCandidateForRole(persona.role, item),
+          secondary: item.job,
+          state:
+            item.id === "APP-DEMO-001"
+              ? scenarioState.decisionState
+              : "Offer approval",
+          to: `/hr/decisions/${item.id}`,
+        })),
+    },
   }[kind];
-  return <HrShell title={config.title} eyebrow={config.eyebrow} screenId={config.screenId} screen={config.screen}><ScenarioControl /><section className="panel record-list-panel"><div className="panel-heading"><div><h2>{config.title}</h2><span>{config.rows.length} synthetic route-bound records</span></div><Freshness>Canonical registry · now</Freshness></div><div className="record-list">{config.rows.map((row) => <NavLink to={row.to} key={row.id}><span className="object-icon"><AppWindow size={18} /></span><div><strong>{row.primary}</strong><span>{row.id} · {row.secondary}</span></div><Pill tone={row.state.includes("Overdue") || row.state.includes("Blocked") ? "danger" : row.state.includes("Complete") || row.state.includes("Submitted") ? "success" : "info"}>{row.state}</Pill><ArrowRight size={17} /></NavLink>)}</div></section></HrShell>;
+  return (
+    <HrShell
+      title={config.title}
+      eyebrow={config.eyebrow}
+      screenId={config.screenId}
+      screen={config.screen}
+    >
+      <ScenarioControl />
+      <section className="panel record-list-panel">
+        <div className="panel-heading">
+          <div>
+            <h2>{config.title}</h2>
+            <span>{config.rows.length} synthetic route-bound records</span>
+          </div>
+          <Freshness>Canonical registry · now</Freshness>
+        </div>
+        <div className="record-list">
+          {config.rows.map((row) => (
+            <NavLink to={row.to} key={row.id}>
+              <span className="object-icon">
+                <AppWindow size={18} />
+              </span>
+              <div>
+                <strong>{row.primary}</strong>
+                <span>
+                  {row.id} · {row.secondary}
+                </span>
+              </div>
+              <Pill
+                tone={
+                  row.state.includes("Overdue") || row.state.includes("Blocked")
+                    ? "danger"
+                    : row.state.includes("Complete") ||
+                        row.state.includes("Submitted")
+                      ? "success"
+                      : "info"
+                }
+              >
+                {row.state}
+              </Pill>
+              <ArrowRight size={17} />
+            </NavLink>
+          ))}
+        </div>
+      </section>
+    </HrShell>
+  );
 }
 
 function JobWorkspace() {
-  const { jobId } = useParams(); const navigate = useNavigate(); const { scenarioState, announce } = usePrototype();
+  const { jobId } = useParams();
+  const navigate = useNavigate();
+  const { scenarioState, announce, persona } = usePrototype();
   if (!jobId) return <RecordList kind="jobs" />;
-  const job = jobs.find((item) => item.id === jobId) ?? jobs[0]; const blocked = job.id === "JOB-DEMO-001" && scenarioState.policyBlocked; const reserved = job.id === "JOB-DEMO-001" ? scenarioState.openingReserved : 0;
-  return <HrShell title={job.title} eyebrow={`Job & opening workspace · ${job.id}`} screenId="UI-HR-002" screen="job" actions={<><button className="secondary-button" onClick={() => navigate(`/careers/jobs/${job.publicId}`)}>Preview public job</button><button className="primary-button" disabled={blocked} onClick={() => announce(`${job.title} publication previewed in memory.`)}>{blocked ? "Publication blocked" : "Preview publication"}</button></>}><div className="context-strip"><div><span>Job ID</span><strong>{job.id}</strong></div><div><span>Openings</span><strong>1 approved · {scenarioState.openingFilled} filled</strong></div><div><span>Owner</span><strong>{job.id === "JOB-DEMO-002" ? "Priya Nair" : "Alex Rivera"}</strong></div><div><span>Effective plan</span><strong>{job.version}</strong></div><Freshness>Reconciled 4 min ago</Freshness></div><ScenarioControl />{blocked ? <div className="blocking-banner" role="alert"><ShieldAlert size={22} /><div><strong>Publication is blocked</strong><span>Work location and candidate residence produce an unknown policy result. LEGAL-DEMO queue owns review.</span></div><Pill tone="danger">ERR-008</Pill></div> : <div className="success-banner"><CheckCircle2 size={20} /><div><strong>Ready for publication</strong><span>Required content, opening, policy and approval facts are current.</span></div></div>}<div className="job-workspace-grid"><section className="panel"><div className="panel-heading"><div><h2>Readiness</h2><span>Derived from authoritative facts</span></div><strong className={`readiness-score ${blocked ? "blocked" : ""}`}>{blocked ? "71%" : "100%"}</strong></div><div className="readiness-list">{[["Opening approved", true], ["Hiring team covered", true], ["Structured plan approved", true], ["Pay and content approved", true], ["Jurisdiction result known", !blocked]].map(([label, pass]) => <div key={String(label)} className={pass ? "pass" : "fail"}>{pass ? <CheckCircle2 size={18} /> : <XCircle size={18} />}<span>{label}</span><strong>{pass ? "Ready" : "Blocked"}</strong></div>)}</div><ExplainPanel source={`${job.id} · Policy evaluation v12`}>Readiness is recalculated from opening, ownership, content, policy and approval records.</ExplainPanel></section><section className="panel"><div className="panel-heading"><div><h2>Opening reconciliation</h2><span>One approved opening</span></div><Pill tone="success">Balanced</Pill></div><div className="opening-visual"><div><strong>1</strong><span>Approved</span></div><ArrowRight size={20} /><div><strong>{reserved}</strong><span>Reserved</span></div><ArrowRight size={20} /><div><strong>{scenarioState.openingFilled}</strong><span>Filled</span></div></div><dl className="fact-list"><div><dt>Headcount reference</dt><dd>HC-{job.id.slice(-3)}</dd></div><div><dt>Budget approval</dt><dd>Approved fixture · v2</dd></div><div><dt>Reconciliation</dt><dd>No variance</dd></div></dl></section><section className="panel wide-panel"><div className="panel-heading"><div><h2>Structured hiring plan</h2><span>Outcomes → competencies → evidence</span></div><button className="text-button" onClick={() => announce("Plan v1 versus v2 opened read-only.")}>Compare v1 to v2</button></div><div className="plan-grid"><div><span className="plan-kicker">Outcome</span><strong>{job.summary}</strong><p>First 180 days · approved evidence target</p></div><div><span className="plan-kicker">Competencies</span><div className="chip-row"><Pill>Systems thinking</Pill><Pill>Accessible practice</Pill><Pill>Collaboration</Pill></div></div><div><span className="plan-kicker">Evidence</span><strong>Structured interview + work evidence</strong><p>Scorecard v4 · no model-generated ranking</p></div></div></section></div><IntegrityNotice kind="human" /></HrShell>;
+  const job = jobs.find((item) => item.id === jobId) ?? jobs[0];
+  if (!visibleJobsForRole(persona.role).some((item) => item.id === job.id))
+    return (
+      <HrShell
+        title="Job access denied"
+        eyebrow={jobId}
+        screenId="UI-HR-002"
+        screen="job"
+      >
+        <section className="panel access-denied" role="alert">
+          <ShieldAlert size={28} />
+          <div>
+            <h2>Row access denied safely</h2>
+            <p>
+              {persona.role} does not have this job in its authorized
+              population.
+            </p>
+          </div>
+          <NavLink className="primary-button" to="/hr/jobs">
+            Return to visible jobs
+          </NavLink>
+        </section>
+      </HrShell>
+    );
+  const blocked = job.id === "JOB-DEMO-001" && scenarioState.policyBlocked;
+  const reserved =
+    job.id === "JOB-DEMO-001" ? scenarioState.openingReserved : 0;
+  return (
+    <HrShell
+      title={job.title}
+      eyebrow={`Job & opening workspace · ${job.id}`}
+      screenId="UI-HR-002"
+      screen="job"
+      actions={
+        <>
+          <button
+            className="secondary-button"
+            onClick={() => navigate(`/careers/jobs/${job.publicId}`)}
+          >
+            Preview public job
+          </button>
+          <button
+            className="primary-button"
+            disabled={blocked}
+            onClick={() =>
+              announce(`${job.title} publication previewed in memory.`)
+            }
+          >
+            {blocked ? "Publication blocked" : "Preview publication"}
+          </button>
+        </>
+      }
+    >
+      <div className="context-strip">
+        <div>
+          <span>Job ID</span>
+          <strong>{job.id}</strong>
+        </div>
+        <div>
+          <span>Openings</span>
+          <strong>1 approved · {scenarioState.openingFilled} filled</strong>
+        </div>
+        <div>
+          <span>Owner</span>
+          <strong>
+            {job.id === "JOB-DEMO-002" ? "Priya Nair" : "Alex Rivera"}
+          </strong>
+        </div>
+        <div>
+          <span>Effective plan</span>
+          <strong>{job.version}</strong>
+        </div>
+        <Freshness>Reconciled 4 min ago</Freshness>
+      </div>
+      <ScenarioControl />
+      {blocked ? (
+        <div className="blocking-banner" role="alert">
+          <ShieldAlert size={22} />
+          <div>
+            <strong>Publication is blocked</strong>
+            <span>
+              Work location and candidate residence produce an unknown policy
+              result. LEGAL-DEMO queue owns review.
+            </span>
+          </div>
+          <Pill tone="danger">ERR-008</Pill>
+        </div>
+      ) : (
+        <div className="success-banner">
+          <CheckCircle2 size={20} />
+          <div>
+            <strong>Ready for publication</strong>
+            <span>
+              Required content, opening, policy and approval facts are current.
+            </span>
+          </div>
+        </div>
+      )}
+      <div className="job-workspace-grid">
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Readiness</h2>
+              <span>Derived from authoritative facts</span>
+            </div>
+            <strong className={`readiness-score ${blocked ? "blocked" : ""}`}>
+              {blocked ? "71%" : "100%"}
+            </strong>
+          </div>
+          <div className="readiness-list">
+            {[
+              ["Opening approved", true],
+              ["Hiring team covered", true],
+              ["Structured plan approved", true],
+              ["Pay and content approved", true],
+              ["Jurisdiction result known", !blocked],
+            ].map(([label, pass]) => (
+              <div key={String(label)} className={pass ? "pass" : "fail"}>
+                {pass ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
+                <span>{label}</span>
+                <strong>{pass ? "Ready" : "Blocked"}</strong>
+              </div>
+            ))}
+          </div>
+          <ExplainPanel source={`${job.id} · Policy evaluation v12`}>
+            Readiness is recalculated from opening, ownership, content, policy
+            and approval records.
+          </ExplainPanel>
+        </section>
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Opening reconciliation</h2>
+              <span>One approved opening</span>
+            </div>
+            <Pill tone="success">Balanced</Pill>
+          </div>
+          <div className="opening-visual">
+            <div>
+              <strong>1</strong>
+              <span>Approved</span>
+            </div>
+            <ArrowRight size={20} />
+            <div>
+              <strong>{reserved}</strong>
+              <span>Reserved</span>
+            </div>
+            <ArrowRight size={20} />
+            <div>
+              <strong>{scenarioState.openingFilled}</strong>
+              <span>Filled</span>
+            </div>
+          </div>
+          <dl className="fact-list">
+            <div>
+              <dt>Headcount reference</dt>
+              <dd>HC-{job.id.slice(-3)}</dd>
+            </div>
+            <div>
+              <dt>Budget approval</dt>
+              <dd>Approved fixture · v2</dd>
+            </div>
+            <div>
+              <dt>Reconciliation</dt>
+              <dd>No variance</dd>
+            </div>
+          </dl>
+        </section>
+        <section className="panel wide-panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Structured hiring plan</h2>
+              <span>Outcomes → competencies → evidence</span>
+            </div>
+            <button
+              className="text-button"
+              onClick={() => announce("Plan v1 versus v2 opened read-only.")}
+            >
+              Compare v1 to v2
+            </button>
+          </div>
+          <div className="plan-grid">
+            <div>
+              <span className="plan-kicker">Outcome</span>
+              <strong>{job.summary}</strong>
+              <p>First 180 days · approved evidence target</p>
+            </div>
+            <div>
+              <span className="plan-kicker">Competencies</span>
+              <div className="chip-row">
+                <Pill>Systems thinking</Pill>
+                <Pill>Accessible practice</Pill>
+                <Pill>Collaboration</Pill>
+              </div>
+            </div>
+            <div>
+              <span className="plan-kicker">Evidence</span>
+              <strong>Structured interview + work evidence</strong>
+              <p>Scorecard v4 · no model-generated ranking</p>
+            </div>
+          </div>
+        </section>
+      </div>
+      <IntegrityNotice kind="human" />
+    </HrShell>
+  );
 }
-
 
 function ApplicationWorkspace() {
   const { applicationId } = useParams();
   const navigate = useNavigate();
   const [tab, setTab] = useState("Summary");
   const [preview, setPreview] = useState(false);
-  const [draft, setDraft] = useState("Your interview is complete. The team expects to share a process update by Aug 29.");
+  const [draft, setDraft] = useState(
+    "Your interview is complete. The team expects to share a process update by Aug 29.",
+  );
   const [messageQueued, setMessageQueued] = useState(false);
   const [completedTasks, setCompletedTasks] = useState<string[]>([]);
-  const { scenarioState, announce, resolveScorecard, availabilitySubmitted } = usePrototype();
+  const {
+    scenarioState,
+    announce,
+    resolveScorecard,
+    availabilitySubmitted,
+    persona,
+  } = usePrototype();
   if (!applicationId) return <RecordList kind="applications" />;
 
-  const record = applicationRecords.find((item) => item.id === applicationId) ?? applicationRecords[0];
-  const recordIndex = applicationRecords.findIndex((item) => item.id === record.id);
-  const previous = applicationRecords.at(recordIndex - 1);
-  const next = applicationRecords.at(recordIndex + 1);
+  const record =
+    applicationRecords.find((item) => item.id === applicationId) ??
+    applicationRecords[0];
+  const scopedRecords = visibleApplicationsForRole(persona.role);
+  if (!scopedRecords.some((item) => item.id === record.id))
+    return (
+      <HrShell
+        title="Application access denied"
+        eyebrow={applicationId}
+        screenId="UI-HR-003"
+        screen="application"
+      >
+        <section className="panel access-denied" role="alert">
+          <ShieldAlert size={28} />
+          <div>
+            <h2>Row access denied safely</h2>
+            <p>
+              {persona.role} cannot open this application outside its authorized
+              population.
+            </p>
+          </div>
+          <NavLink className="primary-button" to="/hr/applications">
+            Return to visible applications
+          </NavLink>
+        </section>
+      </HrShell>
+    );
+  const recordIndex = scopedRecords.findIndex((item) => item.id === record.id);
+  const previous = scopedRecords.at(recordIndex - 1);
+  const next = scopedRecords.at(recordIndex + 1);
   const isMaya = record.id === "APP-DEMO-001";
   const stage = isMaya ? scenarioState.applicationStage : record.stage;
   const missing = isMaya ? scenarioState.missingScorecards : 0;
   const blocked = missing > 0;
-  const standardStages = ["Submitted", "Recruiter review", "Screening", "Interviews", "Debrief", "Offer"];
-  const stages = standardStages.includes(stage) ? standardStages : [...standardStages.slice(0, 4), stage];
+  const standardStages = [
+    "Submitted",
+    "Recruiter review",
+    "Screening",
+    "Interviews",
+    "Debrief",
+    "Offer",
+  ];
+  const stages = standardStages.includes(stage)
+    ? standardStages
+    : [...standardStages.slice(0, 4), stage];
   const currentIndex = stages.indexOf(stage);
-  const tabs = ["Summary", "Interviews", "Messages", "Activity", "Documents & forms", "Tasks", "Related applications"];
-  const relatedInterviews = interviewRecords.filter((item) => item.applicationId === record.id);
-  const completeTask = (id: string) => setCompletedTasks((items) => items.includes(id) ? items : [...items, id]);
+  const dataScope = roleDataScopes[persona.role];
+  const tabs = [
+    "Summary",
+    ...(["Recruiter", "Recruiting Coordinator", "Hiring Manager"].includes(
+      persona.role,
+    )
+      ? ["Interviews"]
+      : []),
+    ...(["Recruiter", "Recruiting Coordinator", "Candidate Support"].includes(
+      persona.role,
+    )
+      ? ["Messages"]
+      : []),
+    ...([
+      "Recruiter",
+      "Hiring Manager",
+      "Application Integrity Reviewer",
+    ].includes(persona.role)
+      ? ["Activity"]
+      : []),
+    ...(["Recruiter"].includes(persona.role) ? ["Documents & forms"] : []),
+    ...([
+      "Recruiter",
+      "Recruiting Coordinator",
+      "Hiring Manager",
+      "Candidate Support",
+    ].includes(persona.role)
+      ? ["Tasks"]
+      : []),
+    ...(["Recruiter", "Hiring Manager"].includes(persona.role)
+      ? ["Related applications"]
+      : []),
+  ];
+  const relatedInterviews = interviewRecords.filter(
+    (item) => item.applicationId === record.id,
+  );
+  const completeTask = (id: string) =>
+    setCompletedTasks((items) => (items.includes(id) ? items : [...items, id]));
 
-  return <HrShell title={record.candidate} eyebrow={`Application workspace · ${record.id}`} screenId="UI-HR-003" screen="application" actions={<><div className="record-navigation" aria-label="Application record navigation"><button disabled={!previous} onClick={() => previous && navigate(`/hr/applications/${previous.id}`)}>Previous</button><span>{recordIndex + 1} of {applicationRecords.length}</span><button disabled={!next} onClick={() => next && navigate(`/hr/applications/${next.id}`)}>Next</button></div><button className="secondary-button" onClick={() => setTab("Messages")}><MessageSquareText size={16} /> Message</button><button className="primary-button" onClick={() => setPreview(true)}>Review transition</button></>}>
-    <div className="candidate-context operational-context"><div className="avatar large">{record.initials}</div><div><h2>{record.candidate}</h2><span>{record.job} · {stage}</span><div className="identity-line"><a href="mailto:prototype@example.test">{isMaya ? syntheticCandidate.email : `${record.candidate.toLowerCase().replace(" ", ".")}@example.test`}</a><span>America/Los_Angeles · 10:24 AM local</span><span>Source: Careers site · consent v2</span></div></div><Pill tone={blocked ? "warning" : "success"}>{blocked ? "Decision blocked" : "Next gate ready"}</Pill><div className="context-facts"><span>Owner <strong>{record.owner}</strong></span><span>Stage age <strong>{record.stageAge}</strong></span><span>Application <strong>{record.version}</strong></span></div></div>
-    <div className="workspace-tabs" role="tablist" aria-label="Application workspace sections">{tabs.map((item) => <button id={`application-tab-${item.replaceAll(" ", "-")}`} role="tab" aria-selected={tab === item} aria-controls="application-tabpanel" onClick={() => setTab(item)} key={item}>{item}</button>)}</div>
-    <div id="application-tabpanel" role="tabpanel" aria-labelledby={`application-tab-${tab.replaceAll(" ", "-")}`}>
-      {tab === "Summary" && <div className="application-workspace-grid"><section className="panel timeline-panel"><div className="panel-heading"><div><h2>Process timeline</h2><span>Primary stage plus typed parallel work</span></div><Freshness>Application {record.version}</Freshness></div><ol className="stage-timeline">{stages.map((label, index) => { const state = index < currentIndex ? "complete" : index === currentIndex ? "current" : index === currentIndex + 1 && blocked ? "blocked" : "future"; return <li className={state} key={label}><span className="timeline-dot">{state === "complete" ? <Check size={13} /> : ""}</span><div><strong>{label}</strong><small>{state === "current" ? "Current" : state === "blocked" ? "Blocked" : state === "complete" ? "Complete" : "Not started"}</small></div></li>; })}</ol><ExplainPanel source="Readiness calculation v18">{blocked ? "Debrief cannot begin because one required scorecard is missing. The recovery owner and actions are explicit." : `The ${stage} gate is coherent with current evidence.`}</ExplainPanel></section><section className="panel evidence-panel"><div className="panel-heading"><div><h2>Job-related evidence</h2><span>Minimum necessary for this role</span></div><Pill tone="info">Plan v2</Pill></div>{scorecard.map((item) => <div className="evidence-row" key={item.competency}><div><strong>{item.competency}</strong><Pill tone={item.rating.startsWith("Strong") ? "success" : "warning"}>{item.rating}</Pill></div><p>{item.evidence}</p></div>)}<NavLink className="secondary-button full-button" to={isMaya ? "/hr/assignments/ASN-DEMO-001" : "/hr/assignments"}>Open independent scorecards</NavLink></section><aside className="panel parallel-panel"><div className="panel-heading"><h2>Parallel work</h2><span>3 current facts</span></div><div className="parallel-item"><ClipboardCheck size={19} /><div><strong>{missing ? `${missing} scorecard missing` : "Scorecards complete"}</strong><span>{missing ? "Jordan Lee · 6h overdue" : "Required evidence present"}</span></div><Pill tone={missing ? "danger" : "success"}>{missing ? "Blocker" : "Ready"}</Pill></div><div className="parallel-item"><CalendarDays size={19} /><div><strong>{availabilitySubmitted ? "Availability submitted" : "Sessions complete"}</strong><span>{availabilitySubmitted ? "Candidate window · coordinator confirmation due" : "2 of 2 · attendance known"}</span></div><Pill tone={availabilitySubmitted ? "info" : "success"}>{availabilitySubmitted ? "Action" : "Ready"}</Pill></div><div className="parallel-item"><ShieldCheck size={19} /><div><strong>Policy clear</strong><span>California pilot · v2</span></div><Pill tone="success">Ready</Pill></div></aside></div>}
-      {tab === "Interviews" && <section className="operational-panel"><div className="panel-heading"><div><h2>Interview plan and sessions</h2><span>Schedule, attendance and evidence remain separate facts</span></div><Pill tone="info">Plan v2</Pill></div><div className="operational-cards">{(relatedInterviews.length ? relatedInterviews : interviewRecords.slice(0, 1)).map((interview) => <article key={interview.id}><div><CalendarDays size={20} /><span><strong>{interview.type}</strong><small>{interview.time}</small></span><Pill tone={interview.state === "Complete" ? "success" : interview.tone}>{interview.state}</Pill></div><dl><div><dt>Interviewer</dt><dd>{interview.interviewer}</dd></div><div><dt>Feedback</dt><dd>{missing ? "1 required submission outstanding" : "Complete"}</dd></div><div><dt>Candidate timezone</dt><dd>America/Los_Angeles</dd></div></dl><NavLink className="secondary-button" to={`/hr/interviews/${interview.id}`}>Open coordination record</NavLink></article>)}</div><ExplainPanel source="Interview plan v2 · activity status model">Briefing, scheduling, attendance and feedback each keep their own lifecycle; none silently rewrites the application stage.</ExplainPanel></section>}
-      {tab === "Messages" && <div className="message-workspace"><section className="operational-panel"><div className="panel-heading"><div><h2>Candidate conversation</h2><span>Email thread, delivery and scheduled work</span></div><Pill tone="success">Preference eligible</Pill></div><div className="message-thread">{applicationMessages.map((message) => <article className={`message-event ${message.direction}`} key={message.id}><div><Pill tone={message.tone}>{message.channel} · {message.state}</Pill><span>{message.time}</span></div><h3>{message.subject}</h3><p>{message.preview}</p><small>{message.id} · candidate-visible · template and delivery evidence retained</small></article>)}</div></section><aside className="operational-panel message-composer"><div className="panel-heading"><div><h2>Candidate-safe update</h2><span>Preview before queue</span></div><Pill tone="info">Template v4</Pill></div><label><span>Purpose</span><select defaultValue="Process update"><option>Process update</option><option>Scheduling request</option><option>Service recovery</option></select></label><label><span>Send time</span><select defaultValue="Tomorrow · 9:00 AM PT"><option>Tomorrow · 9:00 AM PT</option><option>Send now in simulation</option></select></label><label><span>Message</span><textarea value={draft} onChange={(event) => setDraft(event.target.value)} /></label><div className="eligibility-check"><CheckCircle2 size={18} /><span><strong>Eligible to queue</strong>Email verified · purpose allowed · quiet hours clear</span></div><button className="primary-button" disabled={draft.trim().length < 20 || messageQueued} onClick={() => { setMessageQueued(true); announce("Candidate-safe message queued in memory. No email was sent."); }}><Send size={16} /> {messageQueued ? "Queued in memory" : "Queue message preview"}</button></aside></div>}
-      {tab === "Activity" && <section className="operational-panel"><div className="panel-heading"><div><h2>Application activity</h2><span>Job-consideration-specific event feed</span></div><Freshness>Canonical event order · now</Freshness></div><ol className="activity-feed">{applicationActivity.map((event) => <li key={event.id}><span className={`activity-marker marker-${event.tone}`} /><div><small>{event.time}</small><strong>{event.event}</strong><p>{event.detail}</p><span>{event.actor} · {event.id}</span></div></li>)}</ol></section>}
-      {tab === "Documents & forms" && <section className="operational-panel"><div className="panel-heading"><div><h2>Documents and forms</h2><span>Access-scoped metadata; binaries remain outside this prototype</span></div><Pill tone="success">3 clean fixtures</Pill></div><div className="document-list">{applicationDocuments.map((document) => <article key={document.id}><FileText size={22} /><div><strong>{document.name}</strong><span>{document.category} · {document.version} · updated {document.updated}</span><small>{document.id} · {document.access}</small></div><Pill tone="success">{document.state}</Pill><button className="secondary-button" onClick={() => announce(`${document.name} opened as metadata-only preview.`)}>Preview</button></article>)}</div></section>}
-      {tab === "Tasks" && <section className="operational-panel"><div className="panel-heading"><div><h2>Tasks and reminders</h2><span>Owned work derived from authoritative records</span></div><Pill tone="info">{applicationTasks.length - completedTasks.length} open</Pill></div><div className="task-list">{applicationTasks.map((task) => { const done = completedTasks.includes(task.id); return <article key={task.id}><ListChecks size={20} /><div><strong>{task.title}</strong><span>{task.owner} · {task.due}</span><small>Source: {task.source}</small></div><Pill tone={done ? "success" : task.tone}>{done ? "Completed · demo" : task.state}</Pill><button className="secondary-button" disabled={done || task.state === "Blocked"} onClick={() => completeTask(task.id)}>{done ? "Completed" : task.state === "Blocked" ? "Resolve source first" : "Complete in demo"}</button></article>; })}</div></section>}
-      {tab === "Related applications" && <section className="operational-panel"><div className="panel-heading"><div><h2>Related applications</h2><span>One candidate identity; application truth stays job-specific</span></div><Pill tone="info">2 considerations</Pill></div><div className="related-list">{relatedApplications.map((application) => <article key={application.id}><BriefcaseBusiness size={20} /><div><strong>{application.job}</strong><span>{application.id} · {application.relationship}</span><small>{application.access}</small></div><Pill tone={application.id === record.id ? "success" : "info"}>{application.stage}</Pill>{applicationRecords.some((item) => item.id === application.id) ? <NavLink className="secondary-button" to={`/hr/applications/${application.id}`}>Open application</NavLink> : <button className="secondary-button" onClick={() => announce("Related application is a read-only seeded candidate context.")}>View context</button>}</article>)}</div><IntegrityNotice kind="restricted" /></section>}
-    </div>
-    {preview && <div className="modal-scrim" role="presentation"><section className="transition-modal" role="dialog" aria-modal="true" aria-labelledby="transition-title"><button className="modal-close" aria-label="Close transition preview" onClick={() => setPreview(false)}><XCircle size={20} /></button><Pill tone={blocked ? "warning" : "success"}>TRN-005 · preview only</Pill><h2 id="transition-title">{blocked ? "Move Interviews → Debrief?" : `Move ${stage} → next gate?`}</h2><p>{blocked ? "This transition is blocked. Choose a governed recovery action." : "Required facts are present. This remains an in-memory preview."}</p><div className="transition-checks"><div className="pass"><CheckCircle2 size={18} /><span>All sessions completed</span></div><div className={blocked ? "fail" : "pass"}>{blocked ? <XCircle size={18} /> : <CheckCircle2 size={18} />}<span>{blocked ? "1 required scorecard missing" : "Required scorecards complete"}</span></div></div>{blocked && <div className="recovery-actions"><button className="secondary-button" onClick={() => announce("Synthetic reminder recorded; no message was sent.")}>Send reminder preview</button><NavLink className="secondary-button" to="/hr/assignments/ASN-DEMO-001">Open assignment</NavLink><button className="secondary-button" onClick={() => { resolveScorecard("Governed waiver simulated with a preserved evidence gap and audit note."); setPreview(false); }}>Simulate governed waiver</button></div>}<IntegrityNotice kind="simulation" /><div className="modal-actions"><button className="secondary-button" onClick={() => setPreview(false)}>Close preview</button><button className="primary-button" disabled={blocked} onClick={() => { announce("Transition preview completed in memory."); setPreview(false); }}>{blocked ? "Transition blocked" : "Simulate transition"}</button></div></section></div>}
-  </HrShell>;
+  return (
+    <HrShell
+      title={displayCandidateForRole(persona.role, record)}
+      eyebrow={`Application workspace · ${record.id}`}
+      screenId="UI-HR-003"
+      screen="application"
+      actions={
+        <>
+          <div
+            className="record-navigation"
+            aria-label="Application record navigation"
+          >
+            <button
+              disabled={!previous}
+              onClick={() =>
+                previous && navigate(`/hr/applications/${previous.id}`)
+              }
+            >
+              Previous
+            </button>
+            <span>
+              {recordIndex + 1} of {scopedRecords.length}
+            </span>
+            <button
+              disabled={!next}
+              onClick={() => next && navigate(`/hr/applications/${next.id}`)}
+            >
+              Next
+            </button>
+          </div>
+          {tabs.includes("Messages") && (
+            <button
+              className="secondary-button"
+              onClick={() => setTab("Messages")}
+            >
+              <MessageSquareText size={16} /> Message
+            </button>
+          )}
+          {["Recruiter", "Hiring Manager"].includes(persona.role) && (
+            <button className="primary-button" onClick={() => setPreview(true)}>
+              Review transition
+            </button>
+          )}
+        </>
+      }
+    >
+      <div className="candidate-context operational-context">
+        <div className="avatar large">
+          {roleDataScopes[persona.role]?.identity === "full"
+            ? record.initials
+            : "ID"}
+        </div>
+        <div>
+          <h2>{displayCandidateForRole(persona.role, record)}</h2>
+          <span>
+            {record.job} · {stage}
+          </span>
+          <div className="identity-line">
+            {roleDataScopes[persona.role]?.contact === "full" ? (
+              <a href="mailto:prototype@example.test">
+                {isMaya
+                  ? syntheticCandidate.email
+                  : `${record.candidate.toLowerCase().replace(" ", ".")}@example.test`}
+              </a>
+            ) : (
+              <span>Contact field restricted</span>
+            )}
+            <span>America/Los_Angeles · 10:24 AM local</span>
+            <span>Source: Careers site · consent v2</span>
+          </div>
+        </div>
+        <Pill tone={blocked ? "warning" : "success"}>
+          {blocked ? "Decision blocked" : "Next gate ready"}
+        </Pill>
+        <div className="context-facts">
+          <span>
+            Owner <strong>{record.owner}</strong>
+          </span>
+          <span>
+            Stage age <strong>{record.stageAge}</strong>
+          </span>
+          <span>
+            Application <strong>{record.version}</strong>
+          </span>
+        </div>
+      </div>
+      <div
+        className="workspace-tabs"
+        role="tablist"
+        aria-label="Application workspace sections"
+      >
+        {tabs.map((item) => (
+          <button
+            id={`application-tab-${item.replaceAll(" ", "-")}`}
+            role="tab"
+            aria-selected={tab === item}
+            aria-controls="application-tabpanel"
+            onClick={() => setTab(item)}
+            key={item}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+      <div
+        id="application-tabpanel"
+        role="tabpanel"
+        aria-labelledby={`application-tab-${tab.replaceAll(" ", "-")}`}
+      >
+        {tab === "Summary" && (
+          <div className="application-workspace-grid">
+            <section className="panel timeline-panel">
+              <div className="panel-heading">
+                <div>
+                  <h2>Process timeline</h2>
+                  <span>Primary stage plus typed parallel work</span>
+                </div>
+                <Freshness>Application {record.version}</Freshness>
+              </div>
+              <ol className="stage-timeline">
+                {stages.map((label, index) => {
+                  const state =
+                    index < currentIndex
+                      ? "complete"
+                      : index === currentIndex
+                        ? "current"
+                        : index === currentIndex + 1 && blocked
+                          ? "blocked"
+                          : "future";
+                  return (
+                    <li className={state} key={label}>
+                      <span className="timeline-dot">
+                        {state === "complete" ? <Check size={13} /> : ""}
+                      </span>
+                      <div>
+                        <strong>{label}</strong>
+                        <small>
+                          {state === "current"
+                            ? "Current"
+                            : state === "blocked"
+                              ? "Blocked"
+                              : state === "complete"
+                                ? "Complete"
+                                : "Not started"}
+                        </small>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+              <ExplainPanel source="Readiness calculation v18">
+                {blocked
+                  ? "Debrief cannot begin because one required scorecard is missing. The recovery owner and actions are explicit."
+                  : `The ${stage} gate is coherent with current evidence.`}
+              </ExplainPanel>
+            </section>
+            {dataScope?.decisionEvidence !== "none" ? (
+              <section className="panel evidence-panel">
+                <div className="panel-heading">
+                  <div>
+                    <h2>Job-related evidence</h2>
+                    <span>
+                      {dataScope?.decisionEvidence} visibility for this role
+                    </span>
+                  </div>
+                  <Pill tone="info">Plan v2</Pill>
+                </div>
+                {scorecard.map((item) => (
+                  <div className="evidence-row" key={item.competency}>
+                    <div>
+                      <strong>{item.competency}</strong>
+                      <Pill
+                        tone={
+                          item.rating.startsWith("Strong")
+                            ? "success"
+                            : "warning"
+                        }
+                      >
+                        {item.rating}
+                      </Pill>
+                    </div>
+                    <p>{item.evidence}</p>
+                  </div>
+                ))}
+                {["Recruiter", "Hiring Manager"].includes(persona.role) && (
+                  <NavLink
+                    className="secondary-button full-button"
+                    to={
+                      isMaya
+                        ? "/hr/assignments/ASN-DEMO-001"
+                        : "/hr/assignments"
+                    }
+                  >
+                    Open independent scorecards
+                  </NavLink>
+                )}
+              </section>
+            ) : (
+              <section
+                className="panel field-restriction"
+                aria-label="Restricted job-related evidence"
+              >
+                <LockKeyhole size={24} />
+                <h2>Job-related evidence is restricted</h2>
+                <p>
+                  {persona.role} receives process status and owned recovery
+                  facts, not selection evidence.
+                </p>
+              </section>
+            )}
+            <aside className="panel parallel-panel">
+              <div className="panel-heading">
+                <h2>Parallel work</h2>
+                <span>Purpose-filtered facts</span>
+              </div>
+              {dataScope?.decisionEvidence !== "none" && (
+                <div className="parallel-item">
+                  <ClipboardCheck size={19} />
+                  <div>
+                    <strong>
+                      {missing
+                        ? `${missing} scorecard missing`
+                        : "Scorecards complete"}
+                    </strong>
+                    <span>
+                      {missing
+                        ? "Assigned evidence overdue"
+                        : "Required evidence present"}
+                    </span>
+                  </div>
+                  <Pill tone={missing ? "danger" : "success"}>
+                    {missing ? "Blocker" : "Ready"}
+                  </Pill>
+                </div>
+              )}
+              <div className="parallel-item">
+                <CalendarDays size={19} />
+                <div>
+                  <strong>
+                    {availabilitySubmitted
+                      ? "Availability submitted"
+                      : "Sessions complete"}
+                  </strong>
+                  <span>
+                    {availabilitySubmitted
+                      ? "Candidate window · coordinator confirmation due"
+                      : "2 of 2 · attendance known"}
+                  </span>
+                </div>
+                <Pill tone={availabilitySubmitted ? "info" : "success"}>
+                  {availabilitySubmitted ? "Action" : "Ready"}
+                </Pill>
+              </div>
+              <div className="parallel-item">
+                <ShieldCheck size={19} />
+                <div>
+                  <strong>Policy status</strong>
+                  <span>Allowed · minimized projection</span>
+                </div>
+                <Pill tone="success">Ready</Pill>
+              </div>
+            </aside>
+          </div>
+        )}
+        {tab === "Interviews" && (
+          <section className="operational-panel">
+            <div className="panel-heading">
+              <div>
+                <h2>Interview plan and sessions</h2>
+                <span>
+                  Schedule, attendance and evidence remain separate facts
+                </span>
+              </div>
+              <Pill tone="info">Plan v2</Pill>
+            </div>
+            <div className="operational-cards">
+              {(relatedInterviews.length
+                ? relatedInterviews
+                : interviewRecords.slice(0, 1)
+              ).map((interview) => (
+                <article key={interview.id}>
+                  <div>
+                    <CalendarDays size={20} />
+                    <span>
+                      <strong>{interview.type}</strong>
+                      <small>{interview.time}</small>
+                    </span>
+                    <Pill
+                      tone={
+                        interview.state === "Complete"
+                          ? "success"
+                          : interview.tone
+                      }
+                    >
+                      {interview.state}
+                    </Pill>
+                  </div>
+                  <dl>
+                    <div>
+                      <dt>Interviewer</dt>
+                      <dd>{interview.interviewer}</dd>
+                    </div>
+                    <div>
+                      <dt>Feedback</dt>
+                      <dd>
+                        {missing
+                          ? "1 required submission outstanding"
+                          : "Complete"}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt>Candidate timezone</dt>
+                      <dd>America/Los_Angeles</dd>
+                    </div>
+                  </dl>
+                  <NavLink
+                    className="secondary-button"
+                    to={`/hr/interviews/${interview.id}`}
+                  >
+                    Open coordination record
+                  </NavLink>
+                </article>
+              ))}
+            </div>
+            <ExplainPanel source="Interview plan v2 · activity status model">
+              Briefing, scheduling, attendance and feedback each keep their own
+              lifecycle; none silently rewrites the application stage.
+            </ExplainPanel>
+          </section>
+        )}
+        {tab === "Messages" && (
+          <div className="message-workspace">
+            <section className="operational-panel">
+              <div className="panel-heading">
+                <div>
+                  <h2>Candidate conversation</h2>
+                  <span>Email thread, delivery and scheduled work</span>
+                </div>
+                <Pill tone="success">Preference eligible</Pill>
+              </div>
+              <div className="message-thread">
+                {applicationMessages.map((message) => (
+                  <article
+                    className={`message-event ${message.direction}`}
+                    key={message.id}
+                  >
+                    <div>
+                      <Pill tone={message.tone}>
+                        {message.channel} · {message.state}
+                      </Pill>
+                      <span>{message.time}</span>
+                    </div>
+                    <h3>{message.subject}</h3>
+                    <p>{message.preview}</p>
+                    <small>
+                      {message.id} · candidate-visible · template and delivery
+                      evidence retained
+                    </small>
+                  </article>
+                ))}
+              </div>
+            </section>
+            <aside className="operational-panel message-composer">
+              <div className="panel-heading">
+                <div>
+                  <h2>Candidate-safe update</h2>
+                  <span>Preview before queue</span>
+                </div>
+                <Pill tone="info">Template v4</Pill>
+              </div>
+              <label>
+                <span>Purpose</span>
+                <select defaultValue="Process update">
+                  <option>Process update</option>
+                  <option>Scheduling request</option>
+                  <option>Service recovery</option>
+                </select>
+              </label>
+              <label>
+                <span>Send time</span>
+                <select defaultValue="Tomorrow · 9:00 AM PT">
+                  <option>Tomorrow · 9:00 AM PT</option>
+                  <option>Send now in simulation</option>
+                </select>
+              </label>
+              <label>
+                <span>Message</span>
+                <textarea
+                  value={draft}
+                  onChange={(event) => setDraft(event.target.value)}
+                />
+              </label>
+              <div className="eligibility-check">
+                <CheckCircle2 size={18} />
+                <span>
+                  <strong>Eligible to queue</strong>Email verified · purpose
+                  allowed · quiet hours clear
+                </span>
+              </div>
+              <button
+                className="primary-button"
+                disabled={draft.trim().length < 20 || messageQueued}
+                onClick={() => {
+                  setMessageQueued(true);
+                  announce(
+                    "Candidate-safe message queued in memory. No email was sent.",
+                  );
+                }}
+              >
+                <Send size={16} />{" "}
+                {messageQueued ? "Queued in memory" : "Queue message preview"}
+              </button>
+            </aside>
+          </div>
+        )}
+        {tab === "Activity" && (
+          <section className="operational-panel">
+            <div className="panel-heading">
+              <div>
+                <h2>Application activity</h2>
+                <span>Job-consideration-specific event feed</span>
+              </div>
+              <Freshness>Canonical event order · now</Freshness>
+            </div>
+            <ol className="activity-feed">
+              {applicationActivity.map((event) => (
+                <li key={event.id}>
+                  <span className={`activity-marker marker-${event.tone}`} />
+                  <div>
+                    <small>{event.time}</small>
+                    <strong>{event.event}</strong>
+                    <p>{event.detail}</p>
+                    <span>
+                      {event.actor} · {event.id}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </section>
+        )}
+        {tab === "Documents & forms" && (
+          <section className="operational-panel">
+            <div className="panel-heading">
+              <div>
+                <h2>Documents and forms</h2>
+                <span>
+                  Access-scoped metadata; binaries remain outside this prototype
+                </span>
+              </div>
+              <Pill tone="success">3 clean fixtures</Pill>
+            </div>
+            <div className="document-list">
+              {applicationDocuments.map((document) => (
+                <article key={document.id}>
+                  <FileText size={22} />
+                  <div>
+                    <strong>{document.name}</strong>
+                    <span>
+                      {document.category} · {document.version} · updated{" "}
+                      {document.updated}
+                    </span>
+                    <small>
+                      {document.id} · {document.access}
+                    </small>
+                  </div>
+                  <Pill tone="success">{document.state}</Pill>
+                  <button
+                    className="secondary-button"
+                    onClick={() =>
+                      announce(
+                        `${document.name} opened as metadata-only preview.`,
+                      )
+                    }
+                  >
+                    Preview
+                  </button>
+                </article>
+              ))}
+            </div>
+          </section>
+        )}
+        {tab === "Tasks" && (
+          <section className="operational-panel">
+            <div className="panel-heading">
+              <div>
+                <h2>Tasks and reminders</h2>
+                <span>Owned work derived from authoritative records</span>
+              </div>
+              <Pill tone="info">
+                {applicationTasks.length - completedTasks.length} open
+              </Pill>
+            </div>
+            <div className="task-list">
+              {applicationTasks.map((task) => {
+                const done = completedTasks.includes(task.id);
+                return (
+                  <article key={task.id}>
+                    <ListChecks size={20} />
+                    <div>
+                      <strong>{task.title}</strong>
+                      <span>
+                        {task.owner} · {task.due}
+                      </span>
+                      <small>Source: {task.source}</small>
+                    </div>
+                    <Pill tone={done ? "success" : task.tone}>
+                      {done ? "Completed · demo" : task.state}
+                    </Pill>
+                    <button
+                      className="secondary-button"
+                      disabled={done || task.state === "Blocked"}
+                      onClick={() => completeTask(task.id)}
+                    >
+                      {done
+                        ? "Completed"
+                        : task.state === "Blocked"
+                          ? "Resolve source first"
+                          : "Complete in demo"}
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        )}
+        {tab === "Related applications" && (
+          <section className="operational-panel">
+            <div className="panel-heading">
+              <div>
+                <h2>Related applications</h2>
+                <span>
+                  One candidate identity; application truth stays job-specific
+                </span>
+              </div>
+              <Pill tone="info">2 considerations</Pill>
+            </div>
+            <div className="related-list">
+              {relatedApplications.map((application) => (
+                <article key={application.id}>
+                  <BriefcaseBusiness size={20} />
+                  <div>
+                    <strong>{application.job}</strong>
+                    <span>
+                      {application.id} · {application.relationship}
+                    </span>
+                    <small>{application.access}</small>
+                  </div>
+                  <Pill
+                    tone={application.id === record.id ? "success" : "info"}
+                  >
+                    {application.stage}
+                  </Pill>
+                  {applicationRecords.some(
+                    (item) => item.id === application.id,
+                  ) ? (
+                    <NavLink
+                      className="secondary-button"
+                      to={`/hr/applications/${application.id}`}
+                    >
+                      Open application
+                    </NavLink>
+                  ) : (
+                    <button
+                      className="secondary-button"
+                      onClick={() =>
+                        announce(
+                          "Related application is a read-only seeded candidate context.",
+                        )
+                      }
+                    >
+                      View context
+                    </button>
+                  )}
+                </article>
+              ))}
+            </div>
+            <IntegrityNotice kind="restricted" />
+          </section>
+        )}
+      </div>
+      {preview && (
+        <div className="modal-scrim" role="presentation">
+          <section
+            className="transition-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="transition-title"
+          >
+            <button
+              className="modal-close"
+              aria-label="Close transition preview"
+              onClick={() => setPreview(false)}
+            >
+              <XCircle size={20} />
+            </button>
+            <Pill tone={blocked ? "warning" : "success"}>
+              TRN-005 · preview only
+            </Pill>
+            <h2 id="transition-title">
+              {blocked
+                ? "Move Interviews → Debrief?"
+                : `Move ${stage} → next gate?`}
+            </h2>
+            <p>
+              {blocked
+                ? "This transition is blocked. Choose a governed recovery action."
+                : "Required facts are present. This remains an in-memory preview."}
+            </p>
+            <div className="transition-checks">
+              <div className="pass">
+                <CheckCircle2 size={18} />
+                <span>All sessions completed</span>
+              </div>
+              <div className={blocked ? "fail" : "pass"}>
+                {blocked ? <XCircle size={18} /> : <CheckCircle2 size={18} />}
+                <span>
+                  {blocked
+                    ? "1 required scorecard missing"
+                    : "Required scorecards complete"}
+                </span>
+              </div>
+            </div>
+            {blocked && (
+              <div className="recovery-actions">
+                <button
+                  className="secondary-button"
+                  onClick={() =>
+                    announce(
+                      "Synthetic reminder recorded; no message was sent.",
+                    )
+                  }
+                >
+                  Send reminder preview
+                </button>
+                <NavLink
+                  className="secondary-button"
+                  to="/hr/assignments/ASN-DEMO-001"
+                >
+                  Open assignment
+                </NavLink>
+                <button
+                  className="secondary-button"
+                  onClick={() => {
+                    resolveScorecard(
+                      "Governed waiver simulated with a preserved evidence gap and audit note.",
+                    );
+                    setPreview(false);
+                  }}
+                >
+                  Simulate governed waiver
+                </button>
+              </div>
+            )}
+            <IntegrityNotice kind="simulation" />
+            <div className="modal-actions">
+              <button
+                className="secondary-button"
+                onClick={() => setPreview(false)}
+              >
+                Close preview
+              </button>
+              <button
+                className="primary-button"
+                disabled={blocked}
+                onClick={() => {
+                  announce("Transition preview completed in memory.");
+                  setPreview(false);
+                }}
+              >
+                {blocked ? "Transition blocked" : "Simulate transition"}
+              </button>
+            </div>
+          </section>
+        </div>
+      )}
+    </HrShell>
+  );
 }
-
 
 function InterviewWorkspace() {
   const { interviewId } = useParams();
@@ -150,70 +2004,1048 @@ function InterviewWorkspace() {
   const [mode, setMode] = useState("Availability request");
   const [confirmed, setConfirmed] = useState(false);
   const [linkActive, setLinkActive] = useState(true);
-  const { scenarioState, availabilitySubmitted, announce } = usePrototype();
+  const { scenarioState, availabilitySubmitted, announce, persona } =
+    usePrototype();
   if (!interviewId) return <RecordList kind="interviews" />;
-  const interview = interviewRecords.find((item) => item.id === interviewId) ?? interviewRecords[0];
-  const rawState = interview.id === "INT-DEMO-001" ? scenarioState.interviewState : interview.state;
+  const interview =
+    interviewRecords.find((item) => item.id === interviewId) ??
+    interviewRecords[0];
+  if (
+    !visibleInterviewsForRole(persona.role).some(
+      (item) => item.id === interview.id,
+    )
+  )
+    return (
+      <HrShell
+        title="Interview access denied"
+        eyebrow={interviewId}
+        screenId="UI-HR-004"
+        screen="interview"
+      >
+        <section className="panel access-denied" role="alert">
+          <ShieldAlert size={28} />
+          <div>
+            <h2>Assignment scope denied safely</h2>
+            <p>{persona.role} is not assigned to this interview context.</p>
+          </div>
+          <NavLink className="primary-button" to="/hr/interviews">
+            Return to visible interviews
+          </NavLink>
+        </section>
+      </HrShell>
+    );
+  const rawState =
+    interview.id === "INT-DEMO-001"
+      ? scenarioState.interviewState
+      : interview.state;
   const state = confirmed ? "Confirmed" : rawState;
   const needsAction = state !== "Complete" && state !== "Confirmed";
-  const slots = ["Wed Aug 27 · 9:30 AM PT", "Thu Aug 28 · 9:30 AM PT", "Thu Aug 28 · 1:00 PM PT", "Fri Aug 29 · 11:00 AM PT"];
-  const confirm = () => { setConfirmed(true); setLinkActive(false); announce(`${selectedSlot} confirmed in memory. The active request is invalidated and projection reconciliation is queued.`); };
-  return <HrShell title="Interview coordination" eyebrow={`${interview.candidate} · ${interview.id}`} screenId="UI-HR-004" screen="interview" actions={needsAction ? <button className="primary-button" disabled={!selectedSlot} onClick={confirm}>Confirm demo slot</button> : <Pill tone="success">{state}</Pill>}>
-    <div className={needsAction ? "blocking-banner" : "success-banner"}>{needsAction ? <CalendarDays size={22} /> : <CheckCircle2 size={22} />}<div><strong>{needsAction ? "Scheduling action required" : "Session state reconciled"}</strong><span>{needsAction ? `${interview.candidate} has no confirmed slot. ${availabilitySubmitted ? "Submitted candidate availability is ready for coordination." : "Candidate availability remains valid."}` : `${interview.type} is ${state.toLowerCase()}; evidence is tracked separately.`}</span></div><Pill tone={needsAction ? "warning" : "success"}>{state}</Pill></div>
-    <div className="schedule-mode" role="tablist" aria-label="Scheduling method">{["Availability request", "Direct booking"].map((item) => <button role="tab" aria-selected={mode === item} onClick={() => { setMode(item); setSelectedSlot(null); }} key={item}>{item}</button>)}</div>
-    <div className="scheduling-contract-grid"><section className="panel"><div className="panel-heading"><div><h2>{mode === "Direct booking" ? "Candidate booking slots" : "Candidate availability"}</h2><span>{mode === "Direct booking" ? "Candidate chooses a confirmed one-event slot" : "Coordinator compares candidate and resource availability"}</span></div><Pill tone={linkActive ? "info" : "neutral"}>{linkActive ? "1 active link" : "Link invalidated"}</Pill></div><div className="availability-grid">{slots.map((slot) => <button className={selectedSlot === slot ? "selected" : ""} aria-pressed={selectedSlot === slot} onClick={() => setSelectedSlot(slot)} key={slot}><strong>{slot}</strong><span>{selectedSlot === slot ? "Selected" : availabilitySubmitted ? "Candidate available" : "Prepared fixture"}</span></button>)}</div><ExplainPanel source={`${mode} · request v3`}>{mode === "Direct booking" ? "Only one candidate/job/stage-specific booking link can be active. Booking invalidates the link and creates one canonical session version." : "Submitted availability is not a booking. A coordinator must confirm a slot that satisfies every hard constraint."}</ExplainPanel></section><section className="panel"><div className="panel-heading"><div><h2>Scheduling contract</h2><span>Hard and soft constraints are explicit</span></div><Pill tone="success">Validated</Pill></div><dl className="schedule-facts"><div><dt>Candidate timezone</dt><dd>America/Los_Angeles</dd></div><div><dt>Minimum notice</dt><dd>24 hours · hard</dd></div><div><dt>Buffers</dt><dd>15 minutes before/after · hard</dd></div><div><dt>Booking window</dt><dd>Aug 27–29 · excludes holiday</dd></div><div><dt>Reschedule policy</dt><dd>2 times · until 12h before</dd></div><div><dt>Link expiry</dt><dd>Aug 29 · 5:00 PM PT</dd></div></dl><button className="secondary-button full-button" disabled={!linkActive} onClick={() => { setLinkActive(false); announce("Active scheduling link invalidated in memory; the prior link can no longer be used."); }}>Invalidate active link</button></section><section className="panel"><div className="panel-heading"><div><h2>Participants and capacity</h2><span>Qualified pool and load limits</span></div><Pill tone="success">Capacity available</Pill></div><div className="participant"><div className="avatar">{interview.interviewer.split(" ").map((part) => part[0]).join("")}</div><div><strong>{interview.interviewer}</strong><span>Qualified interviewer · pool DESIGN-02</span></div><Pill tone="success">2/4 today</Pill></div><div className="participant"><div className="avatar">{interview.candidate.split(" ").map((part) => part[0]).join("")}</div><div><strong>{interview.candidate}</strong><span>Candidate · synthetic contact</span></div><Pill tone={availabilitySubmitted ? "success" : "info"}>{availabilitySubmitted ? "Submitted" : "Requested"}</Pill></div><dl className="fact-list"><div><dt>Format</dt><dd>Video · 45 minutes</dd></div><div><dt>Room/resource</dt><dd>Video room · available</dd></div><div><dt>Interviewer limit</dt><dd>4 daily · 12 weekly</dd></div></dl></section><section className="panel"><div className="panel-heading"><div><h2>Session lifecycle</h2><span>Projection and recovery states</span></div><Freshness>Session v3 · now</Freshness></div><ol className="compact-lifecycle">{[["Request created", true], [availabilitySubmitted ? "Availability submitted" : "Waiting on availability", true], [confirmed ? "Session confirmed" : "Coordinator confirmation", confirmed], ["Calendar projection reconciled", false]].map(([label, done], index) => <li className={done ? "done" : index === 2 && !confirmed ? "current" : "future"} key={String(label)}><span>{done ? <Check size={13} /> : index + 1}</span><strong>{label}</strong></li>)}</ol><button className="secondary-button full-button" onClick={() => announce("Cancellation and no-show recovery options opened in preview.")}>Preview cancel / no-show recovery</button></section></div><IntegrityNotice kind="simulation" />
-  </HrShell>;
+  const slots = [
+    "Wed Aug 27 · 9:30 AM PT",
+    "Thu Aug 28 · 9:30 AM PT",
+    "Thu Aug 28 · 1:00 PM PT",
+    "Fri Aug 29 · 11:00 AM PT",
+  ];
+  const confirm = () => {
+    setConfirmed(true);
+    setLinkActive(false);
+    announce(
+      `${selectedSlot} confirmed in memory. The active request is invalidated and projection reconciliation is queued.`,
+    );
+  };
+  return (
+    <HrShell
+      title="Interview coordination"
+      eyebrow={`${displayCandidateForRole(persona.role, interview)} · ${interview.id}`}
+      screenId="UI-HR-004"
+      screen="interview"
+      actions={
+        needsAction ? (
+          <button
+            className="primary-button"
+            disabled={!selectedSlot}
+            onClick={confirm}
+          >
+            Confirm demo slot
+          </button>
+        ) : (
+          <Pill tone="success">{state}</Pill>
+        )
+      }
+    >
+      <div className={needsAction ? "blocking-banner" : "success-banner"}>
+        {needsAction ? <CalendarDays size={22} /> : <CheckCircle2 size={22} />}
+        <div>
+          <strong>
+            {needsAction
+              ? "Scheduling action required"
+              : "Session state reconciled"}
+          </strong>
+          <span>
+            {needsAction
+              ? `${displayCandidateForRole(persona.role, interview)} has no confirmed slot. ${availabilitySubmitted ? "Submitted candidate availability is ready for coordination." : "Candidate availability remains valid."}`
+              : `${interview.type} is ${state.toLowerCase()}; evidence is tracked separately.`}
+          </span>
+        </div>
+        <Pill tone={needsAction ? "warning" : "success"}>{state}</Pill>
+      </div>
+      <div
+        className="schedule-mode"
+        role="tablist"
+        aria-label="Scheduling method"
+      >
+        {["Availability request", "Direct booking"].map((item) => (
+          <button
+            role="tab"
+            aria-selected={mode === item}
+            onClick={() => {
+              setMode(item);
+              setSelectedSlot(null);
+            }}
+            key={item}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+      <div className="scheduling-contract-grid">
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>
+                {mode === "Direct booking"
+                  ? "Candidate booking slots"
+                  : "Candidate availability"}
+              </h2>
+              <span>
+                {mode === "Direct booking"
+                  ? "Candidate chooses a confirmed one-event slot"
+                  : "Coordinator compares candidate and resource availability"}
+              </span>
+            </div>
+            <Pill tone={linkActive ? "info" : "neutral"}>
+              {linkActive ? "1 active link" : "Link invalidated"}
+            </Pill>
+          </div>
+          <div className="availability-grid">
+            {slots.map((slot) => (
+              <button
+                className={selectedSlot === slot ? "selected" : ""}
+                aria-pressed={selectedSlot === slot}
+                onClick={() => setSelectedSlot(slot)}
+                key={slot}
+              >
+                <strong>{slot}</strong>
+                <span>
+                  {selectedSlot === slot
+                    ? "Selected"
+                    : availabilitySubmitted
+                      ? "Candidate available"
+                      : "Prepared fixture"}
+                </span>
+              </button>
+            ))}
+          </div>
+          <ExplainPanel source={`${mode} · request v3`}>
+            {mode === "Direct booking"
+              ? "Only one candidate/job/stage-specific booking link can be active. Booking invalidates the link and creates one canonical session version."
+              : "Submitted availability is not a booking. A coordinator must confirm a slot that satisfies every hard constraint."}
+          </ExplainPanel>
+        </section>
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Scheduling contract</h2>
+              <span>Hard and soft constraints are explicit</span>
+            </div>
+            <Pill tone="success">Validated</Pill>
+          </div>
+          <dl className="schedule-facts">
+            <div>
+              <dt>Candidate timezone</dt>
+              <dd>America/Los_Angeles</dd>
+            </div>
+            <div>
+              <dt>Minimum notice</dt>
+              <dd>24 hours · hard</dd>
+            </div>
+            <div>
+              <dt>Buffers</dt>
+              <dd>15 minutes before/after · hard</dd>
+            </div>
+            <div>
+              <dt>Booking window</dt>
+              <dd>Aug 27–29 · excludes holiday</dd>
+            </div>
+            <div>
+              <dt>Reschedule policy</dt>
+              <dd>2 times · until 12h before</dd>
+            </div>
+            <div>
+              <dt>Link expiry</dt>
+              <dd>Aug 29 · 5:00 PM PT</dd>
+            </div>
+          </dl>
+          <button
+            className="secondary-button full-button"
+            disabled={!linkActive}
+            onClick={() => {
+              setLinkActive(false);
+              announce(
+                "Active scheduling link invalidated in memory; the prior link can no longer be used.",
+              );
+            }}
+          >
+            Invalidate active link
+          </button>
+        </section>
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Participants and capacity</h2>
+              <span>Qualified pool and load limits</span>
+            </div>
+            <Pill tone="success">Capacity available</Pill>
+          </div>
+          <div className="participant">
+            <div className="avatar">
+              {interview.interviewer
+                .split(" ")
+                .map((part) => part[0])
+                .join("")}
+            </div>
+            <div>
+              <strong>{interview.interviewer}</strong>
+              <span>Qualified interviewer · pool DESIGN-02</span>
+            </div>
+            <Pill tone="success">2/4 today</Pill>
+          </div>
+          <div className="participant">
+            <div className="avatar">
+              {roleDataScopes[persona.role]?.identity === "full"
+                ? interview.candidate
+                    .split(" ")
+                    .map((part) => part[0])
+                    .join("")
+                : "ID"}
+            </div>
+            <div>
+              <strong>
+                {displayCandidateForRole(persona.role, interview)}
+              </strong>
+              <span>Candidate · synthetic contact</span>
+            </div>
+            <Pill tone={availabilitySubmitted ? "success" : "info"}>
+              {availabilitySubmitted ? "Submitted" : "Requested"}
+            </Pill>
+          </div>
+          <dl className="fact-list">
+            <div>
+              <dt>Format</dt>
+              <dd>Video · 45 minutes</dd>
+            </div>
+            <div>
+              <dt>Room/resource</dt>
+              <dd>Video room · available</dd>
+            </div>
+            <div>
+              <dt>Interviewer limit</dt>
+              <dd>4 daily · 12 weekly</dd>
+            </div>
+          </dl>
+        </section>
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Session lifecycle</h2>
+              <span>Projection and recovery states</span>
+            </div>
+            <Freshness>Session v3 · now</Freshness>
+          </div>
+          <ol className="compact-lifecycle">
+            {[
+              ["Request created", true],
+              [
+                availabilitySubmitted
+                  ? "Availability submitted"
+                  : "Waiting on availability",
+                true,
+              ],
+              [
+                confirmed ? "Session confirmed" : "Coordinator confirmation",
+                confirmed,
+              ],
+              ["Calendar projection reconciled", false],
+            ].map(([label, done], index) => (
+              <li
+                className={
+                  done
+                    ? "done"
+                    : index === 2 && !confirmed
+                      ? "current"
+                      : "future"
+                }
+                key={String(label)}
+              >
+                <span>{done ? <Check size={13} /> : index + 1}</span>
+                <strong>{label}</strong>
+              </li>
+            ))}
+          </ol>
+          <button
+            className="secondary-button full-button"
+            onClick={() =>
+              announce(
+                "Cancellation and no-show recovery options opened in preview.",
+              )
+            }
+          >
+            Preview cancel / no-show recovery
+          </button>
+        </section>
+      </div>
+      <IntegrityNotice kind="simulation" />
+    </HrShell>
+  );
 }
-
 
 function ScorecardWorkspace() {
   const { assignmentId } = useParams();
-  const { resolveScorecard, scorecardResolved, announce } = usePrototype();
+  const { resolveScorecard, scorecardResolved, announce, persona } =
+    usePrototype();
   const [saved, setSaved] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [briefingTab, setBriefingTab] = useState("Briefing");
   const [amendmentRequested, setAmendmentRequested] = useState(false);
-  const [evidence, setEvidence] = useState<string[]>(scorecard.map((item) => item.evidence));
+  const [evidence, setEvidence] = useState<string[]>(
+    scorecard.map((item) => item.evidence),
+  );
   if (!assignmentId) return <RecordList kind="assignments" />;
-  const assignment = assignmentRecords.find((item) => item.id === assignmentId) ?? assignmentRecords[0];
-  const locked = submitted || (assignment.id === "ASN-DEMO-001" && scorecardResolved);
-  const submit = () => { setSaved(true); setSubmitted(true); if (assignment.id === "ASN-DEMO-001") resolveScorecard(); };
-  return <HrShell title="Structured scorecard" eyebrow={`Independent interviewer workspace · ${assignment.id}`} screenId="UI-HR-005" screen="scorecard" actions={<><span className="autosave-state"><Check size={15} /> {locked ? "Submitted in memory" : saved ? "Draft saved in memory" : "Fixture loaded"}</span><button className="primary-button" disabled={locked || evidence.some((item) => item.trim().length < 20)} onClick={submit}>{locked ? "Submitted · demo" : "Submit scorecard"}</button></>}>
-    <div className="scorecard-brief"><div><Pill tone="info">Assignment {assignment.id}</Pill><h2>Evidence for {assignment.candidate}</h2><p>Assess only approved competencies. Do not compare candidates or infer protected characteristics.</p></div><dl><div><dt>Role</dt><dd>{assignment.job}</dd></div><div><dt>Interviewer</dt><dd>{assignment.interviewer}</dd></div><div><dt>Due</dt><dd>{assignment.due}</dd></div></dl></div>
-    <div className="interviewer-briefing"><div className="briefing-tabs" role="tablist" aria-label="Interviewer briefing sections">{["Briefing", "Candidate context", "Feedback visibility"].map((item) => <button role="tab" aria-selected={briefingTab === item} onClick={() => setBriefingTab(item)} key={item}>{item}</button>)}</div>{briefingTab === "Briefing" && <section><div><span className="eyebrow">Interview objective</span><h2>Portfolio review · accessible systems thinking</h2><p>Ask the three approved questions, capture observable evidence, and leave the hiring recommendation to the human debrief.</p></div><dl><div><dt>Duration</dt><dd>45 minutes</dd></div><div><dt>Your ownership</dt><dd>Systems thinking + accessible design</dd></div><div><dt>Instructions</dt><dd>Do not ask about protected or accommodation information</dd></div></dl></section>}{briefingTab === "Candidate context" && <section><div><span className="eyebrow">Minimum necessary context</span><h2>{assignment.candidate}</h2><p>Application v5 · synthetic résumé v2 · Senior Product Designer. Other applications and restricted notes are not shown.</p></div><button className="secondary-button" onClick={() => announce("Synthetic résumé opened in briefing preview.")}><FileText size={16} /> Preview résumé</button></section>}{briefingTab === "Feedback visibility" && <section><div><span className="eyebrow">Independent evidence</span><h2>Other feedback is hidden</h2><p>You cannot see other interviewers’ ratings or evidence until your own scorecard is submitted. Private fields remain restricted afterward.</p></div><Pill tone={locked ? "success" : "warning"}>{locked ? "Submitted · eligible for debrief view" : "Blinded until submission"}</Pill></section>}</div>
-    <IntegrityNotice kind="human" /><section className="panel scorecard-form"><div className="panel-heading"><div><h2>Competency evidence</h2><span>Scorecard v4 · independent until submission</span></div><Pill tone={locked ? "success" : "warning"}>{locked ? "Locked version" : "Draft"}</Pill></div>{["Systems thinking", "Accessible design", "Collaboration"].map((competency, groupIndex) => <fieldset className="rating-block" key={competency} disabled={locked}><legend><span>{groupIndex + 1}</span>{competency}</legend><p>{groupIndex === 0 ? "Connects user, operational and technical constraints into a coherent direction." : groupIndex === 1 ? "Identifies barriers and designs robust keyboard, screen-reader and recovery behavior." : "Builds shared understanding and resolves disagreement with evidence."}</p><div className="rating-options">{["Insufficient evidence", "Mixed evidence", "Strong evidence"].map((rating) => <label key={rating}><input type="radio" name={`rating-${groupIndex}`} defaultChecked={rating === (groupIndex === 2 ? "Mixed evidence" : "Strong evidence")} /><span>{rating}</span></label>)}</div><label className="evidence-input"><span>Human-entered evidence</span><textarea value={evidence[groupIndex]} onChange={(event) => setEvidence((items) => items.map((item, index) => index === groupIndex ? event.target.value : item))} /><small>Synthetic fixture text is prefilled; edit it before submitting the demo.</small></label></fieldset>)}<div className="scorecard-actions">{locked ? <button className="secondary-button" disabled={amendmentRequested} onClick={() => { setAmendmentRequested(true); announce("Amendment request created in memory. The submitted version remains unchanged."); }}>{amendmentRequested ? "Amendment requested" : "Request attributed amendment"}</button> : <button className="secondary-button" onClick={() => setSaved(true)}>Save demo draft</button>}<span>{locked ? "Submitted evidence is preserved; corrections create a new attributed version." : "No network or persistent storage"}</span></div></section>
-  </HrShell>;
+  const assignment =
+    assignmentRecords.find((item) => item.id === assignmentId) ??
+    assignmentRecords[0];
+  if (
+    !visibleAssignmentsForRole(persona.role).some(
+      (item) => item.id === assignment.id,
+    )
+  )
+    return (
+      <HrShell
+        title="Scorecard access denied"
+        eyebrow={assignmentId}
+        screenId="UI-HR-005"
+        screen="scorecard"
+      >
+        <section className="panel access-denied" role="alert">
+          <ShieldAlert size={28} />
+          <div>
+            <h2>Assignment access denied safely</h2>
+            <p>
+              {persona.role} is not the assigned evidence owner or an authorized
+              reviewer.
+            </p>
+          </div>
+          <NavLink className="primary-button" to="/hr/assignments">
+            Return to visible scorecards
+          </NavLink>
+        </section>
+      </HrShell>
+    );
+  const locked =
+    submitted || (assignment.id === "ASN-DEMO-001" && scorecardResolved);
+  const submit = () => {
+    setSaved(true);
+    setSubmitted(true);
+    if (assignment.id === "ASN-DEMO-001") resolveScorecard();
+  };
+  return (
+    <HrShell
+      title="Structured scorecard"
+      eyebrow={`Independent interviewer workspace · ${assignment.id}`}
+      screenId="UI-HR-005"
+      screen="scorecard"
+      actions={
+        <>
+          <span className="autosave-state">
+            <Check size={15} />{" "}
+            {locked
+              ? "Submitted in memory"
+              : saved
+                ? "Draft saved in memory"
+                : "Fixture loaded"}
+          </span>
+          <button
+            className="primary-button"
+            disabled={
+              locked || evidence.some((item) => item.trim().length < 20)
+            }
+            onClick={submit}
+          >
+            {locked ? "Submitted · demo" : "Submit scorecard"}
+          </button>
+        </>
+      }
+    >
+      <div className="scorecard-brief">
+        <div>
+          <Pill tone="info">Assignment {assignment.id}</Pill>
+          <h2>
+            Evidence for {displayCandidateForRole(persona.role, assignment)}
+          </h2>
+          <p>
+            Assess only approved competencies. Do not compare candidates or
+            infer protected characteristics.
+          </p>
+        </div>
+        <dl>
+          <div>
+            <dt>Role</dt>
+            <dd>{assignment.job}</dd>
+          </div>
+          <div>
+            <dt>Interviewer</dt>
+            <dd>{assignment.interviewer}</dd>
+          </div>
+          <div>
+            <dt>Due</dt>
+            <dd>{assignment.due}</dd>
+          </div>
+        </dl>
+      </div>
+      <div className="interviewer-briefing">
+        <div
+          className="briefing-tabs"
+          role="tablist"
+          aria-label="Interviewer briefing sections"
+        >
+          {["Briefing", "Candidate context", "Feedback visibility"].map(
+            (item) => (
+              <button
+                role="tab"
+                aria-selected={briefingTab === item}
+                onClick={() => setBriefingTab(item)}
+                key={item}
+              >
+                {item}
+              </button>
+            ),
+          )}
+        </div>
+        {briefingTab === "Briefing" && (
+          <section>
+            <div>
+              <span className="eyebrow">Interview objective</span>
+              <h2>Portfolio review · accessible systems thinking</h2>
+              <p>
+                Ask the three approved questions, capture observable evidence,
+                and leave the hiring recommendation to the human debrief.
+              </p>
+            </div>
+            <dl>
+              <div>
+                <dt>Duration</dt>
+                <dd>45 minutes</dd>
+              </div>
+              <div>
+                <dt>Your ownership</dt>
+                <dd>Systems thinking + accessible design</dd>
+              </div>
+              <div>
+                <dt>Instructions</dt>
+                <dd>Do not ask about protected or accommodation information</dd>
+              </div>
+            </dl>
+          </section>
+        )}
+        {briefingTab === "Candidate context" && (
+          <section>
+            <div>
+              <span className="eyebrow">Minimum necessary context</span>
+              <h2>{displayCandidateForRole(persona.role, assignment)}</h2>
+              <p>
+                Application v5 · synthetic résumé v2 · Senior Product Designer.
+                Other applications and restricted notes are not shown.
+              </p>
+            </div>
+            <button
+              className="secondary-button"
+              onClick={() =>
+                announce("Synthetic résumé opened in briefing preview.")
+              }
+            >
+              <FileText size={16} /> Preview résumé
+            </button>
+          </section>
+        )}
+        {briefingTab === "Feedback visibility" && (
+          <section>
+            <div>
+              <span className="eyebrow">Independent evidence</span>
+              <h2>Other feedback is hidden</h2>
+              <p>
+                You cannot see other interviewers’ ratings or evidence until
+                your own scorecard is submitted. Private fields remain
+                restricted afterward.
+              </p>
+            </div>
+            <Pill tone={locked ? "success" : "warning"}>
+              {locked
+                ? "Submitted · eligible for debrief view"
+                : "Blinded until submission"}
+            </Pill>
+          </section>
+        )}
+      </div>
+      <IntegrityNotice kind="human" />
+      <section className="panel scorecard-form">
+        <div className="panel-heading">
+          <div>
+            <h2>Competency evidence</h2>
+            <span>Scorecard v4 · independent until submission</span>
+          </div>
+          <Pill tone={locked ? "success" : "warning"}>
+            {locked ? "Locked version" : "Draft"}
+          </Pill>
+        </div>
+        {["Systems thinking", "Accessible design", "Collaboration"].map(
+          (competency, groupIndex) => (
+            <fieldset
+              className="rating-block"
+              key={competency}
+              disabled={locked}
+            >
+              <legend>
+                <span>{groupIndex + 1}</span>
+                {competency}
+              </legend>
+              <p>
+                {groupIndex === 0
+                  ? "Connects user, operational and technical constraints into a coherent direction."
+                  : groupIndex === 1
+                    ? "Identifies barriers and designs robust keyboard, screen-reader and recovery behavior."
+                    : "Builds shared understanding and resolves disagreement with evidence."}
+              </p>
+              <div className="rating-options">
+                {[
+                  "Insufficient evidence",
+                  "Mixed evidence",
+                  "Strong evidence",
+                ].map((rating) => (
+                  <label key={rating}>
+                    <input
+                      type="radio"
+                      name={`rating-${groupIndex}`}
+                      defaultChecked={
+                        rating ===
+                        (groupIndex === 2
+                          ? "Mixed evidence"
+                          : "Strong evidence")
+                      }
+                    />
+                    <span>{rating}</span>
+                  </label>
+                ))}
+              </div>
+              <label className="evidence-input">
+                <span>Human-entered evidence</span>
+                <textarea
+                  value={evidence[groupIndex]}
+                  onChange={(event) =>
+                    setEvidence((items) =>
+                      items.map((item, index) =>
+                        index === groupIndex ? event.target.value : item,
+                      ),
+                    )
+                  }
+                />
+                <small>
+                  Synthetic fixture text is prefilled; edit it before submitting
+                  the demo.
+                </small>
+              </label>
+            </fieldset>
+          ),
+        )}
+        <div className="scorecard-actions">
+          {locked ? (
+            <button
+              className="secondary-button"
+              disabled={amendmentRequested}
+              onClick={() => {
+                setAmendmentRequested(true);
+                announce(
+                  "Amendment request created in memory. The submitted version remains unchanged.",
+                );
+              }}
+            >
+              {amendmentRequested
+                ? "Amendment requested"
+                : "Request attributed amendment"}
+            </button>
+          ) : (
+            <button className="secondary-button" onClick={() => setSaved(true)}>
+              Save demo draft
+            </button>
+          )}
+          <span>
+            {locked
+              ? "Submitted evidence is preserved; corrections create a new attributed version."
+              : "No network or persistent storage"}
+          </span>
+        </div>
+      </section>
+    </HrShell>
+  );
 }
-
 
 function DecisionWorkspace() {
   const { applicationId } = useParams();
-  const { scenarioState, announce, offerApproved, approveOffer } = usePrototype();
+  const { scenarioState, announce, offerApproved, approveOffer, persona } =
+    usePrototype();
   const [sentBack, setSentBack] = useState(false);
   const [versionsOpen, setVersionsOpen] = useState(false);
   if (!applicationId) return <RecordList kind="decisions" />;
-  const record = applicationRecords.find((item) => item.id === applicationId) ?? applicationRecords[0];
+  const record =
+    applicationRecords.find((item) => item.id === applicationId) ??
+    applicationRecords[0];
+  if (
+    !visibleApplicationsForRole(persona.role).some(
+      (item) => item.id === record.id,
+    ) ||
+    !["APP-DEMO-001", "APP-DEMO-011"].includes(record.id)
+  )
+    return (
+      <HrShell
+        title="Decision access denied"
+        eyebrow={applicationId}
+        screenId="UI-HR-006"
+        screen="decision"
+      >
+        <section className="panel access-denied" role="alert">
+          <ShieldAlert size={28} />
+          <div>
+            <h2>Decision subject denied safely</h2>
+            <p>
+              {persona.role} is not authorized for this decision, offer, or
+              handoff population.
+            </p>
+          </div>
+          <NavLink className="primary-button" to="/hr/decisions">
+            Return to visible decisions
+          </NavLink>
+        </section>
+      </HrShell>
+    );
   const isMaya = record.id === "APP-DEMO-001";
   const blocked = isMaya && scenarioState.decisionState === "Blocked";
   const closed = isMaya && scenarioState.decisionState === "Closed";
   const ready = isMaya && scenarioState.decisionState === "Ready for decision";
   const accepted = isMaya && scenarioState.offerState === "Accepted";
-  const approval = record.id === "APP-DEMO-011" || scenarioState.offerState === "Pending approval";
+  const approval =
+    record.id === "APP-DEMO-011" ||
+    scenarioState.offerState === "Pending approval";
   const approved = offerApproved && approval;
-  const handoffFailed = accepted && scenarioState.handoffState === "Reconciliation failed";
-  const flow = closed ? [["Human decision", "Process closed", "success"], ["Offer approval", "Not started", "neutral"], ["Candidate response", "Not applicable", "neutral"], ["HR handoff", "Not started", "neutral"], ["Hired", "Not hired", "neutral"]] : blocked ? [["Human decision", "Blocked by governed fact", "danger"], ["Offer approval", "Not started", "neutral"], ["Candidate response", "Not started", "neutral"], ["HR handoff", "Not started", "neutral"], ["Hired", "Not started", "neutral"]] : ready ? [["Human decision", "Action required", "warning"], ["Offer approval", "Not started", "neutral"], ["Candidate response", "Not started", "neutral"], ["HR handoff", "Not started", "neutral"], ["Hired", "Not started", "neutral"]] : approval ? [["Human decision", "Complete", "success"], ["Offer approval", approved ? "Approved v4" : sentBack ? "Sent back" : "Action required", approved ? "success" : sentBack ? "danger" : "warning"], ["Candidate response", approved ? "Candidate task available" : "Not started", approved ? "info" : "neutral"], ["HR handoff", "Not started", "neutral"], ["Hired", "Not started", "neutral"]] : [["Human decision", "Complete", "success"], ["Offer approval", "Version 4 approved", "success"], ["Candidate response", "Accepted fixture", "success"], ["HR handoff", handoffFailed ? "Reconciliation failed" : "Pending acknowledgement", handoffFailed ? "danger" : "warning"], ["Hired", "Blocked until ack", "neutral"]];
-  const blockerCopy = scenarioState.missingScorecards ? `${scenarioState.missingScorecards} required scorecard missing. Offer and opening reservation remain not started.` : scenarioState.policyBlocked ? "Policy applicability is unresolved. Regulated action remains blocked and owned." : "A governed integrity or event-reconciliation fact must be resolved before a human decision.";
-  const approve = () => { setSentBack(false); approveOffer(); };
-  return <HrShell title="Decision, offer & handoff" eyebrow={`${record.candidate} · ${record.id}`} screenId="UI-HR-006" screen="decision" actions={approval && !approved ? <><button className="secondary-button" onClick={() => setSentBack(true)}>Send back with reason</button><button className="primary-button" onClick={approve}>Approve current offer</button></> : <button className="primary-button" disabled={blocked || closed || approved} onClick={() => announce(ready ? "Human decision preview opened; no outcome was recorded." : "Next governed action preview opened.")}>{closed ? "Application closed" : blocked ? "Decision blocked" : approved ? "Offer approved · demo" : ready ? "Preview human decision" : "Preview next governed action"}</button>}>
-    <IntegrityNotice kind="human" /><div className="decision-flow" aria-label="Decision and handoff progress">{flow.map(([label, state, tone], index) => <div className="decision-step" key={label}><span className={`decision-dot dot-${tone}`}>{tone === "success" ? <Check size={15} /> : index + 1}</span><div><strong>{label}</strong><small>{state}</small></div>{index < 4 && <ArrowRight size={17} />}</div>)}</div>
-    {blocked && <div className="blocking-banner" role="alert"><ClipboardCheck size={22} /><div><strong>Decision is not ready</strong><span>{blockerCopy}</span></div>{scenarioState.missingScorecards > 0 && <NavLink className="secondary-button" to="/hr/assignments/ASN-DEMO-001">Resolve evidence</NavLink>}</div>}
-    {sentBack && !approved && <div className="blocking-banner" role="status"><AlertOctagon size={22} /><div><strong>Offer sent back in memory</strong><span>Compensation clarification is required. The immutable v4 approval attempt remains preserved.</span></div><button className="secondary-button" onClick={() => setSentBack(false)}>Return to approval</button></div>}
-    {handoffFailed && <div className="blocking-banner"><AlertOctagon size={22} /><div><strong>Handoff delivery not acknowledged</strong><span>The candidate remains Ready for Hire; offer acceptance is never equated with Hired.</span></div><Pill tone="danger">ERR-009</Pill></div>}
-    {approval && <section className="panel approval-workspace"><div className="panel-heading"><div><h2>Version-bound approval route</h2><span>Ordered policy · material change restarts approval</span></div><Pill tone={approved ? "success" : sentBack ? "danger" : "warning"}>{approved ? "Approved v4" : sentBack ? "Sent back" : "1 action required"}</Pill></div><div className="approval-steps">{offerApprovalSteps.map((step) => { const current = step.id === "APR-DEMO-042"; const state = current && approved ? "Approved" : current && sentBack ? "Sent back" : step.state; const tone = current && approved ? "success" : current && sentBack ? "danger" : step.tone; return <article key={step.id}><span className={`approval-index ${tone}`}>{state === "Approved" ? <Check size={15} /> : step.id.slice(-1)}</span><div><strong>{step.role} · {step.approver}</strong><p>{step.detail}</p><small>{current && approved ? "Approved now · synthetic evidence" : step.time} · {step.id}</small></div><Pill tone={tone}>{state}</Pill></article>; })}</div><div className="approval-policy-facts"><span><strong>Policy</strong>OFFER-APPROVAL-v2</span><span><strong>Subject fingerprint</strong>sha256:offer-v4…91ad</span><span><strong>Quorum</strong>All 3 ordered steps</span><span><strong>Escalation</strong>4h then Recruiting lead</span></div></section>}
-    <div className="decision-grid"><section className="panel"><div className="panel-heading"><div><h2>Current offer</h2><span>Immutable version lifecycle</span></div><Pill tone={accepted || approved ? "success" : approval ? "warning" : "neutral"}>{accepted ? "Accepted · demo" : approved ? "Approved · candidate task ready" : approval ? "Approval required" : "Not started"}</Pill></div><dl className="offer-facts"><div><dt>Offer version</dt><dd>{accepted || approval ? "v4 · supersedes v3" : "No version created"}</dd></div><div><dt>Base salary</dt><dd>{accepted || approval ? "$164,000 USD · inside band" : "Not available"}</dd></div><div><dt>Opening reservation</dt><dd>{scenarioState.openingReserved ? "OPEN-DEMO-001 · active" : "No reservation"}</dd></div><div><dt>Candidate projection</dt><dd>{approved ? "Offer ready for review" : accepted ? "Offer accepted" : "No offer action shown"}</dd></div></dl><button className="secondary-button full-button" disabled={!accepted && !approval} onClick={() => setVersionsOpen((value) => !value)}>{versionsOpen ? "Hide version comparison" : "Compare superseded versions"}</button>{versionsOpen && <div className="version-comparison"><div><strong>v3 · superseded</strong><span>$160,000 · Sep 15 start</span></div><ArrowRight size={18} /><div><strong>v4 · current</strong><span>$164,000 · Sep 22 start</span></div><small>Material fields changed; v3 approvals and response link are invalid.</small></div>}</section><section className="panel"><div className="panel-heading"><div><h2>Handoff integrity</h2><span>TRN-010 → TRN-011</span></div><Pill tone={handoffFailed ? "danger" : accepted ? "warning" : "neutral"}>{handoffFailed ? "Needs reconciliation" : accepted ? "Pending acknowledgement" : "Not started"}</Pill></div><dl className="fact-list"><div><dt>Payload hash</dt><dd>{accepted ? "sha256:demo…7f21" : "Not generated"}</dd></div><div><dt>Idempotency key</dt><dd>{accepted ? "HAND-DEMO-01:v2:deliver" : "Not generated"}</dd></div><div><dt>Destination</dt><dd>HRIS fixture adapter</dd></div><div><dt>Hire state</dt><dd><strong>Not Hired</strong></dd></div></dl><ExplainPanel source="Canonical handoff state · now">Hired becomes valid only after the destination acknowledges the exact handoff version.</ExplainPanel></section></div>
-  </HrShell>;
+  const handoffFailed =
+    accepted && scenarioState.handoffState === "Reconciliation failed";
+  const flow = closed
+    ? [
+        ["Human decision", "Process closed", "success"],
+        ["Offer approval", "Not started", "neutral"],
+        ["Candidate response", "Not applicable", "neutral"],
+        ["HR handoff", "Not started", "neutral"],
+        ["Hired", "Not hired", "neutral"],
+      ]
+    : blocked
+      ? [
+          ["Human decision", "Blocked by governed fact", "danger"],
+          ["Offer approval", "Not started", "neutral"],
+          ["Candidate response", "Not started", "neutral"],
+          ["HR handoff", "Not started", "neutral"],
+          ["Hired", "Not started", "neutral"],
+        ]
+      : ready
+        ? [
+            ["Human decision", "Action required", "warning"],
+            ["Offer approval", "Not started", "neutral"],
+            ["Candidate response", "Not started", "neutral"],
+            ["HR handoff", "Not started", "neutral"],
+            ["Hired", "Not started", "neutral"],
+          ]
+        : approval
+          ? [
+              ["Human decision", "Complete", "success"],
+              [
+                "Offer approval",
+                approved
+                  ? "Approved v4"
+                  : sentBack
+                    ? "Sent back"
+                    : "Action required",
+                approved ? "success" : sentBack ? "danger" : "warning",
+              ],
+              [
+                "Candidate response",
+                approved ? "Candidate task available" : "Not started",
+                approved ? "info" : "neutral",
+              ],
+              ["HR handoff", "Not started", "neutral"],
+              ["Hired", "Not started", "neutral"],
+            ]
+          : [
+              ["Human decision", "Complete", "success"],
+              ["Offer approval", "Version 4 approved", "success"],
+              ["Candidate response", "Accepted fixture", "success"],
+              [
+                "HR handoff",
+                handoffFailed
+                  ? "Reconciliation failed"
+                  : "Pending acknowledgement",
+                handoffFailed ? "danger" : "warning",
+              ],
+              ["Hired", "Blocked until ack", "neutral"],
+            ];
+  const blockerCopy = scenarioState.missingScorecards
+    ? `${scenarioState.missingScorecards} required scorecard missing. Offer and opening reservation remain not started.`
+    : scenarioState.policyBlocked
+      ? "Policy applicability is unresolved. Regulated action remains blocked and owned."
+      : "A governed integrity or event-reconciliation fact must be resolved before a human decision.";
+  const canApprove = persona.role === "Offer Approver";
+  const compensationScope =
+    roleDataScopes[persona.role]?.compensation ?? "none";
+  const salary = isMaya ? "$164,000 USD" : "$204,000 USD";
+  const salaryBand = isMaya ? "$148,000–$176,000 USD" : "$184,000–$224,000 USD";
+  const compensationValue =
+    compensationScope === "full"
+      ? `${salary} · inside band`
+      : compensationScope === "band-only"
+        ? `${salaryBand} band · exact amount restricted`
+        : "Restricted by compensation policy";
+  const approve = () => {
+    setSentBack(false);
+    approveOffer();
+  };
+  return (
+    <HrShell
+      title="Decision, offer & handoff"
+      eyebrow={`${displayCandidateForRole(persona.role, record)} · ${record.id}`}
+      screenId="UI-HR-006"
+      screen="decision"
+      actions={
+        approval && !approved && canApprove ? (
+          <>
+            <button
+              className="secondary-button"
+              onClick={() => setSentBack(true)}
+            >
+              Send back with reason
+            </button>
+            <button className="primary-button" onClick={approve}>
+              Approve current offer
+            </button>
+          </>
+        ) : (
+          <button
+            className="primary-button"
+            disabled={blocked || closed || approved || approval}
+            onClick={() =>
+              announce(
+                ready
+                  ? "Human decision preview opened; no outcome was recorded."
+                  : "Next governed action preview opened.",
+              )
+            }
+          >
+            {closed
+              ? "Application closed"
+              : blocked
+                ? "Decision blocked"
+                : approved
+                  ? "Offer approved · demo"
+                  : approval
+                    ? "Approval restricted"
+                    : ready
+                      ? "Preview human decision"
+                      : "Preview next governed action"}
+          </button>
+        )
+      }
+    >
+      <IntegrityNotice kind="human" />
+      <div className="decision-flow" aria-label="Decision and handoff progress">
+        {flow.map(([label, state, tone], index) => (
+          <div className="decision-step" key={label}>
+            <span className={`decision-dot dot-${tone}`}>
+              {tone === "success" ? <Check size={15} /> : index + 1}
+            </span>
+            <div>
+              <strong>{label}</strong>
+              <small>{state}</small>
+            </div>
+            {index < 4 && <ArrowRight size={17} />}
+          </div>
+        ))}
+      </div>
+      {blocked && (
+        <div className="blocking-banner" role="alert">
+          <ClipboardCheck size={22} />
+          <div>
+            <strong>Decision is not ready</strong>
+            <span>{blockerCopy}</span>
+          </div>
+          {scenarioState.missingScorecards > 0 && (
+            <NavLink
+              className="secondary-button"
+              to="/hr/assignments/ASN-DEMO-001"
+            >
+              Resolve evidence
+            </NavLink>
+          )}
+        </div>
+      )}
+      {sentBack && !approved && (
+        <div className="blocking-banner" role="status">
+          <AlertOctagon size={22} />
+          <div>
+            <strong>Offer sent back in memory</strong>
+            <span>
+              Compensation clarification is required. The immutable v4 approval
+              attempt remains preserved.
+            </span>
+          </div>
+          <button
+            className="secondary-button"
+            onClick={() => setSentBack(false)}
+          >
+            Return to approval
+          </button>
+        </div>
+      )}
+      {handoffFailed && (
+        <div className="blocking-banner">
+          <AlertOctagon size={22} />
+          <div>
+            <strong>Handoff delivery not acknowledged</strong>
+            <span>
+              The candidate remains Ready for Hire; offer acceptance is never
+              equated with Hired.
+            </span>
+          </div>
+          <Pill tone="danger">ERR-009</Pill>
+        </div>
+      )}
+      {approval && (
+        <section className="panel approval-workspace">
+          <div className="panel-heading">
+            <div>
+              <h2>Version-bound approval route</h2>
+              <span>Ordered policy · material change restarts approval</span>
+            </div>
+            <Pill tone={approved ? "success" : sentBack ? "danger" : "warning"}>
+              {approved
+                ? "Approved v4"
+                : sentBack
+                  ? "Sent back"
+                  : "1 action required"}
+            </Pill>
+          </div>
+          <div className="approval-steps">
+            {offerApprovalSteps.map((step) => {
+              const current = step.id === "APR-DEMO-042";
+              const state =
+                current && approved
+                  ? "Approved"
+                  : current && sentBack
+                    ? "Sent back"
+                    : step.state;
+              const tone =
+                current && approved
+                  ? "success"
+                  : current && sentBack
+                    ? "danger"
+                    : step.tone;
+              return (
+                <article key={step.id}>
+                  <span className={`approval-index ${tone}`}>
+                    {state === "Approved" ? (
+                      <Check size={15} />
+                    ) : (
+                      step.id.slice(-1)
+                    )}
+                  </span>
+                  <div>
+                    <strong>
+                      {step.role} · {step.approver}
+                    </strong>
+                    <p>{step.detail}</p>
+                    <small>
+                      {current && approved
+                        ? "Approved now · synthetic evidence"
+                        : step.time}{" "}
+                      · {step.id}
+                    </small>
+                  </div>
+                  <Pill tone={tone}>{state}</Pill>
+                </article>
+              );
+            })}
+          </div>
+          <div className="approval-policy-facts">
+            <span>
+              <strong>Policy</strong>OFFER-APPROVAL-v2
+            </span>
+            <span>
+              <strong>Subject fingerprint</strong>sha256:offer-v4…91ad
+            </span>
+            <span>
+              <strong>Quorum</strong>All 3 ordered steps
+            </span>
+            <span>
+              <strong>Escalation</strong>4h then Recruiting lead
+            </span>
+          </div>
+        </section>
+      )}
+      <div className="decision-grid">
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Current offer</h2>
+              <span>Immutable version lifecycle</span>
+            </div>
+            <Pill
+              tone={
+                accepted || approved
+                  ? "success"
+                  : approval
+                    ? "warning"
+                    : "neutral"
+              }
+            >
+              {accepted
+                ? "Accepted · demo"
+                : approved
+                  ? "Approved · candidate task ready"
+                  : approval
+                    ? "Approval required"
+                    : "Not started"}
+            </Pill>
+          </div>
+          <dl className="offer-facts">
+            <div>
+              <dt>Offer version</dt>
+              <dd>
+                {accepted || approval
+                  ? "v4 · supersedes v3"
+                  : "No version created"}
+              </dd>
+            </div>
+            <div>
+              <dt>Base salary</dt>
+              <dd>
+                {accepted || approval ? compensationValue : "Not available"}
+              </dd>
+            </div>
+            <div>
+              <dt>Opening reservation</dt>
+              <dd>
+                {scenarioState.openingReserved
+                  ? "OPEN-DEMO-001 · active"
+                  : "No reservation"}
+              </dd>
+            </div>
+            <div>
+              <dt>Candidate projection</dt>
+              <dd>
+                {approved
+                  ? "Offer ready for review"
+                  : accepted
+                    ? "Offer accepted"
+                    : "No offer action shown"}
+              </dd>
+            </div>
+          </dl>
+          <button
+            className="secondary-button full-button"
+            disabled={!accepted && !approval}
+            onClick={() => setVersionsOpen((value) => !value)}
+          >
+            {versionsOpen
+              ? "Hide version comparison"
+              : "Compare superseded versions"}
+          </button>
+          {versionsOpen && (
+            <div className="version-comparison">
+              <div>
+                <strong>v3 · superseded</strong>
+                <span>
+                  {compensationScope === "full"
+                    ? isMaya
+                      ? "$160,000 · Sep 15 start"
+                      : "$198,000 · Sep 15 start"
+                    : "Compensation changed · exact amount restricted"}
+                </span>
+              </div>
+              <ArrowRight size={18} />
+              <div>
+                <strong>v4 · current</strong>
+                <span>
+                  {compensationScope === "full"
+                    ? `${salary.replace(" USD", "")} · Sep 22 start`
+                    : "Current approved band · Sep 22 start"}
+                </span>
+              </div>
+              <small>
+                Material fields changed; v3 approvals and response link are
+                invalid.
+              </small>
+            </div>
+          )}
+        </section>
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Handoff integrity</h2>
+              <span>TRN-010 → TRN-011</span>
+            </div>
+            <Pill
+              tone={handoffFailed ? "danger" : accepted ? "warning" : "neutral"}
+            >
+              {handoffFailed
+                ? "Needs reconciliation"
+                : accepted
+                  ? "Pending acknowledgement"
+                  : "Not started"}
+            </Pill>
+          </div>
+          <dl className="fact-list">
+            <div>
+              <dt>Payload hash</dt>
+              <dd>{accepted ? "sha256:demo…7f21" : "Not generated"}</dd>
+            </div>
+            <div>
+              <dt>Idempotency key</dt>
+              <dd>{accepted ? "HAND-DEMO-01:v2:deliver" : "Not generated"}</dd>
+            </div>
+            <div>
+              <dt>Destination</dt>
+              <dd>HRIS fixture adapter</dd>
+            </div>
+            <div>
+              <dt>Hire state</dt>
+              <dd>
+                <strong>Not Hired</strong>
+              </dd>
+            </div>
+          </dl>
+          <ExplainPanel source="Canonical handoff state · now">
+            Hired becomes valid only after the destination acknowledges the
+            exact handoff version.
+          </ExplainPanel>
+        </section>
+      </div>
+    </HrShell>
+  );
 }
-
 
 function AutomationWorkspace() {
   const [paused, setPaused] = useState(false);
@@ -221,42 +3053,561 @@ function AutomationWorkspace() {
   const [selectedRuleId, setSelectedRuleId] = useState("AUT-015");
   const [replayed, setReplayed] = useState(false);
   const { announce } = usePrototype();
-  const selectedRule = automationRuleDetails.find((rule) => rule.id === selectedRuleId) ?? automationRuleDetails[0];
-  return <HrShell title="Workflow & automation operations" eyebrow="Simulation control plane" screenId="UI-HR-007" screen="automations" actions={<><button className="secondary-button" onClick={() => setSimulated(true)}><Gauge size={16} /> {simulated ? "Simulation complete" : "Run impact simulation"}</button><button className={paused ? "primary-button" : "danger-button"} onClick={() => setPaused((value) => !value)}>{paused ? <PlayCircle size={16} /> : <PauseCircle size={16} />}{paused ? "Resume demo rules" : "Pause demo rules"}</button></>}>
-    <IntegrityNotice kind="simulation" /><section className="metric-grid"><Metric value={paused ? "Paused" : "14 active"} label="Pilot rules" detail="AUT-003 reserved" tone={paused ? "warning" : "success"} /><Metric value="23" label="Runs today" detail="Fixture ledger" /><Metric value="1" label="Collision predicted" detail="Message + stage move" tone="danger" /><Metric value="0" label="Unowned failures" detail="Operations queue" tone="success" /></section>
-    {simulated && <div className="simulation-result" role="status"><div><CheckCircle2 size={22} /><span><strong>Impact simulation complete</strong>23 fixture runs evaluated; no action executed.</span></div><div className="impact-counts"><span><strong>20</strong>eligible</span><span><strong>2</strong>suppressed</span><span><strong>1</strong>collision</span></div><p><strong>Collision:</strong> AUT-008 reminder and a manual service-recovery message target the same candidate within quiet hours. Keep the manual case; suppress the reminder.</p></div>}
-    <div className="automation-workbench"><section className="panel rule-catalog"><div className="panel-heading"><div><h2>Rule release catalog</h2><span>Draft → simulate → approve → activate</span></div><Pill tone={paused ? "warning" : "success"}>{paused ? "Globally paused · demo" : "Release 1.5 active · demo"}</Pill></div><div className="rule-list">{automationRuleDetails.map((rule) => <button className={`rule-row ${selectedRuleId === rule.id ? "selected" : ""}`} aria-pressed={selectedRuleId === rule.id} onClick={() => setSelectedRuleId(rule.id)} key={rule.id}><Bot size={18} /><div><strong>{rule.id} · {rule.name}</strong><span>{rule.version} · owner: Ops demo</span></div><Pill tone={paused ? "warning" : rule.tone}>{paused ? "Paused" : rule.state}</Pill><ArrowRight size={17} /></button>)}</div></section><section className="panel rule-detail"><div className="panel-heading"><div><span className="eyebrow">Selected rule</span><h2>{selectedRule.id} · {selectedRule.name}</h2></div><Pill tone={selectedRule.tone}>{selectedRule.state}</Pill></div><div className="eca-flow"><div><span>When</span><Workflow size={20} /><strong>{selectedRule.event}</strong></div><ArrowRight size={18} /><div><span>If</span><ShieldCheck size={20} /><strong>{selectedRule.condition}</strong></div><ArrowRight size={18} /><div><span>Then</span><Sparkles size={20} /><strong>{selectedRule.action}</strong></div></div><dl className="rule-facts"><div><dt>Delay / calendar</dt><dd>{selectedRule.delay}</dd></div><div><dt>Cancellation</dt><dd>{selectedRule.cancel}</dd></div><div><dt>Idempotency</dt><dd>sourceId:{selectedRule.version}:semantic-event</dd></div><div><dt>Release</dt><dd>v1.5 · approved fixture manifest</dd></div></dl><div className="version-diff"><span><strong>{selectedRule.version}</strong>Current</span><ArrowRight size={18} /><span><strong>Next draft</strong>No unpublished changes</span></div><button className="secondary-button full-button" onClick={() => announce(`${selectedRule.id} release diff opened read-only; no configuration was changed.`)}>Preview version and affected fixtures</button></section></div>
-    <section className="panel execution-ledger"><div className="panel-heading"><div><h2>Execution and recovery ledger</h2><span>Replay-safe runs, effects and ownership</span></div><Pill tone="info">All fixture runs</Pill></div><div className="run-list">{automationRuns.map((run) => <div className="run-row" key={run.id}><span className={`run-icon run-${run.tone}`}>{run.tone === "success" ? <Check size={16} /> : run.tone === "danger" ? <AlertOctagon size={16} /> : <Hand size={16} />}</span><div><strong>{run.rule}</strong><span>{run.id} · {run.attempts}</span><code>{run.key}</code></div><Pill tone={run.id === "RUN-404" && replayed ? "success" : run.tone}>{run.id === "RUN-404" && replayed ? "Replayed · reconciled" : run.state}</Pill>{run.id === "RUN-404" && <button className="secondary-button" disabled={replayed} onClick={() => { setReplayed(true); announce("Failed fixture replayed with the same idempotency key; one effect was reconciled."); }}>{replayed ? "Replay complete" : "Preview replay"}</button>}</div>)}</div></section>
-  </HrShell>;
+  const selectedRule =
+    automationRuleDetails.find((rule) => rule.id === selectedRuleId) ??
+    automationRuleDetails[0];
+  return (
+    <HrShell
+      title="Workflow & automation operations"
+      eyebrow="Simulation control plane"
+      screenId="UI-HR-007"
+      screen="automations"
+      actions={
+        <>
+          <button
+            className="secondary-button"
+            onClick={() => setSimulated(true)}
+          >
+            <Gauge size={16} />{" "}
+            {simulated ? "Simulation complete" : "Run impact simulation"}
+          </button>
+          <button
+            className={paused ? "primary-button" : "danger-button"}
+            onClick={() => setPaused((value) => !value)}
+          >
+            {paused ? <PlayCircle size={16} /> : <PauseCircle size={16} />}
+            {paused ? "Resume demo rules" : "Pause demo rules"}
+          </button>
+        </>
+      }
+    >
+      <IntegrityNotice kind="simulation" />
+      <section className="metric-grid">
+        <Metric
+          value={paused ? "Paused" : "14 active"}
+          label="Pilot rules"
+          detail="AUT-003 reserved"
+          tone={paused ? "warning" : "success"}
+        />
+        <Metric value="23" label="Runs today" detail="Fixture ledger" />
+        <Metric
+          value="1"
+          label="Collision predicted"
+          detail="Message + stage move"
+          tone="danger"
+        />
+        <Metric
+          value="0"
+          label="Unowned failures"
+          detail="Operations queue"
+          tone="success"
+        />
+      </section>
+      {simulated && (
+        <div className="simulation-result" role="status">
+          <div>
+            <CheckCircle2 size={22} />
+            <span>
+              <strong>Impact simulation complete</strong>23 fixture runs
+              evaluated; no action executed.
+            </span>
+          </div>
+          <div className="impact-counts">
+            <span>
+              <strong>20</strong>eligible
+            </span>
+            <span>
+              <strong>2</strong>suppressed
+            </span>
+            <span>
+              <strong>1</strong>collision
+            </span>
+          </div>
+          <p>
+            <strong>Collision:</strong> AUT-008 reminder and a manual
+            service-recovery message target the same candidate within quiet
+            hours. Keep the manual case; suppress the reminder.
+          </p>
+        </div>
+      )}
+      <div className="automation-workbench">
+        <section className="panel rule-catalog">
+          <div className="panel-heading">
+            <div>
+              <h2>Rule release catalog</h2>
+              <span>Draft → simulate → approve → activate</span>
+            </div>
+            <Pill tone={paused ? "warning" : "success"}>
+              {paused ? "Globally paused · demo" : "Release 1.5 active · demo"}
+            </Pill>
+          </div>
+          <div className="rule-list">
+            {automationRuleDetails.map((rule) => (
+              <button
+                className={`rule-row ${selectedRuleId === rule.id ? "selected" : ""}`}
+                aria-pressed={selectedRuleId === rule.id}
+                onClick={() => setSelectedRuleId(rule.id)}
+                key={rule.id}
+              >
+                <Bot size={18} />
+                <div>
+                  <strong>
+                    {rule.id} · {rule.name}
+                  </strong>
+                  <span>{rule.version} · owner: Ops demo</span>
+                </div>
+                <Pill tone={paused ? "warning" : rule.tone}>
+                  {paused ? "Paused" : rule.state}
+                </Pill>
+                <ArrowRight size={17} />
+              </button>
+            ))}
+          </div>
+        </section>
+        <section className="panel rule-detail">
+          <div className="panel-heading">
+            <div>
+              <span className="eyebrow">Selected rule</span>
+              <h2>
+                {selectedRule.id} · {selectedRule.name}
+              </h2>
+            </div>
+            <Pill tone={selectedRule.tone}>{selectedRule.state}</Pill>
+          </div>
+          <div className="eca-flow">
+            <div>
+              <span>When</span>
+              <Workflow size={20} />
+              <strong>{selectedRule.event}</strong>
+            </div>
+            <ArrowRight size={18} />
+            <div>
+              <span>If</span>
+              <ShieldCheck size={20} />
+              <strong>{selectedRule.condition}</strong>
+            </div>
+            <ArrowRight size={18} />
+            <div>
+              <span>Then</span>
+              <Sparkles size={20} />
+              <strong>{selectedRule.action}</strong>
+            </div>
+          </div>
+          <dl className="rule-facts">
+            <div>
+              <dt>Delay / calendar</dt>
+              <dd>{selectedRule.delay}</dd>
+            </div>
+            <div>
+              <dt>Cancellation</dt>
+              <dd>{selectedRule.cancel}</dd>
+            </div>
+            <div>
+              <dt>Idempotency</dt>
+              <dd>sourceId:{selectedRule.version}:semantic-event</dd>
+            </div>
+            <div>
+              <dt>Release</dt>
+              <dd>v1.5 · approved fixture manifest</dd>
+            </div>
+          </dl>
+          <div className="version-diff">
+            <span>
+              <strong>{selectedRule.version}</strong>Current
+            </span>
+            <ArrowRight size={18} />
+            <span>
+              <strong>Next draft</strong>No unpublished changes
+            </span>
+          </div>
+          <button
+            className="secondary-button full-button"
+            onClick={() =>
+              announce(
+                `${selectedRule.id} release diff opened read-only; no configuration was changed.`,
+              )
+            }
+          >
+            Preview version and affected fixtures
+          </button>
+        </section>
+      </div>
+      <section className="panel execution-ledger">
+        <div className="panel-heading">
+          <div>
+            <h2>Execution and recovery ledger</h2>
+            <span>Replay-safe runs, effects and ownership</span>
+          </div>
+          <Pill tone="info">All fixture runs</Pill>
+        </div>
+        <div className="run-list">
+          {automationRuns.map((run) => (
+            <div className="run-row" key={run.id}>
+              <span className={`run-icon run-${run.tone}`}>
+                {run.tone === "success" ? (
+                  <Check size={16} />
+                ) : run.tone === "danger" ? (
+                  <AlertOctagon size={16} />
+                ) : (
+                  <Hand size={16} />
+                )}
+              </span>
+              <div>
+                <strong>{run.rule}</strong>
+                <span>
+                  {run.id} · {run.attempts}
+                </span>
+                <code>{run.key}</code>
+              </div>
+              <Pill
+                tone={run.id === "RUN-404" && replayed ? "success" : run.tone}
+              >
+                {run.id === "RUN-404" && replayed
+                  ? "Replayed · reconciled"
+                  : run.state}
+              </Pill>
+              {run.id === "RUN-404" && (
+                <button
+                  className="secondary-button"
+                  disabled={replayed}
+                  onClick={() => {
+                    setReplayed(true);
+                    announce(
+                      "Failed fixture replayed with the same idempotency key; one effect was reconciled.",
+                    );
+                  }}
+                >
+                  {replayed ? "Replay complete" : "Preview replay"}
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+    </HrShell>
+  );
 }
 
 function AnalyticsWorkspace() {
   const { persona, announce } = usePrototype();
-  return <HrShell title="Reporting & analytics" eyebrow={`${persona.role} · permission-filtered portfolio`} screenId="UI-HR-001" screen="analytics" actions={<button className="secondary-button" onClick={() => announce("Current dashboard report package prepared in memory; no export was created.")}><BarChart3 size={16} /> Preview report package</button>}>
-    <IntegrityNotice kind="simulation" />
-    <AnalyticsDashboard role={persona.role} announce={announce} />
-  </HrShell>;
+  return (
+    <HrShell
+      title="Reporting & analytics"
+      eyebrow={`${persona.role} · permission-filtered portfolio`}
+      screenId="UI-HR-001"
+      screen="analytics"
+      actions={
+        <button
+          className="secondary-button"
+          onClick={() =>
+            announce(
+              "Current dashboard report package prepared in memory; no export was created.",
+            )
+          }
+        >
+          <BarChart3 size={16} /> Preview report package
+        </button>
+      }
+    >
+      <IntegrityNotice kind="simulation" />
+      <AnalyticsDashboard role={persona.role} announce={announce} />
+    </HrShell>
+  );
 }
 
+function ReportsWorkspace() {
+  const { persona, announce } = usePrototype();
+  return (
+    <HrShell
+      title="Reports & distribution"
+      eyebrow={`${persona.role} · governed reporting`}
+      screenId="UI-HR-009"
+      screen="reports"
+      actions={
+        <button
+          className="secondary-button"
+          onClick={() =>
+            announce(
+              "Report source and distribution contracts opened; no external report was sent.",
+            )
+          }
+        >
+          <FileBarChart2 size={16} /> Reporting controls
+        </button>
+      }
+    >
+      <IntegrityNotice kind="simulation" />
+      <ReportWorkspace />
+    </HrShell>
+  );
+}
+
+function ObjectsWorkspace() {
+  const { persona } = usePrototype();
+  return (
+    <HrShell
+      title="Object workspace"
+      eyebrow={`${persona.role} · row and field scoped`}
+      screenId="UI-HR-010"
+      screen="objects"
+    >
+      <IntegrityNotice kind="simulation" />
+      <ObjectWorkspace />
+    </HrShell>
+  );
+}
 
 function GovernanceWorkspace() {
   const [tab, setTab] = useState("Policy gates");
   const { announce } = usePrototype();
-  const tabs = ["Policy gates", "Privacy requests", "Access", "Object & data contract", "Audit evidence"];
-  return <HrShell title="Privacy, policy, security & audit" eyebrow="Restricted administration" screenId="UI-HR-008" screen="governance" actions={<button className="secondary-button" onClick={() => announce("Evidence export prepared in memory; no file was created.")}><History size={16} /> Export evidence preview</button>}>
-    <IntegrityNotice kind="restricted" />
-    <div className="governance-tabs" role="tablist" aria-label="Governance sections">{tabs.map((item) => <button role="tab" aria-selected={tab === item} className={tab === item ? "active" : ""} onClick={() => setTab(item)} key={item}>{item}</button>)}</div>
-    {tab === "Policy gates" && <div className="governance-grid"><section className="panel"><div className="panel-heading"><div><h2>Jurisdiction evaluation</h2><span>Publication gate · policy v2</span></div><Pill tone="danger">1 blocked</Pill></div><div className="policy-case"><span className="policy-icon"><Scale size={20} /></span><div><strong>CASE-DEMO-012 · unknown work location</strong><p>Job reach conflicts with the California-only synthetic pilot rule.</p><div className="chip-row"><Pill tone="danger">ERR-008</Pill><Pill>Owner: Legal demo queue</Pill></div></div><button className="secondary-button" onClick={() => announce("Policy facts opened read-only; no override is available.")}>Review facts</button></div><ExplainPanel source="Policy evaluation v12">Unknown applicability never defaults to allowed.</ExplainPanel></section><section className="panel"><div className="panel-heading"><div><h2>Provider registry</h2><span>All adapters disabled</span></div><Pill tone="success">No external calls</Pill></div>{[["Email", "Fixture renderer"], ["Calendar", "ICS preview adapter"], ["HRIS", "Handoff fixture adapter"]].map(([purpose, provider]) => <div className="provider-row" key={purpose}><Link2 size={17} /><div><strong>{purpose}</strong><span>{provider}</span></div><Pill tone="neutral">Disabled</Pill></div>)}</section></div>}
-    {tab === "Privacy requests" && <section className="panel"><div className="panel-heading"><div><h2>Privacy request fixtures</h2><span>No real identity verification or execution</span></div><Pill tone="warning">3 active fixtures</Pill></div><div className="privacy-table" role="table" aria-label="Synthetic privacy requests"><div className="privacy-row privacy-head" role="row"><span role="columnheader">Request</span><span role="columnheader">Person</span><span role="columnheader">Type</span><span role="columnheader">Received</span><span role="columnheader">Due</span><span role="columnheader">Owner</span><span role="columnheader">State</span></div>{privacyRequests.map((item) => <div className="privacy-row" role="row" key={item.id}><strong role="cell" data-label="Request">{item.id}</strong><span role="cell" data-label="Person">{item.person}</span><span role="cell" data-label="Type">{item.type}</span><span role="cell" data-label="Received">{item.received}</span><span role="cell" data-label="Due">{item.due}</span><span role="cell" data-label="Owner">{item.owner}</span><span role="cell" data-label="State"><Pill tone="warning">{item.state}</Pill></span></div>)}</div></section>}
-    {tab === "Access" && <section className="panel"><div className="panel-heading"><div><h2>Negative-access demonstrations</h2><span>Least-privilege fixtures</span></div><Pill tone="success">6 of 6 safe</Pill></div><div className="access-matrix">{[["Recruiter", "Compensation approval", false], ["Interviewer", "Other scorecards", false], ["Support", "Application evidence", false], ["Approver", "Medical/accommodation", false], ["Candidate", "Internal stage/reason", false], ["Restricted admin", "Minimized audit event", true]].map(([role, resource, allowed]) => <div key={`${role}-${resource}`}><span>{role}</span><strong>{resource}</strong><Pill tone={allowed ? "success" : "neutral"}>{allowed ? "Allowed" : "Denied safely"}</Pill></div>)}</div></section>}
-    {tab === "Object & data contract" && <ObjectDataStudio announce={announce} />}
-    {tab === "Audit evidence" && <section className="panel"><div className="panel-heading"><div><h2>Minimized audit events</h2><span>Generated fixture evidence</span></div><Freshness>Ledger snapshot · now</Freshness></div><div className="audit-table" role="table" aria-label="Audit fixture events"><div role="row" className="audit-head"><span role="columnheader">Time</span><span role="columnheader">Actor</span><span role="columnheader">Event</span><span role="columnheader">Outcome</span><span role="columnheader">Reference</span></div>{auditEvents.map((event) => <div role="row" key={event.ref}><span role="cell" data-label="Time">{event.time}</span><span role="cell" data-label="Actor">{event.actor}</span><span role="cell" data-label="Event">{event.event}</span><span role="cell" data-label="Outcome"><Pill tone={event.outcome.includes("Denied") ? "neutral" : "success"}>{event.outcome}</Pill></span><code role="cell" data-label="Reference">{event.ref}</code></div>)}</div></section>}
-  </HrShell>;
+  const tabs = [
+    "Policy gates",
+    "Privacy requests",
+    "Access",
+    "Object & data contract",
+    "Audit evidence",
+  ];
+  return (
+    <HrShell
+      title="Privacy, policy, security & audit"
+      eyebrow="Restricted administration"
+      screenId="UI-HR-008"
+      screen="governance"
+      actions={
+        <button
+          className="secondary-button"
+          onClick={() =>
+            announce("Evidence export prepared in memory; no file was created.")
+          }
+        >
+          <History size={16} /> Export evidence preview
+        </button>
+      }
+    >
+      <IntegrityNotice kind="restricted" />
+      <div
+        className="governance-tabs"
+        role="tablist"
+        aria-label="Governance sections"
+      >
+        {tabs.map((item) => (
+          <button
+            role="tab"
+            aria-selected={tab === item}
+            className={tab === item ? "active" : ""}
+            onClick={() => setTab(item)}
+            key={item}
+          >
+            {item}
+          </button>
+        ))}
+      </div>
+      {tab === "Policy gates" && (
+        <div className="governance-grid">
+          <section className="panel">
+            <div className="panel-heading">
+              <div>
+                <h2>Jurisdiction evaluation</h2>
+                <span>Publication gate · policy v2</span>
+              </div>
+              <Pill tone="danger">1 blocked</Pill>
+            </div>
+            <div className="policy-case">
+              <span className="policy-icon">
+                <Scale size={20} />
+              </span>
+              <div>
+                <strong>CASE-DEMO-012 · unknown work location</strong>
+                <p>
+                  Job reach conflicts with the California-only synthetic pilot
+                  rule.
+                </p>
+                <div className="chip-row">
+                  <Pill tone="danger">ERR-008</Pill>
+                  <Pill>Owner: Legal demo queue</Pill>
+                </div>
+              </div>
+              <button
+                className="secondary-button"
+                onClick={() =>
+                  announce(
+                    "Policy facts opened read-only; no override is available.",
+                  )
+                }
+              >
+                Review facts
+              </button>
+            </div>
+            <ExplainPanel source="Policy evaluation v12">
+              Unknown applicability never defaults to allowed.
+            </ExplainPanel>
+          </section>
+          <section className="panel">
+            <div className="panel-heading">
+              <div>
+                <h2>Provider registry</h2>
+                <span>All adapters disabled</span>
+              </div>
+              <Pill tone="success">No external calls</Pill>
+            </div>
+            {[
+              ["Email", "Fixture renderer"],
+              ["Calendar", "ICS preview adapter"],
+              ["HRIS", "Handoff fixture adapter"],
+            ].map(([purpose, provider]) => (
+              <div className="provider-row" key={purpose}>
+                <Link2 size={17} />
+                <div>
+                  <strong>{purpose}</strong>
+                  <span>{provider}</span>
+                </div>
+                <Pill tone="neutral">Disabled</Pill>
+              </div>
+            ))}
+          </section>
+        </div>
+      )}
+      {tab === "Privacy requests" && (
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Privacy request fixtures</h2>
+              <span>No real identity verification or execution</span>
+            </div>
+            <Pill tone="warning">3 active fixtures</Pill>
+          </div>
+          <div
+            className="privacy-table"
+            role="table"
+            aria-label="Synthetic privacy requests"
+          >
+            <div className="privacy-row privacy-head" role="row">
+              <span role="columnheader">Request</span>
+              <span role="columnheader">Person</span>
+              <span role="columnheader">Type</span>
+              <span role="columnheader">Received</span>
+              <span role="columnheader">Due</span>
+              <span role="columnheader">Owner</span>
+              <span role="columnheader">State</span>
+            </div>
+            {privacyRequests.map((item) => (
+              <div className="privacy-row" role="row" key={item.id}>
+                <strong role="cell" data-label="Request">
+                  {item.id}
+                </strong>
+                <span role="cell" data-label="Person">
+                  {item.person}
+                </span>
+                <span role="cell" data-label="Type">
+                  {item.type}
+                </span>
+                <span role="cell" data-label="Received">
+                  {item.received}
+                </span>
+                <span role="cell" data-label="Due">
+                  {item.due}
+                </span>
+                <span role="cell" data-label="Owner">
+                  {item.owner}
+                </span>
+                <span role="cell" data-label="State">
+                  <Pill tone="warning">{item.state}</Pill>
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+      {tab === "Access" && (
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Negative-access demonstrations</h2>
+              <span>Least-privilege fixtures</span>
+            </div>
+            <Pill tone="success">6 of 6 safe</Pill>
+          </div>
+          <div className="access-matrix">
+            {[
+              ["Recruiter", "Compensation approval", false],
+              ["Interviewer", "Other scorecards", false],
+              ["Support", "Application evidence", false],
+              ["Approver", "Medical/accommodation", false],
+              ["Candidate", "Internal stage/reason", false],
+              ["Restricted admin", "Minimized audit event", true],
+            ].map(([role, resource, allowed]) => (
+              <div key={`${role}-${resource}`}>
+                <span>{role}</span>
+                <strong>{resource}</strong>
+                <Pill tone={allowed ? "success" : "neutral"}>
+                  {allowed ? "Allowed" : "Denied safely"}
+                </Pill>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+      {tab === "Object & data contract" && (
+        <ObjectDataStudio announce={announce} />
+      )}
+      {tab === "Audit evidence" && (
+        <section className="panel">
+          <div className="panel-heading">
+            <div>
+              <h2>Minimized audit events</h2>
+              <span>Generated fixture evidence</span>
+            </div>
+            <Freshness>Ledger snapshot · now</Freshness>
+          </div>
+          <div
+            className="audit-table"
+            role="table"
+            aria-label="Audit fixture events"
+          >
+            <div role="row" className="audit-head">
+              <span role="columnheader">Time</span>
+              <span role="columnheader">Actor</span>
+              <span role="columnheader">Event</span>
+              <span role="columnheader">Outcome</span>
+              <span role="columnheader">Reference</span>
+            </div>
+            {auditEvents.map((event) => (
+              <div role="row" key={event.ref}>
+                <span role="cell" data-label="Time">
+                  {event.time}
+                </span>
+                <span role="cell" data-label="Actor">
+                  {event.actor}
+                </span>
+                <span role="cell" data-label="Event">
+                  {event.event}
+                </span>
+                <span role="cell" data-label="Outcome">
+                  <Pill
+                    tone={
+                      event.outcome.includes("Denied") ? "neutral" : "success"
+                    }
+                  >
+                    {event.outcome}
+                  </Pill>
+                </span>
+                <code role="cell" data-label="Reference">
+                  {event.ref}
+                </code>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </HrShell>
+  );
 }
 
 export function HrWorkspace({ screen }: { screen: HrScreen }) {
   if (screen === "actions") return <ActionCenter />;
   if (screen === "analytics") return <AnalyticsWorkspace />;
+  if (screen === "reports") return <ReportsWorkspace />;
+  if (screen === "objects") return <ObjectsWorkspace />;
   if (screen === "job") return <JobWorkspace />;
   if (screen === "application") return <ApplicationWorkspace />;
   if (screen === "interview") return <InterviewWorkspace />;

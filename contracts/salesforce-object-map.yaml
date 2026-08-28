@@ -1,0 +1,35 @@
+version: 0.1.0-proposed
+status: decision-required
+boundary: This is a logical-to-physical decision template, not deployable Salesforce metadata.
+defaults:
+  namespace: Recruitment
+  sourceDriven: true
+  externalIdPattern: "<Object>_External_Id__c"
+  ownerModel: explicit-or-queue
+  sharing: private-by-default
+  history: consequential-fields
+mappings:
+  - logicalId: OBJ-022
+    logicalName: Application
+    proposedApiName: Recruitment_Application__c
+    systemOfRecord: Salesforce
+    externalId: Application_External_Id__c
+    requiredDecisions: [ownership, OWD, criteria-sharing, FLS, encryption, indexes, retention, archive]
+  - logicalName: Candidate
+    proposedApiName: Candidate__c
+    systemOfRecord: Salesforce
+    externalId: Candidate_External_Id__c
+    requiredDecisions: [identity-resolution, merge, correction, deletion, encryption, duplicate-policy]
+  - logicalName: Requisition
+    proposedApiName: Requisition__c
+    systemOfRecord: Salesforce
+    externalId: Requisition_External_Id__c
+    requiredDecisions: [approval, ownership, opening-cardinality, posting-projection]
+  - logicalName: HireHandoff
+    proposedApiName: Hire_Handoff__c
+    systemOfRecord: Salesforce
+    externalId: Handoff_External_Id__c
+    requiredDecisions: [transaction-boundary, retry, reconciliation, cancellation, archive]
+closure:
+  accountableRoles: [Salesforce architect, Security, Privacy, HR operations]
+  requiredEvidence: [approved 92-object map, physical field dictionary, OWD and sharing tests, FLS tests, limit analysis, deployment validation]

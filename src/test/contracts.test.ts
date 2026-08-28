@@ -26,19 +26,35 @@ describe("v0.9 executable artifacts", () => {
   });
 
   it("keeps the governed registries finite", () => {
-    expect(transitions.transitions.map((item) => item.id)).toEqual(Array.from({ length: 15 }, (_, index) => `TRN-${String(index + 1).padStart(3, "0")}`));
+    expect(transitions.transitions.map((item) => item.id)).toEqual(
+      Array.from(
+        { length: 15 },
+        (_, index) => `TRN-${String(index + 1).padStart(3, "0")}`,
+      ),
+    );
     expect(automations.rules).toHaveLength(15);
     expect(interfaces.operations).toHaveLength(15);
     expect(scenarios.scenarios).toHaveLength(12);
   });
 
   it("makes every interface stub incapable of external writes", () => {
-    expect(interfaces.operations.every((operation) => operation.writes === false)).toBe(true);
-    expect(new Set(interfaces.operations.map((operation) => operation.prototype))).toEqual(new Set(["fixture-read", "disabled-stub", "memory-only", "simulation-only"]));
+    expect(
+      interfaces.operations.every((operation) => operation.writes === false),
+    ).toBe(true);
+    expect(
+      new Set(interfaces.operations.map((operation) => operation.prototype)),
+    ).toEqual(
+      new Set([
+        "fixture-read",
+        "disabled-stub",
+        "memory-only",
+        "simulation-only",
+      ]),
+    );
   });
 });
 
-describe("v1.6 canonical scenario and reporting graph", () => {
+describe("v1.7 canonical scenario and reporting graph", () => {
   it("defines a coherent projection for every inherited scenario", () => {
     expect(Object.keys(scenarioStates)).toHaveLength(12);
     for (const state of Object.values(scenarioStates)) {
@@ -46,7 +62,8 @@ describe("v1.6 canonical scenario and reporting graph", () => {
         expect(state.decisionState).toBe("Blocked");
         expect(state.offerState).toBe("Not started");
       }
-      if (state.offerState === "Accepted") expect(state.openingReserved).toBe(1);
+      if (state.offerState === "Accepted")
+        expect(state.openingReserved).toBe(1);
       else expect(state.openingReserved).toBe(0);
       if (state.handoffState === "Reconciliation failed") {
         expect(state.offerState).toBe("Accepted");
@@ -58,14 +75,49 @@ describe("v1.6 canonical scenario and reporting graph", () => {
 
   it("classifies every logical object family and minimum data point", () => {
     expect(objectCatalog).toHaveLength(92);
-    expect(objectCatalogSummary).toMatchObject({ families: 92, expandedConcepts: 111, logicalDataGroups: 48, minimumDataPoints: 920, lifecycleClassified: 92, commandClassified: 92, relationshipClassified: 92 });
-    expect(objectCatalog.every((item) => item.states.length >= 4 && item.commands.length >= 5 && item.relationships.length >= 2 && item.dataPoints.length === 10)).toBe(true);
+    expect(objectCatalogSummary).toMatchObject({
+      families: 92,
+      expandedConcepts: 111,
+      logicalDataGroups: 48,
+      minimumDataPoints: 1472,
+      businessDataPoints: 552,
+      governanceDataPoints: 920,
+      lifecycleClassified: 92,
+      commandClassified: 92,
+      relationshipClassified: 92,
+    });
+    expect(
+      objectCatalog.every(
+        (item) =>
+          item.states.length >= 4 &&
+          item.commands.length >= 5 &&
+          item.relationships.length >= 2 &&
+          item.dataPoints.length === 16,
+      ),
+    ).toBe(true);
+    expect(
+      objectCatalog.every(
+        (item) =>
+          item.dataPoints.filter((field) => field.category === "Business")
+            .length === 6 &&
+          item.dataPoints.filter((field) => field.category === "Governance")
+            .length === 10,
+      ),
+    ).toBe(true);
   });
 
   it("keeps the analytics snapshot bounded, synthetic and dashboard-complete", () => {
-    expect(analyticsApplications).toHaveLength(48);
+    expect(analyticsApplications).toHaveLength(324);
     expect(dashboardCatalog).toHaveLength(11);
-    expect(analyticsApplications.every((row) => row.id.startsWith("ANA-APP-") && row.candidate.startsWith("Synthetic candidate"))).toBe(true);
-    expect(new Set(dashboardCatalog.map((dashboard) => dashboard.id)).size).toBe(dashboardCatalog.length);
+    expect(
+      analyticsApplications.every(
+        (row) =>
+          row.id.startsWith("ANA-APP-") &&
+          row.candidate.startsWith("Synthetic candidate"),
+      ),
+    ).toBe(true);
+    expect(
+      new Set(dashboardCatalog.map((dashboard) => dashboard.id)).size,
+    ).toBe(dashboardCatalog.length);
   });
 });

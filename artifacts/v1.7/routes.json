@@ -1,0 +1,22 @@
+{
+  "artifact": "ART-001-v1.7",
+  "version": "1.7.0",
+  "screenFamilies": [
+    { "id": "UI-CAN-001", "name": "Careers and search", "patterns": ["/careers"] },
+    { "id": "UI-CAN-002", "name": "Public job detail", "patterns": ["/careers/jobs/:publicId"] },
+    { "id": "UI-CAN-003", "name": "Guided application", "patterns": ["/apply/:publicId/*"] },
+    { "id": "UI-CAN-004", "name": "Candidate hub", "patterns": ["/my-applications", "/my-applications/:id"] },
+    { "id": "UI-HR-001", "name": "Action center", "patterns": ["/hr/action-center"] },
+    { "id": "UI-HR-002", "name": "Job and opening", "patterns": ["/hr/jobs", "/hr/jobs/:jobId"] },
+    { "id": "UI-HR-003", "name": "Application cockpit", "patterns": ["/hr/applications", "/hr/applications/:applicationId"] },
+    { "id": "UI-HR-004", "name": "Interview and scheduling", "patterns": ["/hr/interviews", "/hr/interviews/:interviewId"] },
+    { "id": "UI-HR-005", "name": "Scorecard and evidence", "patterns": ["/hr/assignments", "/hr/assignments/:assignmentId"] },
+    { "id": "UI-HR-006", "name": "Decision, offer and handoff", "patterns": ["/hr/decisions", "/hr/decisions/:applicationId"] },
+    { "id": "UI-HR-007", "name": "Automation and integration", "patterns": ["/hr/automations"] },
+    { "id": "UI-HR-008", "name": "Governance", "patterns": ["/hr/governance"] },
+    { "id": "UI-HR-009", "name": "Analytics and governed reporting", "patterns": ["/hr/analytics", "/hr/reports"] },
+    { "id": "UI-HR-010", "name": "Logical object workspace", "patterns": ["/hr/objects", "/hr/objects/:objectSlug", "/hr/objects/:objectSlug/new", "/hr/objects/:objectSlug/:recordId", "/hr/objects/:objectSlug/:recordId/edit"] }
+  ],
+  "functionalPatternCount": 24,
+  "objectPageExpansion": { "families": 92, "templates": 4, "instances": 368 }
+}

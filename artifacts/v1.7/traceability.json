@@ -1,0 +1,20 @@
+{
+  "artifact": "ART-001-TRACE-v1.7",
+  "version": "1.7.0",
+  "rows": [
+    { "screenId": "UI-CAN-001", "component": "CandidatePortal/CareersScreen", "tests": ["candidate filters", "candidate mobile"] },
+    { "screenId": "UI-CAN-002", "component": "CandidatePortal/JobScreen", "tests": ["candidate application journey"] },
+    { "screenId": "UI-CAN-003", "component": "CandidatePortal/ApplyScreen", "tests": ["declaration validation", "candidate application journey"] },
+    { "screenId": "UI-CAN-004", "component": "CandidatePortal/HubScreen", "tests": ["availability safety", "profile controls", "offer projection"] },
+    { "screenId": "UI-HR-001", "component": "HrWorkspace/ActionCenter", "tests": ["persona switching", "row-scoped recent applications"] },
+    { "screenId": "UI-HR-002", "component": "HrWorkspace/JobWorkspace", "tests": ["unknown-jurisdiction publication block"] },
+    { "screenId": "UI-HR-003", "component": "HrWorkspace/ApplicationWorkspace", "tests": ["record binding", "blocked transition", "operational panels"] },
+    { "screenId": "UI-HR-004", "component": "HrWorkspace/InterviewWorkspace", "tests": ["availability recovery", "role identity masking"] },
+    { "screenId": "UI-HR-005", "component": "HrWorkspace/ScorecardWorkspace", "tests": ["feedback blinding", "readiness recalculation"] },
+    { "screenId": "UI-HR-006", "component": "HrWorkspace/DecisionWorkspace", "tests": ["approver-only offer approval", "candidate-safe offer projection"] },
+    { "screenId": "UI-HR-007", "component": "HrWorkspace/AutomationWorkspace", "tests": ["collision simulation", "replay recovery"] },
+    { "screenId": "UI-HR-008", "component": "HrWorkspace/GovernanceWorkspace", "tests": ["privacy scope", "object-data studio"] },
+    { "screenId": "UI-HR-009", "component": "AnalyticsDashboard + ReportWorkspace", "tests": ["600 filter combinations", "zero-denominator N/A", "reporting registries"] },
+    { "screenId": "UI-HR-010", "component": "ObjectWorkspace", "tests": ["92 slugs", "368 page instances", "276 records", "1,472 fields", "role/field metadata"] }
+  ]
+}

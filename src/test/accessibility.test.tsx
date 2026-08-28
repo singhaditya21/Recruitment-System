@@ -6,9 +6,12 @@ import App from "../App";
 
 async function expectNoAxeViolations(hash: string) {
   window.location.hash = hash;
-  const { container } = render(<App />);
+  const { container, unmount } = render(<App />);
   const results = await axe.run(container);
-  expect(results.violations.map(({ id, nodes }) => ({ id, nodes: nodes.length }))).toEqual([]);
+  expect(
+    results.violations.map(({ id, nodes }) => ({ id, nodes: nodes.length })),
+  ).toEqual([]);
+  unmount();
 }
 
 describe("automated WCAG baseline", () => {
@@ -36,9 +39,30 @@ describe("automated WCAG baseline", () => {
     const user = userEvent.setup();
     window.location.hash = "#/hr/governance";
     const { container } = render(<App />);
-    await user.selectOptions(screen.getByRole("combobox", { name: "View as demo persona" }), "USR-CFG-001");
-    await user.click(screen.getByRole("tab", { name: "Object & data contract" }));
+    await user.selectOptions(
+      screen.getByRole("combobox", { name: "View as demo persona" }),
+      "USR-CFG-001",
+    );
+    await user.click(
+      screen.getByRole("tab", { name: "Object & data contract" }),
+    );
     const results = await axe.run(container);
-    expect(results.violations.map(({ id, nodes }) => ({ id, nodes: nodes.length }))).toEqual([]);
+    expect(
+      results.violations.map(({ id, nodes }) => ({ id, nodes: nodes.length })),
+    ).toEqual([]);
+  });
+
+  it("passes the routed object list/new/detail baselines", async () => {
+    for (const hash of [
+      "#/hr/objects/requisition",
+      "#/hr/objects/requisition/new",
+      "#/hr/objects/requisition/REC-007-001",
+    ]) {
+      await expectNoAxeViolations(hash);
+    }
+  });
+
+  it("passes the governed reporting baseline", async () => {
+    await expectNoAxeViolations("#/hr/reports");
   });
 });

@@ -1,0 +1,230 @@
+openapi: 3.1.0
+info:
+  title: Recruitment System candidate and operator boundary
+  version: 0.1.0-proposed
+  description: Proposed contract only. No server or production endpoint exists in this repository.
+servers: []
+tags:
+  - name: Public jobs
+  - name: Candidate applications
+  - name: Internal objects
+  - name: Reporting
+paths:
+  /public/jobs:
+    get:
+      tags: [Public jobs]
+      operationId: listPublishedJobs
+      responses:
+        "200":
+          description: Sanitized, policy-approved public job projections.
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: "#/components/schemas/PublicJob" }
+  /candidate/applications/{applicationId}:
+    get:
+      tags: [Candidate applications]
+      operationId: getOwnCandidateApplication
+      security: [{ candidateSession: [] }]
+      parameters:
+        - $ref: "#/components/parameters/ApplicationId"
+      responses:
+        "200":
+          description: Candidate-safe projection for the verified subject.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/CandidateApplication" }
+        "403": { $ref: "#/components/responses/Denied" }
+        "404": { $ref: "#/components/responses/NotFound" }
+  /internal/objects/{objectKey}:
+    get:
+      tags: [Internal objects]
+      operationId: listAuthorizedObjectRecords
+      security: [{ workforceOauth: [recruitment.read] }]
+      parameters:
+        - $ref: "#/components/parameters/ObjectKey"
+        - name: cursor
+          in: query
+          schema: { type: string }
+      responses:
+        "200":
+          description: Row- and field-filtered object collection.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [items, permissionContext]
+                properties:
+                  items: { type: array, items: { $ref: "#/components/schemas/AuthorizedRecord" } }
+                  nextCursor: { type: [string, "null"] }
+                  permissionContext: { $ref: "#/components/schemas/PermissionContext" }
+        "403": { $ref: "#/components/responses/Denied" }
+    post:
+      tags: [Internal objects]
+      operationId: createAuthorizedObjectRecord
+      security: [{ workforceOauth: [recruitment.write] }]
+      parameters: [{ $ref: "#/components/parameters/ObjectKey" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/MutationRequest" }
+      responses:
+        "201":
+          description: Accepted canonical record projection.
+          headers:
+            ETag: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthorizedRecord" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/Invalid" }
+  /internal/objects/{objectKey}/{recordId}:
+    get:
+      tags: [Internal objects]
+      operationId: getAuthorizedObjectRecord
+      security: [{ workforceOauth: [recruitment.read] }]
+      parameters:
+        - $ref: "#/components/parameters/ObjectKey"
+        - $ref: "#/components/parameters/RecordId"
+      responses:
+        "200":
+          description: Row- and field-filtered record with permission context.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthorizedRecord" }
+        "403": { $ref: "#/components/responses/Denied" }
+        "404": { $ref: "#/components/responses/NotFound" }
+    patch:
+      tags: [Internal objects]
+      operationId: updateAuthorizedObjectRecord
+      security: [{ workforceOauth: [recruitment.write] }]
+      parameters:
+        - $ref: "#/components/parameters/ObjectKey"
+        - $ref: "#/components/parameters/RecordId"
+        - name: If-Match
+          in: header
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/merge-patch+json:
+            schema: { $ref: "#/components/schemas/MutationRequest" }
+      responses:
+        "200":
+          description: Updated record with a new version.
+          headers:
+            ETag: { schema: { type: string } }
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AuthorizedRecord" }
+        "403": { $ref: "#/components/responses/Denied" }
+        "409": { $ref: "#/components/responses/Conflict" }
+        "422": { $ref: "#/components/responses/Invalid" }
+  /internal/reports/{reportId}/runs:
+    post:
+      tags: [Reporting]
+      operationId: runAuthorizedReport
+      security: [{ workforceOauth: [reports.run] }]
+      parameters:
+        - name: reportId
+          in: path
+          required: true
+          schema: { type: string, pattern: "^RPT-[0-9]{3}$" }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                filters: { type: object, additionalProperties: { type: string } }
+      responses:
+        "200":
+          description: Aggregated rows with numerator, denominator and availability.
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [sourceVersion, rows]
+                properties:
+                  sourceVersion: { type: string }
+                  rows:
+                    type: array
+                    items: { $ref: "#/components/schemas/MetricResult" }
+components:
+  securitySchemes:
+    candidateSession:
+      type: openIdConnect
+      openIdConnectUrl: https://idp.invalid/.well-known/openid-configuration
+    workforceOauth:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://idp.invalid/authorize
+          tokenUrl: https://idp.invalid/token
+          scopes:
+            recruitment.read: Read authorized recruitment records
+            recruitment.write: Mutate authorized recruitment records
+            reports.run: Run authorized aggregate reports
+  parameters:
+    ApplicationId: { name: applicationId, in: path, required: true, schema: { type: string } }
+    ObjectKey: { name: objectKey, in: path, required: true, schema: { type: string, pattern: "^[a-z0-9-]+$" } }
+    RecordId: { name: recordId, in: path, required: true, schema: { type: string } }
+  responses:
+    Denied: { description: Purpose, row or field authorization denied without disclosing existence. }
+    NotFound: { description: Resource unavailable in the authorized scope. }
+    Conflict: { description: Version mismatch or idempotency conflict. }
+    Invalid: { description: Validation or governed-transition failure with stable error codes. }
+  schemas:
+    PublicJob:
+      type: object
+      required: [id, title, location, descriptionVersion, policyVersion]
+      properties:
+        id: { type: string }
+        title: { type: string }
+        location: { type: string }
+        descriptionVersion: { type: string }
+        policyVersion: { type: string }
+    CandidateApplication:
+      type: object
+      required: [id, candidateSafeStatus, updatedAt]
+      properties:
+        id: { type: string }
+        candidateSafeStatus: { type: string }
+        nextCandidateAction: { type: [string, "null"] }
+        updatedAt: { type: string, format: date-time }
+    PermissionContext:
+      type: object
+      required: [purpose, readableFields, writableFields]
+      properties:
+        purpose: { type: string }
+        readableFields: { type: array, items: { type: string } }
+        writableFields: { type: array, items: { type: string } }
+    AuthorizedRecord:
+      type: object
+      required: [id, objectKey, version, fields, permissionContext]
+      properties:
+        id: { type: string }
+        objectKey: { type: string }
+        version: { type: integer, minimum: 1 }
+        fields: { type: object, additionalProperties: true }
+        permissionContext: { $ref: "#/components/schemas/PermissionContext" }
+    MutationRequest:
+      type: object
+      required: [commandId, idempotencyKey, fields]
+      properties:
+        commandId: { type: string }
+        idempotencyKey: { type: string, minLength: 16 }
+        fields: { type: object, additionalProperties: true }
+    MetricResult:
+      type: object
+      required: [metricKey, available, display]
+      properties:
+        metricKey: { type: string }
+        numerator: { type: [number, "null"] }
+        denominator: { type: [number, "null"] }
+        available: { type: boolean }
+        display: { type: string, description: N/A when the denominator is zero or evidence is unavailable. }

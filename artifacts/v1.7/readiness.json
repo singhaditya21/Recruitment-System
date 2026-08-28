@@ -1,0 +1,41 @@
+{
+  "artifact": "ART-015-v1.7-remediation",
+  "version": "1.7.0",
+  "generatedAt": "2026-08-28T12:00:00.000Z",
+  "syntheticContract": {
+    "personas": 13,
+    "internalRoles": 12,
+    "screenFamilies": 14,
+    "functionalRoutePatterns": 24,
+    "objectFamilies": 92,
+    "expandedConcepts": 111,
+    "pageTemplates": 4,
+    "routedObjectPages": 368,
+    "seededObjectRecords": 276,
+    "businessFields": 552,
+    "governanceFields": 920,
+    "logicalFields": 1472,
+    "analyticsRows": 324,
+    "testedFilterCombinations": 600,
+    "emptyFilterCombinations": 0,
+    "dashboardViews": 11,
+    "savedReports": 6
+  },
+  "formalFindings": {
+    "open": 18,
+    "blocker": 3,
+    "high": 10,
+    "medium": 5,
+    "closureRule": "Accountable dated acceptance or valid time-bound exception is required; author implementation alone does not close a finding."
+  },
+  "production": {
+    "salesforceMetadata": "absent",
+    "bff": "absent",
+    "idp": "absent",
+    "providerIntegrations": "absent",
+    "manualAccessibility": "not-run",
+    "moderatedUsability": "not-run",
+    "legalSecurityApproval": "not-approved",
+    "pilot": "blocked"
+  }
+}
