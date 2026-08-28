@@ -1,4 +1,4 @@
-name: Deploy v1.7 object, analytics and reporting wireframe to Pages
+name: Deploy v1.8 dense data and core forms wireframe to Pages
 
 on:
   workflow_dispatch:
