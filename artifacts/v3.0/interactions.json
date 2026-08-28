@@ -1,0 +1,22 @@
+{
+  "version": "3.0.0",
+  "staticSourceAudit": {
+    "files": 18,
+    "buttons": 277,
+    "handlerBacked": 245,
+    "submitBacked": 30,
+    "intentionallyDisabled": 2,
+    "links": 287,
+    "routeDeclarations": 156,
+    "defects": 0
+  },
+  "builtBrowserCrawl": {
+    "project": "desktop-chromium",
+    "renderedInternalDestinations": 1018,
+    "silentRedirects": 0,
+    "missingMainDestinations": 0,
+    "browserErrors": 0,
+    "authorizedAdminPersona": "USR-ADM-001"
+  },
+  "scope": "Every rendered internal href discovered from the bounded public, candidate, new-hire, internal, role-portal and privileged-admin roots was opened against the production build. Disabled controls are allowed only when the disabled state is intentional and visible."
+}

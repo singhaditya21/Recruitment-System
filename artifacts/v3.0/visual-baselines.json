@@ -1,0 +1,15 @@
+{
+  "version": "3.0.0",
+  "status": "generated and visually inspected",
+  "baselines": [
+    { "file": "artifacts/screenshots/v3-candidate-regulated-task.png", "route": "/my-tasks/CTK-004", "viewport": "1440x1100" },
+    { "file": "artifacts/screenshots/v3-new-hire-benefits.png", "route": "/preboarding/benefits/BEN-DEMO-001", "viewport": "1440x1100" },
+    { "file": "artifacts/screenshots/v3-recruiting-event-operations.png", "route": "/hr/events/REV-DEMO-001", "viewport": "1440x1100" },
+    { "file": "artifacts/screenshots/v3-cohort-analytics.png", "route": "/hr/high-volume/HVC-001/analytics", "viewport": "1440x1100" },
+    { "file": "artifacts/screenshots/v3-referrer-portal.png", "route": "/referrer", "viewport": "1440x1100" },
+    { "file": "artifacts/screenshots/v3-worker-transitions.png", "route": "/hr/transitions", "viewport": "1440x1100" },
+    { "file": "artifacts/screenshots/v3-admin-control-plane.png", "route": "/admin", "viewport": "1440x1100", "persona": "USR-ADM-001" },
+    { "file": "artifacts/screenshots/v3-admin-mobile.png", "route": "/admin", "viewport": "320x900", "persona": "USR-ADM-001" }
+  ],
+  "limits": "These are review baselines, not cross-browser pixel-diff or manual assistive-technology evidence."
+}

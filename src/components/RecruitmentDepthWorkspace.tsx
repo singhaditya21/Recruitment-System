@@ -10,6 +10,9 @@ const tabs = [
   ["/hr/high-volume", "High-volume & campus"],
   ["/hr/locales", "Country variants"],
   ["/hr/recovery", "Failure recovery"],
+  ["/hr/events", "Events"],
+  ["/hr/agency-assignments", "Agency assignments"],
+  ["/hr/transitions", "Worker transitions"],
 ] as const;
 
 function stateTone(state: string) {

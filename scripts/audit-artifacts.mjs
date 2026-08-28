@@ -149,6 +149,30 @@ const v22Routes = JSON.parse(
     "utf8",
   ),
 );
+const v30 = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v3.0/readiness.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v30Routes = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v3.0/routes.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v30Interactions = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v3.0/interactions.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v30Visuals = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v3.0/visual-baselines.json", import.meta.url),
+    "utf8",
+  ),
+);
 
 assertSeries(
   routes.routes.filter(({ id }) => id.startsWith("UI-CAN")),
@@ -485,6 +509,69 @@ assert(
     v22.production.pilot === "blocked",
   "v2.2 must retain every production identity, persistence and pilot gate",
 );
+assert(
+  v30.version === "3.0.0" && v30.syntheticOnly === true,
+  "v3.0 must identify the full-system wireframe as synthetic-only",
+);
+assert(
+  v30.counts.actorPersonas === 13 &&
+    v30.counts.internalRoles === 12 &&
+    v30.counts.screenContracts === 62 &&
+    v30.counts.routeDeclarations === 156 &&
+    v30.counts.functionalDestinations === 154 &&
+    v30Routes.screenContracts.length === 62 &&
+    v30Routes.routeDeclarationCount === 156 &&
+    v30Routes.functionalDestinationCount === 154 &&
+    v30Routes.v30AddedRoutePatterns.length === 85,
+  "v3.0 persona, screen, route and added-route counts must reconcile",
+);
+assert(
+  v30.counts.routedObjectFamilies === 138 &&
+    v30.counts.routedObjectPageInstances === 552 &&
+    v30.counts.seededObjectRecords === 1656 &&
+    v30.counts.workspaceFieldContracts === 2208 &&
+    v30.counts.combinedLogicalConcepts === 175 &&
+    v30.counts.physicalObjectsApproved === 0,
+  "v3.0 must preserve object/page coverage and zero approved physical objects",
+);
+assert(
+  Object.entries(v30.additionalFullSystemSeeds)
+    .filter(([key]) => key !== "total")
+    .reduce((sum, [, count]) => sum + count, 0) === 336 &&
+    v30.additionalFullSystemSeeds.total === 336,
+  "v3.0 additional full-system seeds must reconcile to 336",
+);
+assert(
+  v30Interactions.staticSourceAudit.links === 287 &&
+    v30Interactions.staticSourceAudit.buttons === 277 &&
+    v30Interactions.staticSourceAudit.routeDeclarations === 156 &&
+    v30Interactions.staticSourceAudit.defects === 0 &&
+    v30Interactions.builtBrowserCrawl.renderedInternalDestinations === 1018 &&
+    v30Interactions.builtBrowserCrawl.silentRedirects === 0 &&
+    v30Interactions.builtBrowserCrawl.missingMainDestinations === 0 &&
+    v30Interactions.builtBrowserCrawl.browserErrors === 0,
+  "v3.0 interaction and built-route evidence must remain defect-free",
+);
+assert(
+  v30Visuals.baselines.length === 8 &&
+    v30Visuals.status === "generated and visually inspected",
+  "v3.0 must retain eight inspected visual baselines",
+);
+for (const baseline of v30Visuals.baselines) {
+  const file = await readFile(new URL(`../${baseline.file}`, import.meta.url));
+  assert(
+    file.length > 20_000 && file.subarray(1, 4).toString("utf8") === "PNG",
+    `${baseline.file} must be a nontrivial PNG baseline`,
+  );
+}
+assert(
+  v30.production.authentication === "not implemented" &&
+    v30.production.serverAuthorization === "not implemented" &&
+    v30.production.persistence === "browser memory only" &&
+    v30.production.manualAssistiveTechnology === "not run" &&
+    v30.production.pilot === "blocked",
+  "v3.0 must retain every production and human-evidence gate",
+);
 
 const sourcePaths = await sourceFiles(new URL("../src/", import.meta.url));
 const source = (
@@ -552,21 +639,30 @@ assert(
   "The v1.9 canonical model, runtime, relationship access and event lineage must be present",
 );
 assert(
-  source.includes("v2.2 deep lifecycle wireframe") &&
+  source.includes("v3.0 full-system wireframe") &&
     source.includes("lifecycleObjectContracts") &&
     source.includes("newHireRecords") &&
     source.includes("talentCampaigns") &&
     source.includes("screeningCases") &&
     source.includes("agencySubmissions") &&
     source.includes("recoveryScenarios"),
-  "The v2.2 release marker and deep-journey contracts must be visible in the wireframe",
+  "The v3.0 release marker and inherited deep-journey contracts must be visible in the wireframe",
+);
+assert(
+  source.includes("fullSystemCounts") &&
+    source.includes("CandidateSystemWorkspace") &&
+    source.includes("RecruitingOperationsV3") &&
+    source.includes("AdditionalPortalsV3") &&
+    source.includes("LifecycleV3") &&
+    source.includes("AdminOperationsV3"),
+  "The v3.0 seed summary and all full-system workspace families must be present",
 );
 const appSource = await readFile(new URL("../src/App.tsx", import.meta.url), "utf8");
 assert(
-  (appSource.match(/<Route\b/g) ?? []).length === 71,
-  "The executable v2.2 route declaration count must remain 71",
+  (appSource.match(/<Route\b/g) ?? []).length === 156,
+  "The executable v3.0 route declaration count must remain 156",
 );
 
 console.log(
-  "Artifact audit passed: v2.2 exposes 32 screen contracts and 71 routes across deep candidate, regulated-case, high-volume, localized, recovery and role-portal journeys while preserving zero production connections or approved physical objects.",
+  "Artifact audit passed: v3.0 exposes 62 screen contracts and 156 routes across the complete candidate, recruiting, onboarding, role-portal and administration wireframe while preserving zero production connections or approved physical objects.",
 );

@@ -3,7 +3,7 @@ export type Tone = "success" | "warning" | "danger" | "info" | "neutral";
 export const prototypeMeta = {
   employer: "Harbor & Pine Labs",
   candidate: "Maya Chen",
-  release: "v2.2-wireframe",
+  release: "v3.0-full-system-wireframe",
   generatedAt: "2026-08-28T12:00:00.000Z",
   fictional: true,
 } as const;
