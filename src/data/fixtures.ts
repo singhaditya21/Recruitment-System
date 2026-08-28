@@ -3,7 +3,7 @@ export type Tone = "success" | "warning" | "danger" | "info" | "neutral";
 export const prototypeMeta = {
   employer: "Harbor & Pine Labs",
   candidate: "Maya Chen",
-  release: "v2.1-wireframe",
+  release: "v2.2-wireframe",
   generatedAt: "2026-08-28T12:00:00.000Z",
   fictional: true,
 } as const;
@@ -206,6 +206,8 @@ export type HrScreenKey =
   | "decision"
   | "onboarding"
   | "talent"
+  | "cases"
+  | "high-volume"
   | "platform"
   | "automations"
   | "governance";
@@ -228,6 +230,8 @@ export const personaOperatingModels: Record<
       "decision",
       "onboarding",
       "talent",
+      "cases",
+      "high-volume",
     ],
     focus: "Candidate progress and evidence readiness",
     queue: "Recruiter queue",
@@ -243,6 +247,7 @@ export const personaOperatingModels: Record<
       "interview",
       "onboarding",
       "talent",
+      "high-volume",
     ],
     focus: "Scheduling, messages and candidate wait time",
     queue: "Coordination queue",
@@ -259,6 +264,7 @@ export const personaOperatingModels: Record<
       "decision",
       "onboarding",
       "talent",
+      "high-volume",
     ],
     focus: "Hiring plan, debrief and human decision",
     queue: "Hiring manager queue",
@@ -274,12 +280,12 @@ export const personaOperatingModels: Record<
     queue: "Approval queue",
   },
   "USR-SUP-001": {
-    screens: ["actions", "analytics", "reports", "objects", "candidate", "application", "onboarding"],
+    screens: ["actions", "analytics", "reports", "objects", "candidate", "application", "onboarding", "cases"],
     focus: "Candidate-safe support and communications",
     queue: "Support queue",
   },
   "USR-INTG-001": {
-    screens: ["actions", "analytics", "objects", "application", "governance"],
+    screens: ["actions", "analytics", "objects", "application", "cases", "governance"],
     focus: "Restricted integrity cases",
     queue: "Integrity queue",
   },
@@ -292,6 +298,7 @@ export const personaOperatingModels: Record<
       "automations",
       "onboarding",
       "talent",
+      "high-volume",
       "platform",
       "governance",
     ],
@@ -312,7 +319,7 @@ export const personaOperatingModels: Record<
     queue: "Platform queue",
   },
   "USR-PRV-001": {
-    screens: ["actions", "analytics", "reports", "objects", "candidate", "talent", "platform", "governance"],
+    screens: ["actions", "analytics", "reports", "objects", "candidate", "talent", "cases", "platform", "governance"],
     focus: "Privacy requests and policy gates",
     queue: "Privacy queue",
   },
@@ -339,6 +346,8 @@ export const personaOperatingModels: Record<
       "candidate",
       "onboarding",
       "talent",
+      "cases",
+      "high-volume",
       "platform",
       "automations",
       "governance",

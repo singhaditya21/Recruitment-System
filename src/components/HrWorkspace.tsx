@@ -88,6 +88,7 @@ import { ReportWorkspace } from "./ReportWorkspace";
 import { OnboardingOperations } from "./OnboardingWorkspace";
 import { TalentGrowthWorkspace } from "./TalentGrowthWorkspace";
 import { PlatformControlWorkspace } from "./PlatformControlWorkspace";
+import { RecruitmentDepthWorkspace } from "./RecruitmentDepthWorkspace";
 import {
   displayCandidateForRole,
   roleDataScopes,
@@ -173,6 +174,18 @@ const hrNav = [
     label: "Talent growth",
     screen: "talent" as const,
     icon: UsersRound,
+  },
+  {
+    to: "/hr/cases",
+    label: "Assessment & checks",
+    screen: "cases" as const,
+    icon: ShieldAlert,
+  },
+  {
+    to: "/hr/high-volume",
+    label: "High-volume",
+    screen: "high-volume" as const,
+    icon: Workflow,
   },
   {
     to: "/hr/automations",
@@ -388,6 +401,9 @@ function HrShell({
                 </NavLink>
                 <NavLink to="/careers">Candidate site</NavLink>
                 <NavLink to="/preboarding">New-hire portal</NavLink>
+                <NavLink to="/manager">Manager portal</NavLink>
+                <NavLink to="/it">IT fulfilment portal</NavLink>
+                <NavLink to="/agency">Agency portal</NavLink>
               </>
             ) : topPanel === "help" ? (
               <>
@@ -4449,6 +4465,25 @@ function PlatformWorkspace() {
   );
 }
 
+function RecruitmentDepth({ screen }: { screen: "cases" | "high-volume" }) {
+  const { announce } = usePrototype();
+  return (
+    <HrShell
+      title={screen === "cases" ? "Assessment and screening operations" : "Scaled recruiting operations"}
+      eyebrow={screen === "cases" ? "Assessment, reference, background and adverse action" : "Evergreen, campus, event and seasonal cohorts"}
+      screenId={screen === "cases" ? "UI-HR-014" : "UI-HR-015"}
+      screen={screen}
+      actions={
+        <button className="secondary-button" onClick={() => announce("Controlled workflow preview opened with version, population, owner and failure-state evidence.")}>
+          <FileText size={15} /> Review contract
+        </button>
+      }
+    >
+      <RecruitmentDepthWorkspace />
+    </HrShell>
+  );
+}
+
 export function HrWorkspace({ screen }: { screen: HrScreen }) {
   if (screen === "actions") return <ActionCenter />;
   if (screen === "analytics") return <AnalyticsWorkspace />;
@@ -4462,6 +4497,8 @@ export function HrWorkspace({ screen }: { screen: HrScreen }) {
   if (screen === "decision") return <DecisionWorkspace />;
   if (screen === "onboarding") return <OnboardingWorkspace />;
   if (screen === "talent") return <TalentWorkspace />;
+  if (screen === "cases") return <RecruitmentDepth screen="cases" />;
+  if (screen === "high-volume") return <RecruitmentDepth screen="high-volume" />;
   if (screen === "platform") return <PlatformWorkspace />;
   if (screen === "automations") return <AutomationWorkspace />;
   return <GovernanceWorkspace />;

@@ -1,11 +1,13 @@
 import { useMemo, useState } from "react";
-import { NavLink, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, ArrowRight, Bell, BriefcaseBusiness, Building2, CalendarDays, CheckCircle2, CircleHelp, Clock3, Copy, FileCheck2, FileText, Globe2, HeartHandshake, LockKeyhole, Mail, MapPin, MessageCircle, Save, Search, ShieldCheck, SlidersHorizontal, Star, UserRound } from "lucide-react";
+import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, ArrowRight, Bell, BriefcaseBusiness, Building2, CalendarDays, CheckCircle2, CircleHelp, Clock3, Copy, FileCheck2, FileText, Globe2, HeartHandshake, LockKeyhole, Mail, MapPin, MessageCircle, Save, Search, ShieldCheck, SlidersHorizontal, Star, UserRound, UsersRound } from "lucide-react";
 import { applicationMessages, candidateApplications, syntheticCandidate } from "../data/fixtures";
+import { candidateTasks, jobAlerts, savedJobs } from "../data/lifecycleDepth";
+import { careerEvents } from "../data/talentGrowth";
 import { Freshness, Pill, PrototypeBanner, ScenarioControl, ScreenId, Stepper } from "./Common";
 import { usePrototype } from "../prototype/PrototypeContext";
 
-type CandidateScreen = "careers" | "job" | "apply" | "hub";
+type CandidateScreen = "careers" | "job" | "apply" | "hub" | "relationship" | "tasks";
 
 function CandidateShell({ children }: { children: React.ReactNode }) {
   return (
@@ -18,7 +20,10 @@ function CandidateShell({ children }: { children: React.ReactNode }) {
         </NavLink>
         <nav aria-label="Candidate navigation">
           <NavLink to="/careers">Open roles</NavLink>
+          <NavLink to="/saved-jobs">Saved & alerts</NavLink>
+          <NavLink to="/events">Events</NavLink>
           <NavLink to="/my-applications">My applications</NavLink>
+          <NavLink to="/my-tasks">Checks & tasks</NavLink>
           <a href="#candidate-support">Candidate support</a>
         </nav>
         <NavLink className="candidate-account" to="/my-applications"><UserRound size={17} aria-hidden="true" /> Maya <span>Demo</span></NavLink>
@@ -266,9 +271,51 @@ function HubScreen() {
   );
 }
 
+function RelationshipScreen() {
+  const location = useLocation();
+  const { eventId } = useParams();
+  const { announce } = usePrototype();
+  const [removed, setRemoved] = useState<string[]>([]);
+  const [paused, setPaused] = useState<string[]>([]);
+  const [registrationState, setRegistrationState] = useState<"None" | "Registered" | "Waitlisted" | "Cancelled">("None");
+  const [confirmed, setConfirmed] = useState(false);
+  const event = careerEvents.find((item) => item.id === eventId);
+  if (location.pathname.startsWith("/events") && eventId && !event) return <CandidateShell><section className="candidate-page empty-state"><CalendarDays size={28} /><h1>Event unavailable</h1><p>The event link may be stale, cancelled or outside this synthetic fixture.</p><NavLink className="primary-button" to="/events">View current events</NavLink></section></CandidateShell>;
+  if (event) {
+    const full = event.registered >= event.capacity || event.status === "Full";
+    return <CandidateShell><div className="candidate-page narrow-page"><NavLink className="back-link" to="/events"><ArrowLeft size={15} /> All events</NavLink><section className="candidate-event-detail"><div><ScreenId>UI-CAN-005</ScreenId><span className="eyebrow">{event.id} · {event.format}</span><h1>{event.name}</h1><p>{event.audience} · {event.date}</p><div className="job-facts"><span><CalendarDays size={17} />{event.date}</span><span><UserRound size={17} />{event.registered}/{event.capacity} registered</span><span><Globe2 size={17} />English · accessibility alternatives</span></div></div><aside className="apply-card"><Pill tone={event.status === "Cancelled" ? "danger" : full ? "warning" : "success"}>{event.status}</Pill><h2>{full ? "Join the waitlist" : "Reserve a synthetic place"}</h2><p>Registration authorizes event-specific updates only. It does not create a job application or general recruiting consent.</p>{registrationState === "None" ? <><label className="confirm-check"><input type="checkbox" checked={confirmed} onChange={(event) => setConfirmed(event.target.checked)} /><span>I reviewed the event notice and understand this is synthetic.</span></label><button disabled={!confirmed || event.status === "Cancelled"} className="primary-button full-button" onClick={() => { setRegistrationState(full ? "Waitlisted" : "Registered"); announce(`${event.id} ${full ? "waitlist" : "registration"} saved in browser memory.`); }}>{full ? "Join waitlist" : "Register in demo"}</button></> : <div className="completion-receipt"><CheckCircle2 size={22} /><div><strong>{registrationState}</strong><span>ERG-MEM-001 · memory only</span></div></div>}{registrationState !== "None" && registrationState !== "Cancelled" && <button className="secondary-button full-button" onClick={() => setRegistrationState("Cancelled")}>Cancel registration</button>}<button className="secondary-button full-button" onClick={() => announce("Private event accessibility-support route opened; event staff receive only the requested adjustment.")}>Request accessibility support</button></aside></section></div></CandidateShell>;
+  }
+  if (location.pathname.startsWith("/events")) return <CandidateShell><div className="candidate-page relationship-page"><div className="hub-welcome"><div><ScreenId>UI-CAN-005</ScreenId><span className="eyebrow">Recruiting events</span><h1>Meet the team without creating an application.</h1><p>Registration, attendance, contact authority and later applications remain separate records.</p></div><Pill tone="info">{careerEvents.filter((item) => item.status === "Published" || item.status === "Full").length} open events</Pill></div><div className="candidate-event-grid">{careerEvents.filter((item) => item.status !== "Draft").map((item) => <article key={item.id}><div><CalendarDays size={21} /><Pill tone={item.status === "Full" ? "warning" : item.status === "Cancelled" ? "danger" : item.status === "Completed" ? "neutral" : "success"}>{item.status}</Pill></div><small>{item.id} · {item.format}</small><h2><NavLink to={`/events/${item.id}`}>{item.name}</NavLink></h2><p>{item.audience} · {item.date}</p><span>{item.registered}/{item.capacity} registered</span><NavLink className="secondary-button" to={`/events/${item.id}`}>{item.status === "Full" ? "Join waitlist" : "View event"}</NavLink></article>)}</div></div></CandidateShell>;
+  const savedView = !location.pathname.startsWith("/job-alerts");
+  return <CandidateShell><div className="candidate-page relationship-page"><div className="hub-welcome"><div><ScreenId>UI-CAN-005</ScreenId><span className="eyebrow">Candidate-controlled discovery</span><h1>Keep track without losing control.</h1><p>Saved jobs and alerts are separate from applications, contact authority and hiring decisions.</p></div><Pill tone="info">Memory-only controls</Pill></div><div className="candidate-hub-tabs" role="tablist" aria-label="Saved jobs and alert views"><NavLink role="tab" aria-selected={savedView} to="/saved-jobs"><Save size={17} /> Saved jobs</NavLink><NavLink role="tab" aria-selected={!savedView} to="/job-alerts"><Bell size={17} /> Job alerts</NavLink></div>{savedView ? <section className="saved-job-list" aria-label="Saved jobs">{savedJobs.filter((item) => !removed.includes(item.id)).map((item) => <article key={item.id}><span className="job-icon"><BriefcaseBusiness size={21} /></span><div><small>{item.id} · saved {item.savedAt}</small><h2>{item.title}</h2><p>{item.location} · {item.workplace}</p></div><Pill tone={item.state === "Open" ? "success" : item.state === "Closing soon" ? "warning" : "neutral"}>{item.state}</Pill><div><NavLink aria-disabled={item.state === "Closed"} className="primary-button" to={item.state === "Closed" ? "/careers" : `/careers/jobs/${item.publicId}`}>{item.state === "Closed" ? "Find similar" : "View role"}</NavLink><button className="text-button" onClick={() => setRemoved((current) => [...current, item.id])}>Remove</button></div></article>)}</section> : <section className="alert-list"><div className="panel-heading"><div><h2>Your synthetic alerts</h2><span>Exact criteria, cadence, locale and channel remain visible.</span></div><button className="primary-button" onClick={() => announce("New alert builder opened with function, location, level, cadence, channel and consent fields.")}>Create alert</button></div>{jobAlerts.map((alert) => { const isPaused = paused.includes(alert.id) || alert.cadence === "Paused"; return <article key={alert.id}><div><Bell size={20} /><span><small>{alert.id} · {alert.locale}</small><strong>{alert.name}</strong><em>{alert.criteria}</em></span></div><span><strong>{isPaused ? "Paused" : alert.cadence}</strong><small>{alert.channel} · {alert.lastResult}</small></span><button className="secondary-button" onClick={() => setPaused((current) => current.includes(alert.id) ? current.filter((id) => id !== alert.id) : [...current, alert.id])}>{isPaused ? "Resume" : "Pause"}</button></article>; })}</section>}</div></CandidateShell>;
+}
+
+function CandidateTasksScreen() {
+  const { announce } = usePrototype();
+  const [stateOverrides, setStateOverrides] = useState<Record<string, string>>({});
+  const [selectedId, setSelectedId] = useState(candidateTasks[0].id);
+  const selected = candidateTasks.find((item) => item.id === selectedId) ?? candidateTasks[0];
+  const state = stateOverrides[selected.id] ?? selected.state;
+  const act = () => {
+    if (state === "Expired") {
+      setStateOverrides((current) => ({ ...current, [selected.id]: "Ready" }));
+      announce(`${selected.id} replacement window issued in memory; the expired link remains invalid.`);
+    } else if (selected.kind === "Adverse-action notice") {
+      setStateOverrides((current) => ({ ...current, [selected.id]: "Dispute open" }));
+      announce(`${selected.id} correction request opened; the hiring decision remains paused.`);
+    } else {
+      setStateOverrides((current) => ({ ...current, [selected.id]: "In progress" }));
+      announce(`${selected.id} opened in candidate-safe preview; no provider was contacted.`);
+    }
+  };
+  return <CandidateShell><div className="candidate-page candidate-task-center"><div className="hub-welcome"><div><ScreenId>UI-CAN-006</ScreenId><span className="eyebrow">Assessments, references and checks</span><h1>Know what is requested and how to get help.</h1><p>Notices, expiry, provider-safe status, correction and dispute routes are visible without exposing internal evidence.</p></div><Pill tone="warning">{candidateTasks.filter((item) => !["Complete"].includes(stateOverrides[item.id] ?? item.state)).length} active tasks</Pill></div><div className="candidate-task-layout"><section className="candidate-task-list">{candidateTasks.map((item) => { const current = stateOverrides[item.id] ?? item.state; return <button className={selected.id === item.id ? "selected" : ""} onClick={() => setSelectedId(item.id)} key={item.id}><span>{item.kind === "Assessment" ? <FileCheck2 size={19} /> : item.kind === "Reference" ? <UsersRound size={19} /> : <ShieldCheck size={19} />}</span><span><small>{item.id} · {item.kind}</small><strong>{item.title}</strong><em>{item.due}</em></span><Pill tone={current === "Complete" ? "success" : current === "Expired" || current === "Dispute open" ? "danger" : current === "Needs support" ? "warning" : "info"}>{current}</Pill></button>; })}</section><section className="candidate-control-card candidate-task-detail"><div className="panel-heading"><div><span className="eyebrow">{selected.id} · {selected.application}</span><h2>{selected.title}</h2><span>{selected.kind} · due {selected.due}</span></div><Pill tone={state === "Complete" ? "success" : state === "Expired" || state === "Dispute open" ? "danger" : "warning"}>{state}</Pill></div><div className="candidate-notice"><ShieldCheck size={21} /><div><h3>Your notice and control</h3><p>{selected.noticeVersion} is bound to this task. Completing it does not automatically decide your application.</p></div></div><dl className="offer-facts"><div><dt>Provider-safe status</dt><dd>{selected.providerSafeStatus}</dd></div><div><dt>Next action</dt><dd>{selected.nextAction}</dd></div><div><dt>Accessibility</dt><dd>Alternative format and time support available</dd></div><div><dt>Correction/redress</dt><dd>Private support and correction route retained</dd></div></dl>{state !== "Complete" && <button className="primary-button" onClick={act}>{state === "Expired" ? "Request replacement window" : selected.kind === "Adverse-action notice" ? "Open correction or dispute" : "Continue safely"}</button>}<button className="secondary-button" onClick={() => announce(`${selected.id} private support case opened without sharing details with interviewers.`)}>Request support</button><p className="field-assurance"><LockKeyhole size={16} />Internal scores, report content and decision rationale are not shown here.</p></section></div></div></CandidateShell>;
+}
+
 export function CandidatePortal({ screen }: { screen: CandidateScreen }) {
   if (screen === "careers") return <CareersScreen />;
   if (screen === "job") return <JobScreen />;
   if (screen === "apply") return <ApplyScreen />;
+  if (screen === "relationship") return <RelationshipScreen />;
+  if (screen === "tasks") return <CandidateTasksScreen />;
   return <HubScreen />;
 }

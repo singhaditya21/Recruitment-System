@@ -74,4 +74,17 @@ describe("automated WCAG baseline", () => {
   ])("passes the dense core baseline at %s", async (hash) => {
     await expectNoAxeViolations(hash);
   });
+
+  it.each([
+    "#/saved-jobs",
+    "#/my-tasks",
+    "#/hr/cases",
+    "#/hr/talent/referrals",
+    "#/hr/high-volume",
+    "#/manager",
+    "#/it",
+    "#/agency",
+  ])("passes the v2.2 deep-journey baseline at %s", async (hash) => {
+    await expectNoAxeViolations(hash);
+  });
 });

@@ -336,6 +336,56 @@ test("v2.1 operations expose programs, compliance, experience and talent channel
   ).toBeVisible();
 });
 
+test("v2.2 candidate controls saved jobs, event registration and checks", async ({ page }) => {
+  await page.goto("/#/saved-jobs");
+  await expect(page.getByRole("heading", { name: "Keep track without losing control." })).toBeVisible();
+  await page.getByRole("button", { name: "Remove" }).first().click();
+  await expect(page.getByText("SVJ-001 · saved Aug 27")).toHaveCount(0);
+
+  await page.goto("/#/events/EVT-DEMO-002");
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Register in demo" }).click();
+  await expect(page.getByText("ERG-MEM-001 · memory only")).toBeVisible();
+
+  await page.goto("/#/my-tasks");
+  await expect(page.getByRole("heading", { name: "Know what is requested and how to get help." })).toBeVisible();
+  await expect(page.getByText(/NOTICE-ASSESS-v4 is bound to this task/)).toBeVisible();
+});
+
+test("v2.2 regulated, high-volume, localized and recovery work is executable", async ({ page }) => {
+  await page.goto("/#/hr/cases/SCR-DEMO-004");
+  await expect(page.getByRole("heading", { name: "Consequential-decision guardrail" })).toBeVisible();
+
+  await page.goto("/#/hr/talent/referrals");
+  await expect(page.getByRole("heading", { name: "Referral eligibility, milestones and disputes" })).toBeVisible();
+
+  await page.goto("/#/hr/high-volume");
+  await page.getByRole("button", { name: "Preview bounded bulk action" }).click();
+  await expect(page.getByRole("heading", { name: "Preview invitation for 48 eligible fixtures" })).toBeVisible();
+
+  await page.goto("/#/hr/locales");
+  await expect(page.getByRole("heading", { name: "Country, language and worker-type variants" })).toBeVisible();
+
+  await page.goto("/#/hr/recovery");
+  await page.getByRole("button", { name: "Reconcile safely" }).first().click();
+  await expect(page.getByText(/reconciled in memory using idem_demo_/)).toBeVisible();
+});
+
+test("v2.2 manager, IT and agency portals enforce distinct scoped shells", async ({ page }) => {
+  await page.goto("/#/manager");
+  await expect(page.getByRole("heading", { name: "Make every start intentional." })).toBeVisible();
+
+  await page.goto("/#/it");
+  await expect(page.getByRole("heading", { name: "Ready on time. Least privilege by default." })).toBeVisible();
+
+  await page.goto("/#/agency/submissions/new");
+  await page.getByRole("button", { name: "Submit to validation" }).click();
+  await expect(page.getByText("Submission AGS-MEM-001 created")).toBeVisible();
+
+  await page.goto("/#/agency/submissions/AGS-DEMO-002");
+  await expect(page.getByRole("heading", { name: "Submission outside this agency scope" })).toBeVisible();
+});
+
 test("object workspace executes new, detail and edit states", async ({
   page,
 }) => {

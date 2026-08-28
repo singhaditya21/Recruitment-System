@@ -39,6 +39,544 @@
   }
 }
 
+/* v2.2 deep recruitment, candidate relationship and partner portal surfaces */
+.regulated-case-workspace,
+.recruitment-depth,
+.high-volume-workspace,
+.relationship-page,
+.candidate-task-center {
+  display: grid;
+  gap: 1rem;
+}
+
+.regulated-case-table {
+  display: grid;
+  min-width: 980px;
+}
+
+.regulated-case-table > div,
+.regulated-case-table > a {
+  display: grid;
+  grid-template-columns: .8fr 1.35fr .7fr .7fr .55fr 1.4fr;
+  gap: .75rem;
+  align-items: center;
+  padding: .78rem .9rem;
+  border-bottom: 1px solid var(--line);
+  color: inherit;
+  text-decoration: none;
+}
+
+.regulated-case-table > .regulated-case-head {
+  background: #f4f6f9;
+  color: #52606d;
+  font-size: .73rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.regulated-case-table > a:hover,
+.regulated-case-table > a:focus-visible {
+  background: #f5f9ff;
+}
+
+.regulated-case-table span,
+.regulated-case-table strong,
+.regulated-case-table small {
+  min-width: 0;
+}
+
+.regulated-case-table small {
+  display: block;
+  margin-top: .2rem;
+  color: var(--muted);
+}
+
+.case-detail-layout,
+.high-volume-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 2.25fr) minmax(260px, .75fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.case-record,
+.case-guardrail,
+.campaign-detail,
+.locale-workspace {
+  padding: 1.15rem;
+}
+
+.case-fact-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .8rem;
+  margin: 1rem 0;
+}
+
+.case-fact-grid div {
+  display: grid;
+  gap: .25rem;
+  padding: .75rem;
+  border: 1px solid var(--line);
+  border-radius: .6rem;
+  background: #fbfcfe;
+}
+
+.case-fact-grid dt,
+.locale-grid dt {
+  color: var(--muted);
+  font-size: .72rem;
+  font-weight: 800;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+
+.case-fact-grid dd,
+.locale-grid dd {
+  margin: 0;
+  font-weight: 650;
+}
+
+.case-journey {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  align-items: center;
+  gap: .5rem;
+  margin: 1rem 0;
+}
+
+.case-journey article {
+  display: flex;
+  align-items: flex-start;
+  gap: .55rem;
+  min-height: 74px;
+  padding: .7rem;
+  border: 1px solid var(--line);
+  border-radius: .6rem;
+  background: #f8fafc;
+}
+
+.case-journey article.complete { border-color: #8ac7a0; background: #f1fbf4; }
+.case-journey article.active { border-color: #77a7df; background: #f1f7ff; }
+.case-journey article.future { color: var(--muted); }
+.case-journey strong,
+.case-journey small { display: block; }
+.case-journey small { margin-top: .2rem; color: var(--muted); }
+
+.case-guardrail {
+  border-top: 4px solid #c23934;
+}
+
+.case-guardrail ul,
+.manager-privacy ul {
+  padding-left: 1.1rem;
+  line-height: 1.65;
+}
+
+.high-volume-grid {
+  grid-template-columns: minmax(260px, .75fr) minmax(0, 1.6fr);
+}
+
+.cohort-flow {
+  margin-top: 1rem;
+}
+
+.cohort-flow article {
+  display: grid;
+  grid-template-columns: 34px minmax(140px, .8fr) 1.4fr;
+  align-items: center;
+  gap: .7rem;
+  padding: .7rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.cohort-flow article > span {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  background: #eaf3ff;
+  color: #0b5cab;
+  font-weight: 800;
+}
+
+.cohort-flow small { color: var(--muted); }
+
+.locale-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .9rem;
+  margin-top: 1rem;
+}
+
+.locale-grid article {
+  padding: .9rem;
+  border: 1px solid var(--line);
+  border-radius: .65rem;
+  background: #fff;
+}
+
+.locale-grid header {
+  display: flex;
+  justify-content: space-between;
+  gap: .6rem;
+  margin-bottom: .8rem;
+}
+
+.locale-grid header strong,
+.locale-grid header small { display: block; }
+.locale-grid header small { color: var(--muted); }
+.locale-grid dl { display: grid; gap: .55rem; margin: 0; }
+.locale-grid dl div { display: grid; grid-template-columns: .8fr 1.2fr; gap: .5rem; }
+
+.recovery-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .8rem;
+  padding: .9rem;
+}
+
+.recovery-grid article {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  padding: .85rem;
+  border: 1px solid var(--line);
+  border-radius: .65rem;
+  background: #fff;
+}
+
+.recovery-grid article > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recovery-grid h3,
+.recovery-grid p { margin: 0; }
+.recovery-grid > article > small { color: var(--muted); overflow-wrap: anywhere; }
+.recovery-grid button { margin-top: auto; }
+
+.referral-workspace {
+  display: grid;
+  gap: 1rem;
+}
+
+.reward-ledger { padding: 1rem; }
+.reward-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .8rem;
+}
+
+.reward-grid article {
+  display: flex;
+  flex-direction: column;
+  gap: .55rem;
+  padding: .8rem;
+  border: 1px solid var(--line);
+  border-radius: .65rem;
+  background: #fff;
+}
+
+.reward-grid article > div:first-child { display: flex; justify-content: space-between; align-items: center; }
+.reward-grid h3,
+.reward-grid p { margin: 0; }
+.reward-grid dl { display: grid; gap: .35rem; margin: 0; }
+.reward-grid dl div { display: grid; grid-template-columns: .7fr 1.3fr; gap: .45rem; }
+.reward-grid dt { color: var(--muted); font-size: .72rem; font-weight: 800; }
+.reward-grid dd { margin: 0; }
+.reward-grid button { margin-top: auto; }
+
+.candidate-event-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .9rem;
+}
+
+.candidate-event-grid article {
+  display: flex;
+  flex-direction: column;
+  gap: .65rem;
+  padding: 1rem;
+  border: 1px solid #d9e1ec;
+  border-radius: .85rem;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(17 46 81 / 6%);
+}
+
+.candidate-event-grid article > div:first-child,
+.candidate-event-grid article > span {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.candidate-event-grid h2,
+.candidate-event-grid p { margin: 0; }
+.candidate-event-grid .secondary-button { margin-top: auto; }
+
+.candidate-event-detail {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(280px, .65fr);
+  gap: 1.25rem;
+  align-items: start;
+}
+
+.candidate-event-detail > div:first-child {
+  padding: 1.25rem;
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #eef7ff, #f7f2ff);
+}
+
+.candidate-event-detail h1 { font-size: clamp(2rem, 4vw, 3.5rem); }
+
+.saved-job-list,
+.alert-list {
+  display: grid;
+  gap: .75rem;
+}
+
+.saved-job-list article,
+.alert-list article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  gap: .9rem;
+  align-items: center;
+  padding: .9rem 1rem;
+  border: 1px solid #d9e1ec;
+  border-radius: .75rem;
+  background: #fff;
+}
+
+.saved-job-list h2,
+.saved-job-list p { margin: .18rem 0; }
+.saved-job-list > article > div:last-child { display: grid; gap: .35rem; }
+.alert-list article { grid-template-columns: minmax(0, 1.5fr) minmax(200px, .7fr) auto; }
+.alert-list article > div { display: flex; gap: .65rem; align-items: flex-start; }
+.alert-list strong,
+.alert-list small,
+.alert-list em { display: block; }
+.alert-list em { margin-top: .25rem; color: var(--muted); font-style: normal; }
+
+.candidate-task-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, .75fr) minmax(0, 1.45fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.candidate-task-list {
+  display: grid;
+  gap: .55rem;
+}
+
+.candidate-task-list > button {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: .65rem;
+  align-items: center;
+  width: 100%;
+  padding: .85rem;
+  border: 1px solid #d9e1ec;
+  border-radius: .7rem;
+  background: #fff;
+  color: inherit;
+  text-align: left;
+}
+
+.candidate-task-list > button.selected {
+  border-color: #0b5cab;
+  box-shadow: 0 0 0 2px rgb(11 92 171 / 12%);
+}
+
+.candidate-task-list small,
+.candidate-task-list strong,
+.candidate-task-list em { display: block; }
+.candidate-task-list em { margin-top: .25rem; color: var(--muted); font-style: normal; }
+.candidate-task-detail { position: sticky; top: 1rem; }
+
+.role-portal {
+  min-height: 100vh;
+  background: #f4f7fb;
+  color: #17263b;
+}
+
+.role-portal-header {
+  position: sticky;
+  z-index: 10;
+  top: 0;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  min-height: 68px;
+  padding: .65rem clamp(1rem, 4vw, 3rem);
+  border-bottom: 1px solid #d8e1ec;
+  background: rgb(255 255 255 / 96%);
+  backdrop-filter: blur(12px);
+}
+
+.role-portal-brand {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  margin-right: auto;
+  color: inherit;
+  text-decoration: none;
+}
+
+.role-portal-brand strong,
+.role-portal-brand small { display: block; }
+.role-portal-brand small { color: #607085; }
+.role-portal-mark {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border-radius: .75rem;
+  background: #0b5cab;
+  color: #fff;
+}
+
+.it-portal .role-portal-mark { background: #1f6e5d; }
+.agency-portal .role-portal-mark { background: #653cad; }
+
+.role-portal-header nav {
+  display: flex;
+  gap: .45rem;
+}
+
+.role-portal-header nav a {
+  padding: .5rem .7rem;
+  border-radius: .45rem;
+  color: #3e526c;
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.role-portal-header nav a.active { background: #eaf3ff; color: #0b5cab; }
+.role-portal-main { width: min(1320px, calc(100% - 2rem)); margin: 0 auto; padding: 1.2rem 0 3rem; }
+.role-portal-footer { display: flex; justify-content: center; gap: .7rem; padding: 1rem; border-top: 1px solid #d8e1ec; background: #fff; }
+.role-portal-footer strong,
+.role-portal-footer span { display: block; }
+
+.role-portal-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin: .8rem 0 1rem;
+  padding: clamp(1.2rem, 3vw, 2.3rem);
+  border-radius: 1rem;
+  background: linear-gradient(135deg, #0b274d, #125faa);
+  color: #fff;
+}
+
+.it-portal .role-portal-hero { background: linear-gradient(135deg, #123f39, #237b68); }
+.agency-portal .role-portal-hero { background: linear-gradient(135deg, #321861, #7249b8); }
+.role-portal-hero.compact { padding: 1.25rem; }
+.role-portal-hero h1 { margin: .2rem 0; font-size: clamp(1.8rem, 3vw, 3rem); }
+.role-portal-hero p { margin: 0; color: rgb(255 255 255 / 82%); }
+
+.role-summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: .8rem;
+  margin-bottom: 1rem;
+}
+
+.role-summary-cards article {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: .15rem .6rem;
+  align-items: center;
+  padding: .9rem;
+  border: 1px solid #d8e1ec;
+  border-radius: .7rem;
+  background: #fff;
+}
+
+.role-summary-cards article svg { grid-row: span 2; color: #0b5cab; }
+.role-summary-cards strong { font-size: 1.45rem; }
+.role-summary-cards span { color: #607085; }
+
+.role-record-list { overflow: hidden; }
+.role-record-list > a {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1.2fr) minmax(170px, .7fr) auto;
+  gap: .8rem;
+  align-items: center;
+  padding: .85rem 1rem;
+  border-top: 1px solid #e2e8f0;
+  color: inherit;
+  text-decoration: none;
+}
+
+.role-record-list > a:hover,
+.role-record-list > a:focus-visible { background: #f3f8ff; }
+.role-record-list strong,
+.role-record-list small { display: block; }
+.role-record-list small { color: #607085; }
+.role-portal-record-icon { display: grid; width: 36px; height: 36px; place-items: center; border-radius: .55rem; background: #eaf3ff; color: #0b5cab; }
+
+.role-dashboard-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr) minmax(240px, .6fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.role-dashboard-grid > .panel { padding: 1rem; }
+.portal-task-list { display: grid; }
+.portal-task-list article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: .65rem;
+  align-items: center;
+  padding: .7rem 0;
+  border-top: 1px solid var(--line);
+}
+.portal-task-list small { display: block; color: var(--muted); }
+.portal-task-list button { border: 0; background: transparent; color: #0b5cab; font-weight: 800; }
+.role-access-denied { display: grid; place-items: center; gap: .7rem; min-height: 60vh; text-align: center; }
+
+.agency-submission-form { max-width: 960px; margin: 1rem auto; padding: 1.25rem; }
+.agency-submission-form form { display: grid; gap: 1rem; }
+
+@media (max-width: 1000px) {
+  .case-detail-layout,
+  .high-volume-grid,
+  .candidate-event-detail,
+  .candidate-task-layout,
+  .role-dashboard-grid { grid-template-columns: 1fr; }
+  .locale-grid,
+  .recovery-grid,
+  .reward-grid,
+  .candidate-event-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .candidate-task-detail { position: static; }
+}
+
+@media (max-width: 720px) {
+  .role-portal-header { align-items: flex-start; flex-wrap: wrap; }
+  .role-portal-header nav { order: 3; width: 100%; overflow-x: auto; }
+  .role-portal-header > .pill { display: none; }
+  .role-summary-cards,
+  .locale-grid,
+  .recovery-grid,
+  .reward-grid,
+  .candidate-event-grid { grid-template-columns: 1fr; }
+  .case-fact-grid { grid-template-columns: 1fr; }
+  .case-journey { grid-template-columns: 1fr; }
+  .case-journey > svg { transform: rotate(90deg); justify-self: center; }
+  .saved-job-list article,
+  .alert-list article,
+  .role-record-list > a { grid-template-columns: 1fr; }
+  .role-record-list > a > .candidate-avatar,
+  .role-record-list > a > .role-portal-record-icon { display: none; }
+}
+
 /* v2.0 full talent-lifecycle wireframe */
 .workspace-subnav {
   position: sticky;

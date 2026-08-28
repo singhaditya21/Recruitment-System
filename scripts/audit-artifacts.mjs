@@ -137,6 +137,18 @@ const v21Routes = JSON.parse(
     "utf8",
   ),
 );
+const v22 = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v2.2/readiness.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v22Routes = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v2.2/routes.json", import.meta.url),
+    "utf8",
+  ),
+);
 
 assertSeries(
   routes.routes.filter(({ id }) => id.startsWith("UI-CAN")),
@@ -433,6 +445,46 @@ assert(
     v21.production.pilot === "blocked",
   "v2.1 must preserve the physical, identity and pilot production gates",
 );
+assert(
+  v22.version === "2.2.0" && v22.syntheticOnly === true,
+  "v2.2 must identify the deep-journey wireframe as synthetic-only",
+);
+assert(
+  v22.counts.personas === 13 &&
+    v22.counts.screenContracts === 32 &&
+    v22.counts.routeDeclarations === 71 &&
+    v22.counts.functionalDestinations === 69 &&
+    v22Routes.screenContracts.length === 32 &&
+    v22Routes.routeDeclarationCount === 71 &&
+    v22Routes.functionalDestinationCount === 69,
+  "v2.2 persona, screen and route counts must reconcile",
+);
+assert(
+  v22.counts.routedObjectFamilies === 138 &&
+    v22.counts.routedObjectPageInstances === 552 &&
+    v22.counts.seededObjectRecords === 1656 &&
+    v22.counts.workspaceFieldContracts === 2208 &&
+    v22.counts.physicalObjectsApproved === 0,
+  "v2.2 must preserve the reconciled object and physical-schema boundaries",
+);
+assert(
+  v22.deepJourneySeeds.candidateTasks === 6 &&
+    v22.deepJourneySeeds.screeningCases === 32 &&
+    v22.deepJourneySeeds.eventRegistrations === 36 &&
+    v22.deepJourneySeeds.referralRewards === 24 &&
+    v22.deepJourneySeeds.agencySubmissions === 32 &&
+    v22.deepJourneySeeds.highVolumeCampaigns === 8 &&
+    v22.deepJourneySeeds.localeVariants === 12 &&
+    v22.deepJourneySeeds.recoveryScenarios === 24,
+  "v2.2 deep-journey seed counts must reconcile",
+);
+assert(
+  v22.production.authentication === "not implemented" &&
+    v22.production.serverAuthorization === "not implemented" &&
+    v22.production.persistence === "browser memory only" &&
+    v22.production.pilot === "blocked",
+  "v2.2 must retain every production identity, persistence and pilot gate",
+);
 
 const sourcePaths = await sourceFiles(new URL("../src/", import.meta.url));
 const source = (
@@ -500,13 +552,21 @@ assert(
   "The v1.9 canonical model, runtime, relationship access and event lineage must be present",
 );
 assert(
-  source.includes("v2.1 complete lifecycle wireframe") &&
+  source.includes("v2.2 deep lifecycle wireframe") &&
     source.includes("lifecycleObjectContracts") &&
     source.includes("newHireRecords") &&
-    source.includes("talentCampaigns"),
-  "The v2.1 release marker and full-lifecycle data contracts must be visible in the wireframe",
+    source.includes("talentCampaigns") &&
+    source.includes("screeningCases") &&
+    source.includes("agencySubmissions") &&
+    source.includes("recoveryScenarios"),
+  "The v2.2 release marker and deep-journey contracts must be visible in the wireframe",
+);
+const appSource = await readFile(new URL("../src/App.tsx", import.meta.url), "utf8");
+assert(
+  (appSource.match(/<Route\b/g) ?? []).length === 71,
+  "The executable v2.2 route declaration count must remain 71",
 );
 
 console.log(
-  "Artifact audit passed: v2.1 routes all 138 core/lifecycle families through 552 page contracts, adds complete program, candidate, onboarding-experience and talent-channel surfaces, and preserves zero approved physical objects or production connections.",
+  "Artifact audit passed: v2.2 exposes 32 screen contracts and 71 routes across deep candidate, regulated-case, high-volume, localized, recovery and role-portal journeys while preserving zero production connections or approved physical objects.",
 );
