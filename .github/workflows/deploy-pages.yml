@@ -1,4 +1,4 @@
-name: Deploy v1.8 dense data and core forms wireframe to Pages
+name: Deploy v2.0 recruitment and onboarding wireframe to Pages
 
 on:
   workflow_dispatch:

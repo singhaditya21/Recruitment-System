@@ -19,6 +19,7 @@ import {
 import {
   canCreateObject,
   canReadObject,
+  canReadObjectRecord,
   fieldAccessForRole,
   roleDataScopes,
 } from "../data/access";
@@ -38,27 +39,15 @@ import { ExplainPanel, Pill } from "./Common";
 
 function recordsForRole(
   role: string,
-  objectId: string,
+  personaId: string,
+  object: ObjectContract,
   records: ReturnType<typeof usePrototype>["objectRecords"],
 ) {
-  const rows = records.filter((record) => record.objectId === objectId);
-  if (
-    [
-      "Recruiter",
-      "Configuration Admin",
-      "Platform Admin",
-      "Privacy & Legal",
-      "Auditor",
-    ].includes(role)
-  )
-    return rows;
-  const offset =
-    Math.abs(
-      role
-        .split("")
-        .reduce((sum, character) => sum + character.charCodeAt(0), 0),
-    ) % Math.max(1, rows.length);
-  return rows.filter((_, index) => index === offset);
+  return records.filter(
+    (record) =>
+      record.objectId === object.id &&
+      canReadObjectRecord(role, personaId, object, record),
+  );
 }
 
 function ObjectMatrix() {
@@ -120,7 +109,7 @@ function ObjectMatrix() {
             <strong>{objectWorkspaceSummary.seededRecords}</strong>Seeded
             records
           </span>
-          <Pill tone="success">3 per family</Pill>
+          <Pill tone="success">12 per family</Pill>
         </article>
       </section>
 
@@ -298,7 +287,12 @@ function ObjectMatrix() {
 
 function ObjectList({ object }: { object: ObjectContract }) {
   const { persona, objectRecords } = usePrototype();
-  const rows = recordsForRole(persona.role, object.id, objectRecords);
+  const rows = recordsForRole(
+    persona.role,
+    persona.id,
+    object,
+    objectRecords,
+  );
   const canCreate = canCreateObject(persona.role, object);
   return (
     <div className="object-record-workspace">
@@ -495,7 +489,7 @@ function ObjectForm({
     (item) => item.id === recordId && item.objectId === object.id,
   );
   const rowAuthorized = record
-    ? recordsForRole(persona.role, object.id, objectRecords).some(
+    ? recordsForRole(persona.role, persona.id, object, objectRecords).some(
         (item) => item.id === record.id,
       )
     : true;
@@ -714,7 +708,12 @@ function ObjectDetail({
         </NavLink>
       </div>
     );
-  const scopedRecords = recordsForRole(persona.role, object.id, objectRecords);
+  const scopedRecords = recordsForRole(
+    persona.role,
+    persona.id,
+    object,
+    objectRecords,
+  );
   if (!scopedRecords.some((item) => item.id === record.id))
     return (
       <div className="panel access-denied" role="alert">

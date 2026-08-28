@@ -95,6 +95,36 @@ const v18Trace = JSON.parse(
     "utf8",
   ),
 );
+const v19 = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v1.9/readiness.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v19Model = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v1.9/data-model.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v20 = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v2.0/readiness.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v20Routes = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v2.0/routes.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v20Model = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v2.0/data-model-extension.json", import.meta.url),
+    "utf8",
+  ),
+);
 
 assertSeries(
   routes.routes.filter(({ id }) => id.startsWith("UI-CAN")),
@@ -254,6 +284,105 @@ assert(
   v18.formalFindings.open === 18 && v18.production.pilot === "blocked",
   "v1.8 must preserve formal finding and pilot gates",
 );
+assert(
+  v19.version === "1.9.0" && v19.syntheticOnly === true,
+  "v1.9 must identify the canonical contract as synthetic-only",
+);
+assert(
+  v19.counts.navigationFamilies === 92 &&
+    v19.counts.inheritedAtomicConcepts === 111 &&
+    v19.counts.supportingConcepts === 18 &&
+    v19.counts.atomicConcepts === 129,
+  "v1.9 navigation, inherited and supporting concept counts must reconcile",
+);
+assert(
+  v19.counts.atomicFields === 2350 &&
+    v19.counts.businessFields === 673 &&
+    v19.counts.governanceFields === 1677 &&
+    v19.counts.businessFields + v19.counts.governanceFields ===
+      v19.counts.atomicFields,
+  "v1.9 atomic field composition must reconcile",
+);
+assert(
+  v19.counts.relationships === 173 &&
+    v19.counts.invariants === 15 &&
+    v19.counts.transitions === 675 &&
+    v19.counts.domainEvents === 13 &&
+    v19.counts.humanRolePolicies === 13 &&
+    v19.counts.analyticsContracts === 12 &&
+    v19.counts.referenceDatasets === 12 &&
+    v19.counts.dataQualityRules === 15,
+  "v1.9 relationship, lifecycle, event, access, analytical and quality counts must reconcile",
+);
+assert(
+  v19.runtime.canonicalRequisitions === 48 &&
+    v19.runtime.canonicalCandidates === 320 &&
+    v19.runtime.candidateIdentifiers === 640 &&
+    v19.runtime.consentRecords === 320 &&
+    v19.runtime.canonicalApplications === 640 &&
+    v19.runtime.applicationStageEvents === 640 &&
+    v19.runtime.workItems === 640 &&
+    v19.runtime.interviewSessions === 192 &&
+    v19.runtime.interviewerAssignments === 160 &&
+    v19.runtime.analyticsRowsWithCanonicalLineage === 324 &&
+    v19.runtime.supportedFilterCombinations === 600 &&
+    v19.runtime.emptyFilterCombinations === 0,
+  "v1.9 canonical runtime and analytics lineage counts must reconcile",
+);
+assert(
+  v19.counts.physicalSalesforceObjectsApproved === 0 &&
+    v19Model.physicalDisposition.approvedObjectCount === 0 &&
+    v19.production.physicalSchemaApproved === false &&
+    v19.production.pilot === "blocked",
+  "v1.9 must not claim an approved physical schema or pilot",
+);
+assert(
+  v19Model.authoritativeSources.includes(
+    "src/data/canonicalDataModel.ts",
+  ) &&
+    v19Model.authoritativeSources.includes("src/data/canonicalRuntime.ts") &&
+    v19Model.acceptanceEvidence.includes("src/test/dataModel.test.ts"),
+  "v1.9 must identify its executable model, runtime and acceptance evidence",
+);
+assert(
+  v20.version === "2.0.0" && v20.syntheticOnly === true,
+  "v2.0 must identify the full-lifecycle wireframe as synthetic-only",
+);
+assert(
+  v20.counts.personas === 13 &&
+    v20.counts.screenContracts === 24 &&
+    v20.counts.routeDeclarations === 49 &&
+    v20.counts.functionalDestinations === 47 &&
+    v20Routes.screenContracts.length === 24 &&
+    v20Routes.routeDeclarationCount === 49,
+  "v2.0 persona, screen and route counts must reconcile",
+);
+assert(
+  v20.counts.coreAtomicConcepts === 129 &&
+    v20.counts.lifecycleExtensionObjects === 46 &&
+    v20.counts.combinedLogicalConcepts === 175 &&
+    v20.counts.extensionKeyDataPoints === 186 &&
+    v20.counts.extensionLifecycleStates === 238 &&
+    v20Model.extension.objects === 46 &&
+    v20Model.extension.objectNames.length === 46,
+  "v2.0 lifecycle extension counts must reconcile",
+);
+assert(
+  v20.seededWireframe.newHires === 36 &&
+    v20.seededWireframe.onboardingTemplates === 8 &&
+    v20.seededWireframe.onboardingExceptions === 18 &&
+    v20.seededWireframe.provisioningRequests === 72 &&
+    v20.seededWireframe.talentProspects === 120 &&
+    v20.seededWireframe.jobDistributions === 24,
+  "v2.0 onboarding and talent seed counts must reconcile",
+);
+assert(
+  v20.counts.physicalObjectsApproved === 0 &&
+    v20Model.physicalDisposition.approvedObjectCount === 0 &&
+    v20.production.authentication === "not implemented" &&
+    v20.production.pilot === "blocked",
+  "v2.0 must preserve the physical, identity and pilot production gates",
+);
 
 const sourcePaths = await sourceFiles(new URL("../src/", import.meta.url));
 const source = (
@@ -308,10 +437,26 @@ assert(
   "The v1.8 core routes and mutation contracts must be present",
 );
 assert(
-  source.includes("SRC-ANALYTICS-FIXTURE-v1.7"),
-  "The v1.7 analytics source contract must be present",
+  source.includes("SRC-ANALYTICS-CANONICAL-v1.9") &&
+    source.includes("SRC-CANONICAL-DATA-MODEL-v1.9"),
+  "The v1.9 canonical analytics and data-readiness source contracts must be present",
+);
+assert(
+  source.includes("canonicalDataModelSummary") &&
+    source.includes("seededCanonicalCoreStore") &&
+    source.includes("canReadObjectRecord") &&
+    source.includes("sourceEventId") &&
+    source.includes("aggregateVersion"),
+  "The v1.9 canonical model, runtime, relationship access and event lineage must be present",
+);
+assert(
+  source.includes("v2.0 recruitment + onboarding") &&
+    source.includes("lifecycleObjectContracts") &&
+    source.includes("newHireRecords") &&
+    source.includes("talentCampaigns"),
+  "The v2.0 release marker and full-lifecycle data contracts must be visible in the wireframe",
 );
 
 console.log(
-  "Artifact audit passed: 12 inherited executable route artifacts, 14 current screen families, 29 functional patterns, 12 scenarios, 15 transitions, 15 automations, 15 interfaces, 15 invariants, 10 error classes, 18 formally open controlled findings, 92 objects, 368 generic page instances, 2,464 core-plus-generic records, 1,472 fields and 600 populated analytics filter combinations.",
+  "Artifact audit passed: v2.0 inherits the v1.9 canonical recruitment model and adds 46 logical lifecycle/platform objects, 24 screen contracts, 47 functional destinations, dense onboarding/talent fixtures and zero approved physical objects or production connections.",
 );

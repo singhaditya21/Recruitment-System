@@ -101,7 +101,7 @@ describe("HR prototype controls", () => {
     expect(screen.getByLabelText("Job lifecycle state")).toBeDisabled();
     await user.type(screen.getByLabelText("Role summary"), "Structured synthetic quality leadership role.");
     await user.click(screen.getByRole("button", { name: "Save job changes" }));
-    expect(screen.getByText(/Posting v2 · in-memory/)).toBeInTheDocument();
+    expect(screen.getByText(/Posting v2 · Policy pending/)).toBeInTheDocument();
   });
 
   it("creates a candidate identity without silently creating an application", async () => {
@@ -119,7 +119,7 @@ describe("HR prototype controls", () => {
   it("creates an application as an explicit candidate-job junction", async () => {
     const user = userEvent.setup();
     open("#/hr/applications/new");
-    await user.selectOptions(screen.getByLabelText("Application candidate"), "PER-SEED-002");
+    await user.selectOptions(screen.getByLabelText("Application candidate"), "PER-DEMO-001");
     await user.selectOptions(screen.getByLabelText("Application job"), "JOB-DEMO-003");
     await user.click(screen.getByRole("button", { name: "Create application" }));
     expect(screen.getAllByText(/APP-MEM-001/).length).toBeGreaterThan(0);
@@ -378,7 +378,8 @@ describe("HR prototype controls", () => {
     await user.click(
       screen.getByRole("tab", { name: "Object & data contract" }),
     );
-    expect(screen.getAllByText("92/92")).toHaveLength(3);
+    expect(screen.getAllByText("92/92")).toHaveLength(2);
+    expect(screen.getByText("129")).toBeInTheDocument();
     expect(screen.getByText("48/48")).toBeInTheDocument();
     await user.type(
       screen.getByLabelText("Search object and data catalog"),
@@ -389,10 +390,10 @@ describe("HR prototype controls", () => {
       screen.getByRole("heading", { name: "Application" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("table", { name: "Application logical data points" }),
+      screen.getByRole("table", { name: "Application atomic field contracts" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText("Exactly one Candidate and one Requisition"),
+      screen.getByText(/Application\.candidate_id/),
     ).toBeInTheDocument();
   });
 

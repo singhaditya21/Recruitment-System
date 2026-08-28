@@ -1,4 +1,4 @@
-name: v1.8 dense data, core forms and reporting verification
+name: v2.0 full recruitment and onboarding verification
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: v1.8-wireframe-verification-output
+          name: v2.0-wireframe-verification-output
           path: |
             dist
             playwright-report

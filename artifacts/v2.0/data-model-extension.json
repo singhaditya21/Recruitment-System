@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "status": "logical extension proposed; no physical object approved",
+  "coreModel": {
+    "version": "1.9.0",
+    "navigationFamilies": 92,
+    "atomicConcepts": 129,
+    "atomicFields": 2350
+  },
+  "extension": {
+    "objects": 46,
+    "keyDataPoints": 186,
+    "lifecycleStates": 238,
+    "domains": {
+      "Onboarding": 28,
+      "Talent relationship": 7,
+      "Internal mobility": 3,
+      "Platform": 8
+    },
+    "objectNames": [
+      "PreHire", "PendingWorker", "EmployeeConversion", "OnboardingTemplate", "OnboardingTemplateVersion", "OnboardingPlan", "OnboardingStage", "OnboardingTaskDefinition", "OnboardingTask", "NewHirePortalAccount", "PersonalInformationSubmission", "DocumentPackage", "DocumentSubmission", "SignatureEnvelope", "WorkAuthorizationCase", "PayrollElection", "BenefitsEnrollment", "ProvisioningRequest", "EquipmentRequest", "AccountProvisioningRequest", "FacilityAccessRequest", "OrientationSession", "BuddyAssignment", "LearningAssignment", "OnboardingException", "StartDateChange", "NoShowCase", "OnboardingSurveyResponse", "Prospect", "TalentCommunity", "TalentCommunityMembership", "TalentCampaign", "CampaignMembership", "CareerEvent", "JobDistribution", "InternalOpportunity", "EmployeeTalentProfile", "InternalApplication", "IdentityProviderConnection", "ServiceIdentity", "IntegrationConnection", "ApiClient", "DataStoreContract", "EncryptionKeyReference", "AccessReview", "SecurityIncident"
+    ]
+  },
+  "physicalDisposition": {
+    "approvedObjectCount": 0,
+    "salesforceMetadataPresent": false,
+    "databaseSchemaPresent": false,
+    "productionMigrationApproved": false
+  }
+}

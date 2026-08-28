@@ -1,4 +1,16 @@
 import { objectCatalog, type ObjectContract } from "./objectCatalog";
+import { demoPersonas } from "./fixtures";
+
+export type RecordSecurityContext = {
+  organizationId: string;
+  ownerUserId: string;
+  assignedUserIds: string[];
+  assignedRoles: string[];
+  purposeCodes: string[];
+  validFrom: string;
+  validTo: string | null;
+  restrictedEntitlements: string[];
+};
 
 export type ObjectRecord = {
   id: string;
@@ -8,6 +20,7 @@ export type ObjectRecord = {
   owner: string;
   version: number;
   updatedAt: string;
+  security: RecordSecurityContext;
   values: Record<string, string>;
   history: Array<{
     at: string;
@@ -38,6 +51,12 @@ export function objectListPath(object: ObjectContract) {
 }
 
 const owners = ["Alex Rivera", "Priya Nair", "Configuration queue"];
+const personaByRole = new Map<string, (typeof demoPersonas)[number]>(
+  demoPersonas.map((persona) => [persona.role, persona]),
+);
+const personaByName = new Map<string, (typeof demoPersonas)[number]>(
+  demoPersonas.map((persona) => [persona.name, persona]),
+);
 
 export const seededObjectRecords: ObjectRecord[] = objectCatalog.flatMap(
   (object, objectIndex) =>
@@ -46,6 +65,14 @@ export const seededObjectRecords: ObjectRecord[] = objectCatalog.flatMap(
       const id = `${object.id.replace("OBJ", "REC")}-${String(number).padStart(3, "0")}`;
       const state =
         object.states[Math.min(recordIndex, object.states.length - 1)];
+      const owner = owners[(objectIndex + recordIndex) % owners.length];
+      const internalRoles = object.personas.filter(
+        (role) => role !== "Candidate",
+      );
+      const assignedRole =
+        internalRoles[recordIndex % Math.max(1, internalRoles.length)] ??
+        "Auditor";
+      const assignedPersona = personaByRole.get(assignedRole);
       const values = Object.fromEntries(
         object.dataPoints.map((field) => {
           if (field.key === "stable_id") return [field.key, id];
@@ -55,7 +82,7 @@ export const seededObjectRecords: ObjectRecord[] = objectCatalog.flatMap(
           if (field.key === "owner_or_service")
             return [
               field.key,
-              owners[(objectIndex + recordIndex) % owners.length],
+              owner,
             ];
           return [
             field.key,
@@ -70,7 +97,7 @@ export const seededObjectRecords: ObjectRecord[] = objectCatalog.flatMap(
         objectId: object.id,
         label: `${object.name} fixture ${number}`,
         state,
-        owner: owners[(objectIndex + recordIndex) % owners.length],
+        owner,
         version: number,
         updatedAt:
           number === 1
@@ -78,6 +105,21 @@ export const seededObjectRecords: ObjectRecord[] = objectCatalog.flatMap(
             : number === 2
               ? "Yesterday · 4:20 PM"
               : `${Math.min(number, 28)} days ago · generated fixture`,
+        security: {
+          organizationId: "ORG-DEMO-001",
+          ownerUserId:
+            personaByName.get(owner)?.id ?? "USR-CFG-001",
+          assignedUserIds: assignedPersona ? [assignedPersona.id] : [],
+          assignedRoles: [assignedRole],
+          purposeCodes: [...object.dataGroups],
+          validFrom: "2026-08-01T00:00:00.000Z",
+          validTo: null,
+          restrictedEntitlements:
+            object.classification.includes("restricted") ||
+            object.classification.includes("Restricted")
+              ? [object.domain]
+              : [],
+        },
         values,
         history: [
           {
@@ -90,7 +132,7 @@ export const seededObjectRecords: ObjectRecord[] = objectCatalog.flatMap(
             ? [
                 {
                   at: "Aug 27 · 4:20 PM",
-                  actor: owners[(objectIndex + recordIndex) % owners.length],
+                  actor: owner,
                   action: "Updated permitted fields",
                   version: number,
                 },

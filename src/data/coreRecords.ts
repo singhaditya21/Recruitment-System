@@ -263,13 +263,47 @@ const applicationStages = [
   "Withdrawn",
 ];
 
+const analyticsSources = ["Careers site", "Referral", "Agency", "Sourced"];
+const analyticsWindows = [2, 14, 60];
+const candidatesBySource = Object.fromEntries(
+  analyticsSources.map((source) => [
+    source,
+    generatedCandidates.filter((candidate) => candidate.source === source),
+  ]),
+) as Record<string, CandidateRecord[]>;
+
 const generatedApplications: ApplicationRecord[] = Array.from(
   { length: 635 },
   (_, index) => {
     const number = index + 1;
-    const candidate = generatedCandidates[index % generatedCandidates.length];
-    const job = seededJobs[index % seededJobs.length];
-    const stage = applicationStages[index % applicationStages.length];
+    const isAnalyticsCohort = index < 324;
+    const windowIndex = index % analyticsWindows.length;
+    const stageIndex = Math.floor(index / analyticsWindows.length) % applicationStages.length;
+    const sourceIndex =
+      Math.floor(index / (analyticsWindows.length * applicationStages.length)) %
+      analyticsSources.length;
+    const jobIndex = Math.floor(
+      index /
+        (analyticsWindows.length *
+          applicationStages.length *
+          analyticsSources.length),
+    );
+    const source = analyticsSources[sourceIndex];
+    const sourceCandidates = candidatesBySource[source];
+    const candidatePosition =
+      jobIndex *
+        (analyticsWindows.length * applicationStages.length) +
+      stageIndex * analyticsWindows.length +
+      windowIndex;
+    const candidate = isAnalyticsCohort
+      ? sourceCandidates[candidatePosition % sourceCandidates.length]
+      : generatedCandidates[index % generatedCandidates.length];
+    const job = isAnalyticsCohort
+      ? seededJobs[jobIndex]
+      : seededJobs[index % seededJobs.length];
+    const stage = isAnalyticsCohort
+      ? applicationStages[stageIndex]
+      : applicationStages[index % applicationStages.length];
     const tone: Tone =
       stage === "Hired"
         ? "success"
@@ -288,7 +322,9 @@ const generatedApplications: ApplicationRecord[] = Array.from(
       stage,
       owner: owners[index % owners.length],
       stageAge: `${(index % 12) + 1} ${index % 4 === 0 ? "hours" : "days"}`,
-      updated: `${(index % 28) + 1} days ago`,
+      updated: isAnalyticsCohort
+        ? `${analyticsWindows[windowIndex]} days ago`
+        : `${(index % 28) + 1} days ago`,
       tone,
       version: `v${(index % 8) + 1}`,
       nextInternalAction:

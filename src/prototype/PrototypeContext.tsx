@@ -15,17 +15,28 @@ import {
   seededObjectRecords,
   type ObjectRecord,
 } from "../data/objectWorkspace";
+import { objectCatalog } from "../data/objectCatalog";
 import {
-  seededApplications,
-  seededAssignments,
-  seededCandidates,
-  seededInterviews,
-  seededJobs,
   type AssignmentRecord,
   type CandidateRecord,
   type InterviewRecord,
   type JobRecord,
 } from "../data/coreRecords";
+import {
+  createCanonicalApplication,
+  createCanonicalCandidate,
+  createCanonicalJob,
+  projectApplications,
+  projectAssignments,
+  projectCandidates,
+  projectInterviews,
+  projectJobs,
+  seededCanonicalCoreStore,
+  updateCanonicalApplication,
+  updateCanonicalCandidate,
+  updateCanonicalJob,
+  type CanonicalCoreStore,
+} from "../data/canonicalRuntime";
 import type { ApplicationRecord } from "../data/fixtures";
 
 type Scenario = (typeof scenarioArtifact.scenarios)[number];
@@ -47,6 +58,16 @@ type PrototypeContextValue = {
   shareAvailability: (message?: string) => void;
   offerApproved: boolean;
   approveOffer: (message?: string) => void;
+  completedOnboardingTaskIds: string[];
+  completeOnboardingTask: (id: string, message?: string) => void;
+  signedDocumentIds: string[];
+  completeDocument: (id: string, message?: string) => void;
+  resolvedOnboardingExceptionIds: string[];
+  resolveOnboardingException: (id: string, message?: string) => void;
+  completedProvisioningIds: string[];
+  completeProvisioning: (id: string, message?: string) => void;
+  pendingWorkerCorrected: boolean;
+  correctPendingWorker: (message?: string) => void;
   objectRecords: ObjectRecord[];
   createObjectRecord: (
     objectId: string,
@@ -102,19 +123,49 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
   const [scorecardResolved, setScorecardResolved] = useState(false);
   const [availabilitySubmitted, setAvailabilitySubmitted] = useState(false);
   const [offerApproved, setOfferApproved] = useState(false);
+  const [completedOnboardingTaskIds, setCompletedOnboardingTaskIds] = useState([
+    "OBT-DEMO-005",
+  ]);
+  const [signedDocumentIds, setSignedDocumentIds] = useState([
+    "DOC-NH-001",
+    "DOC-NH-006",
+  ]);
+  const [resolvedOnboardingExceptionIds, setResolvedOnboardingExceptionIds] =
+    useState<string[]>([]);
+  const [completedProvisioningIds, setCompletedProvisioningIds] = useState<
+    string[]
+  >([]);
+  const [pendingWorkerCorrected, setPendingWorkerCorrected] = useState(false);
   const [objectRecords, setObjectRecords] =
     useState<ObjectRecord[]>(seededObjectRecords);
-  const [jobRecords, setJobRecords] = useState<JobRecord[]>(seededJobs);
-  const [candidateRecords, setCandidateRecords] =
-    useState<CandidateRecord[]>(seededCandidates);
-  const [applicationRecords, setApplicationRecords] =
-    useState<ApplicationRecord[]>(seededApplications);
+  const [canonicalCoreStore, setCanonicalCoreStore] =
+    useState<CanonicalCoreStore>(seededCanonicalCoreStore);
   const [resetKey, setResetKey] = useState(0);
   const scenario =
     scenarioArtifact.scenarios.find((item) => item.id === scenarioId) ??
     scenarioArtifact.scenarios[0];
   const persona =
     demoPersonas.find((item) => item.id === personaId) ?? demoPersonas[0];
+  const jobRecords = useMemo(
+    () => projectJobs(canonicalCoreStore),
+    [canonicalCoreStore],
+  );
+  const candidateRecords = useMemo(
+    () => projectCandidates(canonicalCoreStore),
+    [canonicalCoreStore],
+  );
+  const applicationRecords = useMemo(
+    () => projectApplications(canonicalCoreStore),
+    [canonicalCoreStore],
+  );
+  const interviewRecords = useMemo(
+    () => projectInterviews(canonicalCoreStore),
+    [canonicalCoreStore],
+  );
+  const assignmentRecords = useMemo(
+    () => projectAssignments(canonicalCoreStore),
+    [canonicalCoreStore],
+  );
   const rawScenarioState = resolveScenarioState(scenario.id);
   const scenarioState =
     scorecardResolved && rawScenarioState.id === "SCN-005"
@@ -165,6 +216,58 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         setOfferApproved(true);
         setNotice(message);
       },
+      completedOnboardingTaskIds,
+      completeOnboardingTask: (
+        id: string,
+        message = `${id} completed in browser memory with synthetic evidence.`,
+      ) => {
+        setCompletedOnboardingTaskIds((current) =>
+          current.includes(id) ? current : [...current, id],
+        );
+        setNotice(message);
+      },
+      signedDocumentIds,
+      completeDocument: (
+        id: string,
+        message = `${id} completed in browser memory. No real signature or document was transmitted.`,
+      ) => {
+        setSignedDocumentIds((current) =>
+          current.includes(id) ? current : [...current, id],
+        );
+        setNotice(message);
+      },
+      resolvedOnboardingExceptionIds,
+      resolveOnboardingException: (
+        id: string,
+        message = `${id} resolved in browser memory with a synthetic audit event.`,
+      ) => {
+        setResolvedOnboardingExceptionIds((current) =>
+          current.includes(id) ? current : [...current, id],
+        );
+        setNotice(message);
+      },
+      completedProvisioningIds,
+      completeProvisioning: (
+        id: string,
+        message = `${id} marked delivered in browser memory. No provider request was sent.`,
+      ) => {
+        setCompletedProvisioningIds((current) =>
+          current.includes(id) ? current : [...current, id],
+        );
+        setNotice(message);
+      },
+      pendingWorkerCorrected,
+      correctPendingWorker: (
+        message = "Pending-worker location corrected and revalidated in browser memory. No HRIS retry was executed.",
+      ) => {
+        setPendingWorkerCorrected(true);
+        setCompletedOnboardingTaskIds((current) =>
+          current.includes("OBT-DEMO-003")
+            ? current
+            : [...current, "OBT-DEMO-003"],
+        );
+        setNotice(message);
+      },
       objectRecords,
       createObjectRecord: (
         objectId: string,
@@ -185,6 +288,18 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
             owner: persona.name,
             version: 1,
             updatedAt: "Now · in-memory fixture",
+            security: {
+              organizationId: "ORG-DEMO-001",
+              ownerUserId: persona.id,
+              assignedUserIds: [persona.id],
+              assignedRoles: [persona.role],
+              purposeCodes:
+                objectCatalog.find((object) => object.id === objectId)
+                  ?.dataGroups ?? [],
+              validFrom: "2026-08-28T00:00:00.000Z",
+              validTo: null,
+              restrictedEntitlements: [],
+            },
             values: {
               ...values,
               stable_id: id,
@@ -246,22 +361,16 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
       jobRecords,
       candidateRecords,
       applicationRecords,
-      interviewRecords: seededInterviews,
-      assignmentRecords: seededAssignments,
+      interviewRecords,
+      assignmentRecords,
       createJob: (input: Omit<JobRecord, "id" | "version" | "posted">) => {
         const sequence =
           jobRecords.filter((record) => record.id.startsWith("JOB-MEM-")).length +
           1;
         const id = `JOB-MEM-${String(sequence).padStart(3, "0")}`;
-        setJobRecords((records) => [
-          {
-            ...input,
-            id,
-            version: "Posting v1 · Policy pending",
-            posted: input.status === "Published" ? "Now · in-memory fixture" : "Not public",
-          },
-          ...records,
-        ]);
+        setCanonicalCoreStore((store) =>
+          createCanonicalJob(store, id, input),
+        );
         setNotice(
           `${id} created as an in-memory ${input.status.toLowerCase()} requisition. No public posting or Salesforce record was created.`,
         );
@@ -271,22 +380,8 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         id: string,
         input: Omit<JobRecord, "id" | "version" | "posted">,
       ) => {
-        setJobRecords((records) =>
-          records.map((record) =>
-            record.id === id
-              ? {
-                  ...record,
-                  ...input,
-                  version: `Posting v${Number(record.version.match(/v(\d+)/)?.[1] ?? 1) + 1} · in-memory`,
-                  posted:
-                    input.status === "Published"
-                      ? record.posted === "Not public"
-                        ? "Now · in-memory fixture"
-                        : record.posted
-                      : "Not public",
-                }
-              : record,
-          ),
+        setCanonicalCoreStore((store) =>
+          updateCanonicalJob(store, id, input),
         );
         setNotice(`${id} updated in memory. Publication still requires the governed preview action.`);
       },
@@ -297,15 +392,9 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
           candidateRecords.filter((record) => record.id.startsWith("PER-MEM-"))
             .length + 1;
         const id = `PER-MEM-${String(sequence).padStart(3, "0")}`;
-        const initials = input.name
-          .split(/\s+/)
-          .slice(0, 2)
-          .map((part) => part[0]?.toUpperCase() ?? "")
-          .join("");
-        setCandidateRecords((records) => [
-          { ...input, id, initials, updated: "Now · in-memory fixture" },
-          ...records,
-        ]);
+        setCanonicalCoreStore((store) =>
+          createCanonicalCandidate(store, id, input),
+        );
         setNotice(
           `${id} candidate identity created in memory. No application was created automatically.`,
         );
@@ -315,21 +404,8 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         id: string,
         input: Omit<CandidateRecord, "id" | "initials" | "updated">,
       ) => {
-        setCandidateRecords((records) =>
-          records.map((record) =>
-            record.id === id
-              ? {
-                  ...record,
-                  ...input,
-                  initials: input.name
-                    .split(/\s+/)
-                    .slice(0, 2)
-                    .map((part) => part[0]?.toUpperCase() ?? "")
-                    .join(""),
-                  updated: "Now · in-memory fixture",
-                }
-              : record,
-          ),
+        setCanonicalCoreStore((store) =>
+          updateCanonicalCandidate(store, id, input),
         );
         setNotice(`${id} candidate identity updated in memory with consent provenance preserved.`);
       },
@@ -340,33 +416,15 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         owner: string;
         nextInternalAction: string;
       }) => {
-        const candidate = candidateRecords.find((record) => record.id === input.candidateId);
-        const job = jobRecords.find((record) => record.id === input.jobId);
-        if (!candidate || !job) throw new Error("Candidate and job are required.");
         const sequence =
           applicationRecords.filter((record) => record.id.startsWith("APP-MEM-"))
             .length + 1;
         const id = `APP-MEM-${String(sequence).padStart(3, "0")}`;
-        setApplicationRecords((records) => [
-          {
-            id,
-            candidateId: candidate.id,
-            candidate: candidate.name,
-            initials: candidate.initials,
-            jobId: job.id,
-            job: job.title,
-            stage: input.stage,
-            owner: input.owner,
-            stageAge: "0 hours",
-            updated: "Now",
-            tone: "info",
-            version: "v1",
-            nextInternalAction: input.nextInternalAction,
-          },
-          ...records,
-        ]);
+        setCanonicalCoreStore((store) =>
+          createCanonicalApplication(store, id, input),
+        );
         setNotice(
-          `${id} linked ${candidate.id} to ${job.id} in memory. The candidate identity and requisition remain separate records.`,
+          `${id} linked ${input.candidateId} to ${input.jobId} through the canonical application junction in memory.`,
         );
         return id;
       },
@@ -380,29 +438,10 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
           nextInternalAction: string;
         },
       ) => {
-        const candidate = candidateRecords.find((record) => record.id === input.candidateId);
-        const job = jobRecords.find((record) => record.id === input.jobId);
-        if (!candidate || !job) throw new Error("Candidate and job are required.");
-        setApplicationRecords((records) =>
-          records.map((record) =>
-            record.id === id
-              ? {
-                  ...record,
-                  candidateId: candidate.id,
-                  candidate: candidate.name,
-                  initials: candidate.initials,
-                  jobId: job.id,
-                  job: job.title,
-                  stage: input.stage,
-                  owner: input.owner,
-                  nextInternalAction: input.nextInternalAction,
-                  updated: "Now",
-                  version: `v${Number(record.version.replace("v", "")) + 1}`,
-                }
-              : record,
-          ),
+        setCanonicalCoreStore((store) =>
+          updateCanonicalApplication(store, id, input),
         );
-        setNotice(`${id} updated in memory; stage and reference history remain synthetic.`);
+        setNotice(`${id} updated in canonical memory; stage changes append an immutable event.`);
       },
       resetKey,
       resetPrototype: () => {
@@ -411,10 +450,13 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         setScorecardResolved(false);
         setAvailabilitySubmitted(false);
         setOfferApproved(false);
+        setCompletedOnboardingTaskIds(["OBT-DEMO-005"]);
+        setSignedDocumentIds(["DOC-NH-001", "DOC-NH-006"]);
+        setResolvedOnboardingExceptionIds([]);
+        setCompletedProvisioningIds([]);
+        setPendingWorkerCorrected(false);
         setObjectRecords(seededObjectRecords);
-        setJobRecords(seededJobs);
-        setCandidateRecords(seededCandidates);
-        setApplicationRecords(seededApplications);
+        setCanonicalCoreStore(seededCanonicalCoreStore);
         setNotice(
           "Prototype reset to the coherent missing-scorecard scenario.",
         );
@@ -428,7 +470,14 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
       jobRecords,
       candidateRecords,
       applicationRecords,
+      interviewRecords,
+      assignmentRecords,
       offerApproved,
+      completedOnboardingTaskIds,
+      signedDocumentIds,
+      resolvedOnboardingExceptionIds,
+      completedProvisioningIds,
+      pendingWorkerCorrected,
       persona,
       personaId,
       resetKey,

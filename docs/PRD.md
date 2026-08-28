@@ -2,24 +2,24 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Draft v1.8 — dense synthetic data and object-specific core creation/editing wireframe contract |
+| Status | Draft v2.0 — full recruitment, talent growth and onboarding wireframe contract |
 | Last updated | August 28, 2026 |
 | Product owner | Aditya Singh |
 | Initial market | San Francisco–based employer hiring in the United States |
 | Primary timezone | America/Los_Angeles |
 | Currency | USD |
-| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; v1.8 is delivered through the protected `main` Pages workflow and verification evidence is recorded in section 22.12 |
+| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; the local v2.0 release candidate is not the deployed release until section 22.16 records the exact Pages commit and successful workflow |
 | Pilot/production candidate deployment | Approved external application host and backend-for-frontend; providers TBD |
 | Pilot/production HR deployment | Native Salesforce Lightning application |
 | Operational system of record | Salesforce custom recruitment application |
-| Implementation state | React/TypeScript/Vite synthetic prototype includes a Lightning-style internal shell, both product surfaces, 14 canonical screen families, 29 functional route patterns, 13 personas, domain-specific List/New/Detail/Edit journeys for jobs/candidate identities/applications, workflow-generation explanations for downstream records, complete reusable List/New/Detail/Edit routes for 92 logical object families (368 page instances), 1,104 seeded generic records, 1,360 dense core records, 1,472 logical field contracts (552 business plus 920 governance/provenance), row/field-aware persona projections, 11 dashboards over 324 separate analytics rows with all 600 supported global-filter combinations populated, and governed saved-report/builder/schedule/delivery/target/restatement previews; Salesforce metadata, approved physical fields/API names, production services/data, BFF/IdP, provider integrations and an approved pilot environment do not exist |
+| Implementation state | React/TypeScript/Vite synthetic prototype inherits the v1.9 canonical recruitment model (92 navigation families, 129 atomic concepts, 2,350 field contracts, 173 relationships, 675 guarded transitions and the normalized recruitment runtime) and adds a v2.0 logical/wireframe extension: 24 screen contracts, 49 declared routes/47 functional destinations, 46 lifecycle objects with 186 object-specific key data points and 238 lifecycle states, 36 new hires, 8 onboarding templates, 18 exceptions, 72 provisioning requests, 120 prospects, 6 campaigns, 24 channel distributions and 8 internal opportunities; every action is browser-memory-only; Salesforce metadata, approved physical fields/API names, production services/data, BFF/IdP, provider integrations and an approved pilot environment do not exist |
 | Pilot contract state | Proposed control envelope in section 7.6; employer, legal, provider, Salesforce, and named-owner decisions remain unapproved until their `OD-##` records close |
-| Full-audit state | [v1.7 remediation audit](AUDIT-v1.7.md) reconciles the current repository; all 18 controlled findings remain formally Open until accountable dated review, even where the synthetic wireframe gap is implemented, and real-candidate work remains blocked |
-| v1.8 change boundary | Public-safe dense-fixture and core-form release: job/candidate/application browser-memory state, deterministic fixtures, route/search/filter/pagination/validation interactions, tests, contracts, documentation, CI/security automation and Pages deployment may change; no deployable Salesforce org metadata, production backend, authentication, provider write, real candidate data, legal approval or pilot authorization is created |
+| Full-audit state | [v2.0 completion audit](AUDIT-v2.0.md) reconciles the expanded wireframe; prior controlled findings remain formally Open until accountable dated review, and the platform control center explicitly retains six production gates |
+| v2.0 change boundary | Public-safe full-lifecycle wireframe release: onboarding, new-hire, talent relationship, job-distribution, internal-mobility and platform-control routes, fixtures, logical contracts, tests, artifacts and documentation may change; proposed physical dispositions and integrations are review inputs only; no deployable Salesforce metadata, production backend, authentication, provider write, real candidate/employee data, legal approval or pilot authorization is created |
 
 ## 1. Executive summary
 
-Recruitment System is an end-to-end applicant tracking system (ATS) for a San Francisco–based company. It gives HR and hiring teams one structured place to create and publish jobs, collect applications, screen candidates, run assessments, schedule interviews, capture evidence-based feedback, make decisions, issue offers, and retain a complete audit trail. Candidates get a clear, accessible experience from job discovery through application status and offer response.
+Recruitment System is an end-to-end recruitment and onboarding platform for a San Francisco–based company. It gives HR and hiring teams one structured place to build talent relationships, create and distribute jobs, collect applications, screen candidates, run assessments, schedule interviews, capture evidence-based feedback, make decisions, issue offers, transition accepted candidates into pre-hires, orchestrate onboarding and provisioning, and retain a complete audit trail. Candidates get a clear, accessible experience from job discovery through application status and offer response; accepted candidates get a separate purpose-limited new-hire experience through day one and the first 30 days.
 
 The first release is a single-company product, not a multi-tenant SaaS platform. It should feel modern, calm, inclusive, and trustworthy. The system must reduce hiring coordination work without turning consequential hiring decisions over to opaque automation.
 
@@ -57,6 +57,12 @@ For pilot and production, Salesforce is the operational recruitment system of re
 - Treat expansion, provider replacement, portability and system retirement as governed product lifecycles with candidate continuity and residual ownership.
 - Treat the PRD as the product contract and keep physical schemas, APIs, UX specifications, security models, test catalogues, and runbooks as versioned companion artifacts referenced by stable IDs.
 - Separate offer acceptance, post-offer contingencies, ready-for-hire, handoff, and completed-hire states.
+- Never mutate a candidate into an employee. Create linked `PreHire`, `PendingWorker` and `EmployeeConversion` records with explicit lineage, reconciliation and cancellation.
+- Pin every onboarding plan to an approved template version; assign independently owned, dependency-aware tasks to the new hire, People Ops, manager, IT and facilities.
+- Keep the new-hire identity audience, session, fields and portal separate from candidate and workforce identity; expire it at validated employee conversion.
+- Treat CRM outreach, campaign membership and talent-community membership as purpose- and consent-scoped relationships with suppression immediately before delivery.
+- Treat job distribution as a posting-version-to-channel delivery ledger; provider publication is never canonical posting truth without reconciliation.
+- Protect internal-mobility confidentiality with explicit visibility and manager-notification milestones.
 - Evaluate versioned jurisdiction rules at posting and regulated-action time; preserve the applied policy snapshot.
 - Disable interview recording/transcription and automated candidate decision support by default; either capability requires a separately approved control package.
 - Use Salesforce External Client Apps for new OAuth integrations; Connected Apps are legacy-only unless an approved exception applies.
@@ -81,7 +87,7 @@ This brief is a review entrypoint, not a substitute for the numbered contract. A
 | What must be configurable? | Only approved versioned content, job plans, bounded stages/mappings, rubrics, queues/calendars and finite rules inside the `CFG-*` authority model | Named configuration/reviewer roles, physical catalog and release evidence |
 | How will value be judged? | Governed adoption, reduced active coordination/scheduling effort, complete evidence, candidate clarity/support, safe operation and a conservative ≥1.5× recurring benefit-to-cost with ≤24-month modeled payback | Employer baseline, finance assumptions and comparable pilot evidence; economics cannot offset failed rights/guardrails |
 | How will exposure grow? | Synthetic rehearsal → nonproduction qualification → one-job limited live cohort → measured multi-job cohort → full bounded pilot; each boundary ends in one `OUT-*` decision | Approved `ART-002/022/023`, role qualification, launch gates and prior-ramp evidence |
-| What exists now? | The v1.8 synthetic React wireframe, current PRD/matrix/contracts, local automated evidence and GitHub Pages deployment workflow | Accountable acceptance and every production Salesforce/BFF/IdP/provider layer remain unproven |
+| What exists now? | The v2.0 synthetic React full-lifecycle wireframe, inherited v1.9 canonical recruitment model/runtime, 46-object lifecycle extension, current PRD/matrices/artifacts, local automated evidence and GitHub Pages deployment workflow | Accountable physical-schema approval and every production Salesforce/BFF/IdP/provider layer remain unproven |
 | What does this PRD approval authorize? | Agreement on the product contract and recorded decisions only | It does not authorize development, procurement, real candidate data, production deployment or pilot launch without their independent gates |
 
 Executive decision requested:
@@ -156,6 +162,39 @@ v1.8 closes the wireframe-level ambiguity around “New job,” “New candidate
 | Do forms enforce persona rules? | Recruiter can create/edit job, candidate and application; Hiring Manager can create/edit job; Recruiting Coordinator may edit application logistics; all other mutations deny safely in the route | The persona switcher is not authentication and cannot prove IdP, sharing, FLS, Apex/BFF or integration authorization |
 
 The dense fixture is generated at runtime from compact deterministic rules. “Heavy” means enough related rows to exercise search, filtering, pagination, role populations and referential-integrity tests without shipping real or realistic personal data. It does not claim production-scale load testing.
+
+### 1.8 v1.9 canonical data-model brief
+
+v1.9 closes the logical/runtime gaps identified after the 92-object audit without pretending that a Salesforce org has been designed or deployed. The authoritative ledgers are [DATA-MODEL-v1.9.md](DATA-MODEL-v1.9.md) and [MATRIX-v1.9.md](MATRIX-v1.9.md).
+
+| Data-model question | v1.9 implemented answer | Boundary still open |
+| --- | --- | --- |
+| Are slash-combined objects one record? | No. All 111 inherited concepts receive independent grains and kinds; 18 missing supporting concepts add submission/stage evidence, hiring-team/access grants, identity review, restricted HR/background/adverse, retention, quality and migration control | Accountable review may consolidate an atomic concept into metadata, an embedded value, an external store or another physical construct |
+| Is the 1,472-field family dictionary the production dictionary? | No. The authoritative atomic dictionary now contains 2,350 contracts: 673 object-specific business fields and 1,677 shared governance/provenance fields across 129 concepts | Salesforce field types/lengths, standard-versus-custom selection, encryption, indexes and migration mappings remain proposed |
+| Are relationships enforceable in the model? | 173 `REL-*` contracts define source/field/target, cardinality, required status, deletion, ownership, time and invariant; 15 `INV-DM-*` rules define application/offer/opening/hire/scorecard/identity/access/audit/analytics truth | Database/Salesforce constraints, transaction services, concurrency/load proof and org-specific delete behavior are not implemented |
+| Is lifecycle a list of labels? | No. 675 `DTR-*` contracts carry source/destination, command, permission, guard, reason, side effects, safe communication, event, idempotency and recovery | Production transition services, Flow/Apex/BFF implementation and provider side effects remain absent |
+| Is runtime data canonical? | Core browser state normalizes requisition/posting, candidate/identifier/consent, application/stage event/work item and session/assignment records; UI names, titles, relative ages and next-action strings are projections | Memory reset remains deliberate; there is no database, server transaction or durable event ledger |
+| Do dashboards use separate business rows? | No. The 324 contract-complete rows now point to canonical Application, ApplicationStageEvent and aggregate version; analytical contracts define late arrival, restatement and security | Production ETL/semantic-layer queries, employer data and reconciliation monitoring remain absent |
+| Is row access random fixture sampling? | No. Generic rows carry organization, owner, user/role assignment, purposes, effective window and restricted entitlements; wrong-organization and expired access deny | Browser evaluation is not authentication, Salesforce sharing/FLS, BFF authorization or security evidence |
+| Is the physical object count now known? | No. Every concept has a proposed target/API name for review, but the approved count is zero and the model explicitly separates navigation, atomic and physical counts | `OD-16/20/21`, `ART-003/006/008/010/018`, org/edition/capacity and accountable architecture review remain required |
+
+### 1.9 v2.0 full recruitment and onboarding brief
+
+v2.0 extends the complete recruitment wireframe through talent relationship management, accepted-candidate transition, onboarding and production-control design. [MATRIX-v2.0.md](MATRIX-v2.0.md) is the authoritative route/persona/object/seed ledger, [DATA-MODEL-v2.0.md](DATA-MODEL-v2.0.md) is the lifecycle extension contract and [AUDIT-v2.0.md](AUDIT-v2.0.md) records what is complete versus still production-blocking.
+
+| Lifecycle question | v2.0 wireframe answer | Boundary that remains open |
+| --- | --- | --- |
+| What happens after offer acceptance? | An accepted application creates a linked `PreHire`; HRIS staging creates a separate `PendingWorker`; a validated, idempotent conversion later links an employee. Candidate, pre-hire, pending-worker and employee identities never collapse into one mutable record | Real HRIS schema, matching, correction, cancellation, legal-name and destination-worker rules require accountable approval and provider testing |
+| How is onboarding configured? | Eight synthetic templates demonstrate stable identity plus immutable versions, population rules, five stages, task definitions, owner selectors, relative dates, dependencies, evidence and assignment simulation | Template approval, migration of active plans, jurisdiction content and owner/service catalogues require production configuration governance |
+| What can a new hire do? | Seven new-hire screens cover home, task list, form/signature task detail, documents, personal-information correction, day-one agenda and private help. Completion updates shared browser memory and never exposes internal evaluation | Production identity, secure form/document storage, e-sign provider, accessibility/usability evidence and legally approved content do not exist |
+| How are documents and restricted values handled? | Version, checksum/evidence, type, due date and retention are visible; restricted form values are separated from manager/operations completion state; the prototype stores no submitted value across refresh | Encryption, key ownership, malware scanning, signed URLs, provider receipts, deletion and legal retention execution require implementation and approval |
+| Who owns downstream readiness? | A provisioning board models 72 manager/IT/facilities requests; an exception register models 18 owned blockers with severity, SLA, safe impact, next action and evidence-based resolution; progress analytics reconciles to 36 seeded new hires | ITSM/IGA/facilities connections, real entitlements/assets, escalation SLOs and on-call ownership remain unimplemented |
+| What expands recruitment before application? | Talent CRM models 120 prospects, eight communities and six campaigns with authority/suppression; distribution models 24 posting-channel deliveries; internal mobility models eight roles/gigs/projects/mentorships with visibility and manager-notification policy | Real sourcing/provider terms, contact authority, communication delivery, employee profile data, mobility policy and works-council/legal approvals remain open |
+| What is the new logical model? | A 46-object extension defines 28 onboarding, seven talent-relationship, three internal-mobility and eight platform-control objects, each with explicit grain, parent, proposed system of record, four key data points and four-or-more lifecycle states | The extension is logical only. The combined 175 logical concepts are not an approved Salesforce/database schema; approved physical-object count remains zero |
+| What production design is visible? | Platform controls show four identity boundaries, six integration contracts, four proposed data stores, server-side authorization layers and six security/operations evidence gates | No IdP, BFF, API gateway, service, datastore, credential, SLO, observability, backup, incident exercise, cutover or rollback evidence exists |
+| How are persona restrictions represented? | Navigation gates 12 internal roles; hiring-manager new-hire rows are relationship-scoped; prospect identities are minimized for privacy/audit views; mutating actions are disabled for read-only or non-owning roles | Browser rendering is not security. Every object/row/field/purpose denial must be reimplemented and proven server-side |
+
+v2.0 changes the product description from “complete ATS wireframe” to “full recruitment and onboarding wireframe.” It does not earn the description “production recruitment and onboarding platform” until the production gates in sections 7, 20 and 22.15 are closed with deployed evidence.
 
 ## 2. Problem statement
 
@@ -2964,14 +3003,15 @@ Research integrity rules:
 
 ### 15.11 v1.2 product surface, persona, data and object matrix
 
-This section is the canonical inventory answer for product review. It distinguishes a contracted screen family from a final page/component, a human persona from a permission or machine identity, a logical data group from an atomic field, and a logical object family from a physical Salesforce object. Counts from different grains must not be added together or presented as implementation sizing.
+This section preserves the v1.2 baseline inventory and counting definitions. Section 15.18 and [MATRIX-v2.0.md](MATRIX-v2.0.md) supersede its current wireframe screen/route counts without changing the distinction between a screen, persona, data group, logical concept and physical object.
 
 #### Canonical totals and counting boundary
 
 | Dimension | Current exact PRD count | Counted unit | Important boundary |
 | --- | ---: | --- | --- |
 | Deployed product surfaces | 2 | External careers/candidate portal; native Salesforce Lightning HR workspace | The public synthetic prototype can demonstrate both, but is not a third production surface |
-| Contracted screen/route families | 12 | 4 candidate `UI-CAN-*` plus 8 internal `UI-HR-*` | This is the only approved exact screen count; one family may later split into several pages, tabs, modals or responsive compositions |
+| v1.2 contracted screen/route families | 12 | 4 candidate `UI-CAN-*` plus 8 internal `UI-HR-*` | Historical v1.2 baseline; superseded for the v2.0 wireframe by the next row |
+| Current v2.0 wireframe screen contracts | 24 | 4 candidate, 13 internal HR/platform and 7 new-hire `UI-*` contracts | 49 route declarations/47 functional destinations are separate route-pattern counts; components/states do not inflate screen count |
 | Atomic production pages/components | Not yet frozen | `ART-003` route, component and state inventory | Section 15.3 lists capability views but does not assign atomic IDs; claiming a larger exact screen count before `ART-003` would be false precision |
 | Human personas/operating roles | 13 | 1 candidate plus 12 internal human personas in section 5 | Machine/service identities, queues, approver pools and permission sets are not additional personas; one person may hold multiple reviewed roles |
 | Core roles in the older compact permission table | 7 | Recruiter, coordinator, hiring manager, interviewer, offer approver, HR configuration administrator and auditor | The six other personas remain governed below and cannot inherit access merely because the compact table omitted a column |
@@ -3186,6 +3226,141 @@ Downstream creation is event/workflow owned:
 4. A list may explain and link to its originating workflow. It must not offer a generic “New” command that bypasses the invariant.
 
 The core seed contract is exactly 48 jobs, 320 candidates, 640 applications, 192 interviews and 160 assignments. IDs are unique within family; every application references an existing candidate and job; every interview references an existing application; every assignment references an existing interview; every seeded candidate email ends in `@example.test`. These are contract tests, not a production migration or performance benchmark.
+
+### 15.17 v1.9 canonical atomic data-model contract
+
+The v1.8 92-family catalogue remains the navigation and reusable-page model. It is no longer the authoritative persistence model. `CON-*`, `AFLD-*`, `REL-*`, `DTR-*`, `INV-DM-*` and `DQ-*` are the v1.9 authoritative logical/runtime contract identifiers.
+
+#### 15.17.1 Atomic concept disposition
+
+Every inherited slash member is expanded. Eighteen supporting concepts are added where the earlier inventory lacked a required independent grain: `HiringTeamMembership`, `PostingChannel`, `ApplicationSubmission`, `ApplicationStageEvent`, `ScorecardResponse`, `ReferenceCheck`, `BackgroundCheck`, `AdverseActionCase`, `RestrictedHRCase`, `RetentionExecution`, `AccessGrant`, `DelegationGrant`, `BreakGlassGrant`, `CandidateIdentifier`, `CandidateDuplicateCase`, `DataQualityIssue`, `SchemaVersion` and `MigrationMapping`.
+
+Each of the resulting 129 concepts declares:
+
+- one grain and organization boundary;
+- one concept kind: entity, child, junction, immutable version, append-only event, derived snapshot, configuration, external reference or read projection;
+- accountable source/owner, classification and retention;
+- object-specific business fields and shared governance fields;
+- state vocabulary and guarded transitions;
+- structured relationships;
+- proposed persistence target/API name; and
+- explicit `Proposed — accountable approval required` status.
+
+An atomic concept is not automatically a physical Salesforce custom object. Physical review must select standard/platform, custom object, custom metadata, external file reference, event/archive, BFF projection or embedded-value implementation.
+
+#### 15.17.2 Atomic field dictionary
+
+Every concept has 13 governance fields—ID, organization, lifecycle, business version, created/updated actor/time, source, classification, retention, legal hold and evidence fingerprint—and at least three object-specific business fields. The generated dictionary contains 673 business plus 1,677 governance/provenance contracts, or 2,350 total.
+
+Every `AFLD-*` defines business meaning, data type, null meaning, required condition, default, allowed values/unit, source/authority/provenance, classification/encryption/masking, read/write roles, validation, retention/hold, history, index/uniqueness intent, reference target, effective dating, proposed physical/API mapping and reporting use. Generic strings are not an acceptable physical implementation for money, date/time, boolean, enum, reference, JSON or hash fields.
+
+#### 15.17.3 Relationship, invariant and transition model
+
+Every persisted tenant concept has a required Organization relationship. Domain relationships define cardinality, optionality, delete behavior, access ownership, effective-time rule and invariant. The 15 cross-object invariants cover application-attempt uniqueness, stage folding, one-active-offer/reservation, Hired proof, scorecard assignment, protected deletion, immutable version pinning, idempotency, human identity review, purpose-bound access, analytics lineage, sensitive-data separation, event/audit completeness and reference vocabulary.
+
+Every concept has a transition contract for its declared lifecycle path. An accepted transition rechecks expected aggregate version, current effective configuration/policy, actor permission, prerequisite evidence and idempotency. Failure cannot leave partial business state. Recoverable side effects reuse the same key; exhausted recovery creates owned work; completed effects are compensated, not erased.
+
+#### 15.17.4 Canonical runtime and projections
+
+The browser-memory source separates:
+
+- Requisition/posting identity and structured compensation/publication facts;
+- Candidate from CandidateIdentifier and Consent;
+- Application from append-only ApplicationStageEvent and RecruitingWorkItem;
+- InterviewSession from InterviewerAssignment.
+
+UI `JobRecord`, `CandidateRecord`, `ApplicationRecord`, `InterviewRecord` and `AssignmentRecord` values are derived projections. Application does not canonically store candidate name, job title, formatted age or next-action text. Create/edit actions mutate the normalized memory store. A stage change appends an event. Duplicate normalized verified email throws a duplicate-review requirement; it never auto-merges.
+
+#### 15.17.5 Authorization contract
+
+All 13 human roles declare approved purposes, record relationships, field entitlements, denied categories, temporal rule, export policy and break-glass treatment. Generic object rows carry explicit organization, owner user, assigned users/roles, purpose codes, validity window and restricted entitlements. Relationship evaluation replaces deterministic role-name hashing. Auditor access is scope/field/time bound; the label `Auditor` is not universal business-field access.
+
+The implementation remains a simulation. Production acceptance requires IdP identity, Salesforce CRUD/FLS/sharing, effective permission-set aggregation, user-mode Apex/BFF enforcement, time-bound grants and negative object/row/field/API tests.
+
+#### 15.17.6 Analytics and quality lineage
+
+The 324 dashboard rows are projections of canonical applications and stage events. Each carries Application ID, source event ID, aggregate version, observed time and restatement version. Eight fact and four dimension contracts define grain, sources, keys, measures, late-arrival behavior, restatement and security.
+
+Fifteen `DQ-*` checks cover primary/composite uniqueness, foreign-key/organization integrity, state reachability, version pinning, temporal/reference validity, provenance, sensitive minimization, idempotency, projection reconciliation, freshness, scale/skew, retention/hold and migration. A blocker failure prevents consequential action and creates `DataQualityIssue` work.
+
+The full readable contract and exact count matrix are [DATA-MODEL-v1.9.md](DATA-MODEL-v1.9.md) and [MATRIX-v1.9.md](MATRIX-v1.9.md). The executable contracts live in `src/data/canonicalDataModel.ts` and `src/data/canonicalRuntime.ts`.
+
+### 15.18 v2.0 recruitment-to-onboarding surface contract
+
+#### 15.18.1 Candidate-to-worker identity and lifecycle
+
+The identity transition is a linked-record process, not a status rename:
+
+1. `OfferResponse.Accepted` plus current offer version, opening reservation and contingency policy emits `PreHireCreationRequested`.
+2. The service reserves one idempotency key over application, offer version and destination organization. Replay returns the original result.
+3. `PreHire` copies only approved onboarding facts and stores source references/fingerprints. Recruiting evaluation, scorecards, restricted cases and free text are excluded.
+4. A purpose-limited `NewHirePortalAccount` binds a separate identity-provider subject and audience. Candidate sessions do not gain onboarding scopes.
+5. Effective template selection uses worker type, employer, country, work location, workplace mode, department, role/security profile and start date. The selected immutable version and explanation are pinned to `OnboardingPlan`.
+6. `PendingWorker` is created only after destination-required facts pass schema/reference validation. Provider rejection creates one owned exception and correction version; replay retains the same business idempotency key.
+7. `EmployeeConversion` occurs only when destination acknowledgement, required tasks/documents, start/readiness policy and opening truth pass. It links the employee identifier and expires the new-hire identity according to policy.
+8. Start-date change, candidate withdrawal, rescinded offer, failed contingency, no-show and duplicate destination worker have explicit cancel/compensate/reconcile paths. No completed provider effect is silently deleted.
+
+#### 15.18.2 Onboarding template, plan and task engine
+
+| Contract | Required data and logic |
+| --- | --- |
+| Template identity | Stable code, name, purpose, owner, current version, allowed populations, status and change authority |
+| Template version | Immutable version, effective window, selection priority, stage graph, task definitions, content/document versions, approval and impact report |
+| Plan | Pre-hire, pinned template version, start date/timezone, plan owner, risk/progress derivation, pause/cancel reason and completion evidence |
+| Stage | Code, sequence/parallel group, relative start/due, entry/exit guard, required/optional status and completion rule |
+| Task definition | Stable task code, owner selector, assignee fallback, candidate/internal visibility, due offset, dependency expression, required evidence, automation and escalation rule |
+| Task instance | Plan/stage/definition, resolved owner, due timestamp/timezone, state, blocker, completion actor/time/evidence, waiver authority and history |
+| Assignment | Selection facts and explanation, generated stages/tasks/requests, collision/duplicate detection, dry run, approval and idempotency |
+| Change control | New version never changes active plans automatically; migration requires affected-plan report, mapping, approval, replay-safe command and rollback |
+
+Task ownership supports new hire, People Ops, hiring manager, buddy, IT, facilities, payroll/benefits, security and an approved service account. A task cannot be “complete” solely because an email was sent; its required evidence contract must pass. A blocked dependency pauses the affected branch, not every independent task. A waiver is a separate human decision with reason, authority, expiry and audit evidence.
+
+#### 15.18.3 New-hire portal, documents and forms
+
+The new-hire portal has seven canonical screen contracts and must expose loading, empty, ready, in-progress, validation error, provider unavailable, expired session, locked account, complete and support-recovery states.
+
+| Screen | Minimum data/actions | Explicit exclusions |
+| --- | --- | --- |
+| Home `UI-NHR-001` | Employer/role/start context, plan progress, next safe task, days to start, privacy/support assurance | Recruiting feedback, other candidates, internal risk reasons |
+| Task list `UI-NHR-002` | New-hire-owned tasks, due/required/status/dependency-safe explanation and continuation | Manager, HRIS, IT/facilities internal work details |
+| Task/form detail `UI-NHR-003` | Versioned prompt/document, accessible review, validation, confirmation, submission receipt and correction | Browser persistence of restricted values; hidden provider submission |
+| Documents `UI-NHR-004` | Document type/version/status/due/retention, secure open, sign/upload/acknowledge and receipt | Raw eligibility/tax values for ordinary People Ops or manager roles |
+| My information `UI-NHR-005` | Transfer-visible personal/contact/address facts, provenance and versioned correction request | Scorecards, disposition rationale, integrity/restricted cases |
+| Day one `UI-NHR-006` | Timezone-safe agenda, owner, location/link availability and calendar preview | Unapproved account credentials or restricted attendee information |
+| Help/privacy `UI-NHR-007` | People Ops, technology, accommodation and privacy routes; case/reference and response expectation | Sending a sensitive request through a general recruiting message thread |
+
+E-signature requires an immutable document hash/version, signer identity/assurance, envelope ID, sent/viewed/signed/declined/voided/expired events, provider receipt, timezone, consent/intent evidence and reconciliation. “Signed” is never inferred from task completion alone. Forms declare jurisdiction, content version, field classification, validation, source/destination, role visibility, correction/rejection state, retention and deletion/legal-hold behavior. Restricted values use a private service; ordinary workflow stores completion and opaque evidence references only.
+
+#### 15.18.4 HRIS, provisioning and exception orchestration
+
+| Flow | Required happy path | Required failure/recovery path |
+| --- | --- | --- |
+| Pending worker | Validate → send → provider accept → reconcile destination ID/version | Reject field/reference/duplicate → owned correction → revalidate → same-key replay; cancel or manual destination reconciliation |
+| Account provisioning | Approved role bundle → manager/security approval where required → IGA request → active/reconciled | Deny, dependency missing, partial entitlement, timeout, duplicate, privileged-access review, revoke on cancellation |
+| Equipment | Approved bundle/address → ITSM request → asset assignment → ship/deliver/confirm | Address correction, inventory delay, lost shipment, start-date change, cancellation/return |
+| Facilities | Effective site/access profile → approval → badge/access ready → activate | Site change, failed identity match, unavailable desk, delayed badge, revoke/suspend |
+| Manager readiness | First-week goals, agenda, buddy, check-ins and learning plan complete | Manager change/absence, overdue task, delegation, escalation and reassignment |
+| Exception | Derive from failed guard/SLA/reconciliation → severity/owner/due/safe impact → evidence-based resolution | Stale/unowned/reopened issue, accepted risk with expiry, escalation and incident linkage |
+
+Every external effect stores interface/schema version, aggregate version, idempotency key, attempt number, request/response fingerprints, provider reference, timestamps, correlation ID, processing state, retry time and reconciliation checkpoint. Raw secrets, credentials and unnecessary restricted payloads never enter the audit event.
+
+#### 15.18.5 Talent CRM, campaigns, distribution and internal mobility
+
+- `Prospect` is a purpose-scoped relationship linked to a reviewed candidate/person identity where permitted; it is not a substitute for Candidate or Application.
+- Talent-community membership declares authority basis, purpose, effective/expiry dates, source, owner and removal/suppression. Importing a list is not outreach authority.
+- Campaign planning requires purpose, approved audience definition, content/locale/version, channel, quiet hours, sender, schedule, capacity/rate limits, approval and stop conditions.
+- Campaign execution snapshots eligibility, rechecks consent/suppression immediately before the effect, retains member-level delivery state, cancels unsent work when paused and reconciles provider callbacks.
+- Job distribution pins one posting version to one channel and stores external ID, publish/expiry/remove state, provider result, spend and last reconciliation. Analytics attributes applications through explicit source events, not a mutable candidate field.
+- Internal opportunities include role, gig, project and mentorship types; employee profile visibility is employee-controlled; eligibility and manager-notification milestones are explicit; retaliation, premature disclosure and biased access are prohibited.
+- Converting a prospect to an applicant creates or links Candidate and creates a separate Application only after an explicit job-specific submission or authorized recruiter action with notice evidence.
+
+#### 15.18.6 Dashboards, measures and persona contracts
+
+Onboarding dashboards operate on plan, task, exception, provisioning and event grains. Minimum measures are active plans, starts in 7/14/30 days, required-task completion, readiness risk, portal activation, document/signature completion, pending-worker acceptance, exception count/age/SLA, provisioning readiness, day-one no-show, 7/30-day completion and experience response/rating. Every ratio declares numerator, denominator, exclusions, as-of time, restatement/version and `N/A` for a zero denominator.
+
+Recruiters/People Ops can assign and operate plans in approved populations. Hiring managers see only effective reports and manager-safe fields. HRIS operators can correct/replay destination records but not recruiting feedback. Configuration admins version templates/rules but do not inherit new-hire private form values. Privacy/legal and auditors receive purpose-limited minimized/read-only evidence. Platform/security users operate connections and incidents without gaining business-content access. Candidate Support receives safe context and support cases, not employee conversion or evaluation details. New hires see only their own portal-scoped data and tasks.
+
+The browser persona switcher demonstrates these contracts but is never enforcement evidence. Production requires object, row, field, purpose, organization and effective-time authorization at the service and source-system layers, including negative API tests and export controls.
 
 ## 16. Analytics and instrumentation
 
@@ -4140,10 +4315,73 @@ Passing v1.8 does not close any production `AUD-*` finding. Dense synthetic fixt
 | Automated local evidence | `pnpm verify` passes artifact audit, TypeScript, 51 unit/component/contract/automated-axe checks and production build; `pnpm test:e2e` passes 42 desktop/mobile Chromium journeys; exact protected-branch CI, CodeQL and Pages runs remain available from the repository workflow history for the release commit |
 | Production boundary | No Salesforce metadata, BFF, IdP, provider integration, authentication, upload, external write, browser persistence, real candidate data or pilot approval is introduced |
 
+### 22.13 Definition of v1.9 canonical data-model acceptance
+
+v1.9 is accepted as a **synthetic logical/runtime data-model release** only when:
+
+1. [MATRIX-v1.9.md](MATRIX-v1.9.md), [DATA-MODEL-v1.9.md](DATA-MODEL-v1.9.md), machine-readable artifacts and executable exports reconcile exactly to 92 navigation families, 111 inherited plus 18 supporting atomic concepts, 2,350 fields, 173 relationships, 15 invariants, 675 transitions, 13 events, 13 role policies, 12 analytics contracts, 12 reference datasets and 15 quality rules.
+2. Every slash-combined family resolves to independently governed concepts with one declared grain, kind, lifecycle, field dictionary and proposed persistence disposition; supporting submission, event, permission, identity-review, quality and migration concepts are not hidden in generic blobs.
+3. Every concept declares at least 13 governance/provenance fields and three object-specific business fields. Each field has an atomic type, null semantics, source/authority/provenance, validation, classification, encryption/masking, role access, retention/hold/history, uniqueness/index intent, relationship target where applicable, reporting use and proposed API mapping.
+4. Every relationship declares endpoints, cardinality, required status, delete behavior, ownership/access inheritance, temporal behavior and an invariant. Cross-object invariant tests cover organization, application attempt, stage fold, offer/opening/hire, scorecard, identity, configuration, integration and privacy truth.
+5. Every concept has an explicit state vocabulary and guarded adjacent transitions carrying command, permission, guard, side effects, communication evaluation, emitted event, idempotency scope and recovery behavior. No UI status string becomes independent canonical truth.
+6. The normalized browser-memory store separates Candidate identifiers and consent, stores Application references rather than duplicate names/job titles, uses stage events and work items as projection sources, uses typed timestamps and monetary minor units, and validates every seeded reference.
+7. UI job/candidate/application/interview/assignment records are projections from the normalized store; supported creates/edits mutate canonical records and stage updates append versioned events. Duplicate verified identity and active candidate/requisition attempt rules fail safely.
+8. Every analytics row references a canonical application, accepted source event, aggregate version, observed timestamp and restatement version. The 600 supported global-filter combinations remain populated without creating a second business population.
+9. Generic row access evaluates organization, explicit owner/user/role assignment and effective dates; restricted entitlement is relationship-gated; auditor access is read-only, scoped and minimized rather than universal. The 13 role policies state purpose, relationship, field entitlement, denial, time, export and break-glass rules.
+10. Reference-data ownership/versioning, quality-rule owner/threshold/remediation, lifecycle/retention/hold behavior, event/audit envelope, late-arrival/restatement handling and scale/index/archive assumptions are represented and tested.
+11. `pnpm verify` and `pnpm test:e2e` pass from the release candidate. The public site may be described as v1.9 only after the deployed marker and exact Pages run are independently verified.
+12. The approved physical Salesforce object and field count remains zero. Proposed standard/custom/metadata/external/archive/read-model dispositions and API names cannot be represented as deployed metadata, approved architecture or pilot evidence.
+
+Passing v1.9 does not close the production blockers. It is a complete logical design and synthetic executable reference, not a production physical schema, access-control system, source of real data, IdP/BFF/provider integration, migration, operational service or legal/pilot approval.
+
+### 22.14 v1.9 release-candidate evidence
+
+| Evidence | Current result |
+| --- | --- |
+| Count and scope ledger | [MATRIX-v1.9.md](MATRIX-v1.9.md), [AUDIT-v1.9.md](AUDIT-v1.9.md), `artifacts/v1.9/readiness.json` and `artifacts/v1.9/data-model.json` bind the exact logical/runtime counts, completion mapping and zero-approved-physical-object boundary |
+| Executable model | `src/data/canonicalDataModel.ts` defines atomic concepts/fields, relationships, invariants, transitions, events, role policies, analytical models, reference data, quality rules and lifecycle/scale contracts |
+| Normalized runtime | `src/data/canonicalRuntime.ts` validates the dense synthetic store and produces every core UI projection; creates/edits retain canonical references and append stage events |
+| Analytics lineage | All 324 analytical cohort rows reference canonical applications, stage events and versions; all 600 supported global-filter combinations remain populated |
+| Authorization evidence | Tests cover organization and effective-time denial, relationship-backed row scope, restricted access and minimized read-only auditor fields; this remains browser-side simulation |
+| Automated local evidence | `pnpm verify` passes the v1.9 artifact audit, TypeScript, 60 unit/component/contract/automated-axe tests and the production build; `pnpm test:e2e` passes 42 desktop/mobile Chromium journeys, including the atomic model studio, core create/edit flows, authorization denial, analytics/report reconciliation and responsive containment |
+| Deployment evidence | Not claimed for v1.9; v1.8 remains the currently evidenced GitHub Pages release until an exact v1.9 workflow/deployment run is verified |
+| Production boundary | No Salesforce metadata, approved physical schema, backend persistence, BFF/IdP, provider integration, real data, load proof, accountable approval or pilot authorization is introduced |
+
+### 22.15 Definition of v2.0 full-lifecycle wireframe acceptance
+
+v2.0 is accepted as a **synthetic full recruitment and onboarding wireframe** only when:
+
+1. [MATRIX-v2.0.md](MATRIX-v2.0.md), [DATA-MODEL-v2.0.md](DATA-MODEL-v2.0.md), [AUDIT-v2.0.md](AUDIT-v2.0.md) and `artifacts/v2.0/*` reconcile to 13 personas, 24 screen contracts, 49 route declarations/47 functional destinations, 46 extension objects, 186 object-specific key data points and 238 lifecycle states.
+2. Accepted-candidate lineage exposes separate Candidate, Application, PreHire, PendingWorker and Employee/Conversion identities, including validation, correction, replay, cancellation and reconciliation states.
+3. Onboarding operations expose list/detail, template/version/stage/task, plan assignment, exception, provisioning and progress-analytics views with explicit owners, due dates, dependencies, evidence and safe actions.
+4. The new-hire portal exposes home, list, form/signature task, document, personal-information correction, day-one and help routes; internal feedback and internal-only work remain absent.
+5. Shared browser memory demonstrates new-hire task/document completion, HRIS correction, exception resolution and provisioning delivery without a network request or durable browser storage.
+6. Talent CRM, community/campaign, channel distribution and internal-mobility views expose authority, suppression, delivery/reconciliation, visibility and manager-notification policy rather than generic contact/list objects.
+7. Hiring-manager onboarding rows are relationship-scoped; privacy/audit prospect views minimize identity; mutation controls deny read-only/non-owning personas. These are explicitly described as UI simulations, not production authorization.
+8. The platform control center exposes candidate/new-hire/workforce/workload identity boundaries, integration contracts, proposed store/recovery boundaries, logical extension objects and six security/operations gates.
+9. Seeded counts reconcile exactly to 36 new hires, 8 templates, 8 flagship tasks, 18 exceptions, 72 provisioning requests, 6 new-hire documents, 120 prospects, 8 communities, 6 campaigns, 24 distributions and 8 internal opportunities.
+10. Automated artifact, TypeScript, unit/component/contract, production-build and repository safety checks pass. Any browser/E2E, accessibility, security or deployment evidence is reported only after it actually runs.
+11. The public site may be described as v2.0 only after the exact release commit is pushed, CI/security/Pages runs succeed and the served asset contains the v2.0 marker.
+12. The approved physical-object count remains zero and production identity, server authorization, persistence, provider integrations, threat/privacy approval, SLO/observability, recovery, cutover/rollback and pilot evidence remain blocking.
+
+### 22.16 v2.0 release-candidate evidence
+
+| Evidence | Current result |
+| --- | --- |
+| Route/screen/seed ledger | [MATRIX-v2.0.md](MATRIX-v2.0.md), `artifacts/v2.0/readiness.json` and `artifacts/v2.0/routes.json` bind 24 screen contracts, 49 declared routes/47 functional destinations and all onboarding/talent seed counts |
+| Logical extension | [DATA-MODEL-v2.0.md](DATA-MODEL-v2.0.md), `src/data/lifecyclePlatform.ts` and `artifacts/v2.0/data-model-extension.json` bind 46 objects, four domains, 186 key data points, 238 states and zero approved physical objects |
+| Executable fixtures | `src/data/onboarding.ts` and `src/data/talentGrowth.ts` generate deterministic new-hire, plan, task, document, exception, provisioning, prospect, community, campaign, distribution and mobility records |
+| Functional surface | Internal onboarding/talent/platform workspaces and the new-hire portal implement route-specific views, seeded forms, cross-route browser-memory completion and bounded failure/recovery previews |
+| Automated local evidence | `pnpm verify` passes the v2.0 artifact audit, TypeScript, 67 unit/component/contract/automated-accessibility tests and the production build; the build emits only the existing bundle-size advisory |
+| Deployment evidence | Not yet claimed for v2.0; the exact GitHub Pages commit and workflow run must be added after successful publication |
+| Production boundary | No real authentication, Salesforce metadata, approved schema, BFF/API, persistent datastore, provider credential/effect, real data, security/legal approval or pilot authorization is introduced |
+
 ## 23. Change log
 
 | Version | Date | Summary |
 | --- | --- | --- |
+| 2.0 | August 28, 2026 | Extended the synthetic product from recruitment through onboarding and talent growth: added 24 total screen contracts and 49 route declarations/47 functional destinations; candidate-to-pre-hire-to-pending-worker-to-employee lineage; onboarding plan/template/version/stage/task, exception, provisioning and progress workspaces; a seven-screen new-hire portal with forms, documents and simulated signatures; HRIS correction/replay; 36 new hires, 8 templates, 18 exceptions and 72 provisioning requests; CRM with 120 prospects, communities/campaigns, 24 job distributions and 8 internal opportunities; identity/integration/persistence/security control views; a 46-object lifecycle extension with 186 key data points and 238 states; persona-scoped/minimized views, tests and artifacts; retained memory-only behavior, zero approved physical objects and every production/legal/security/pilot gate |
+| 1.9 | August 28, 2026 | Replaced navigation-family templates as the data authority with 129 atomic logical concepts, 2,350 typed field contracts, 173 structured relationships, 15 invariants, 675 guarded transitions, 13 domain events, 13 role-security policies, 12 analytics contracts/reference datasets and 15 quality rules; added normalized seeded runtime records and projections, canonical dashboard event/version lineage, relationship/effective-time row access, identity/consent separation, supporting access/duplicate/quality/migration concepts, interactive model-studio detail, machine-readable artifacts and acceptance tests; preserved the 92-family/29-route UI and explicitly retained zero approved physical Salesforce objects and every production/legal/manual/pilot gate |
 | 1.8 | August 28, 2026 | Added dense deterministic core data (48 jobs, 320 candidates, 640 applications, 192 interviews and 160 assignments) and expanded the generic workspace to 12 records per each of 92 families (1,104); added role-scoped search/filter/20-row pagination and empty recovery; implemented object-specific Job, Candidate and Application List/New/Detail/Edit journeys with Draft-only job creation, reserved-domain/duplicate candidate validation, explicit candidate–job application linkage and mutation permission denial; documented workflow-generated interview/scorecard/decision/offer/handoff creation; reconciled 29 functional route patterns in `MATRIX-v1.8`; retained memory-only/public-safe and every production/legal/manual/pilot gate |
 | 1.7 | August 28, 2026 | Implemented the role/data/object/page/reporting remediation release: added `UI-HR-009/010` and reconciled 14 screen families/24 route patterns; instantiated accessible List/New/Detail/Edit routes for 92 logical families (368 pages) with 276 seeded records and object/row/field permission states; replaced the misleading 920-total claim with 552 business plus 920 governance/provenance = 1,472 logical fields; expanded analytics to a 324-row cross-product fixture with 0 empty results across all 600 supported global-filter combinations and N/A zero denominators; reconciled Data Readiness to one object population; added saved reports, builder, drill-through, scheduling, controlled export, delivery audit, targets and restatements; added proposed API/event/Salesforce, security/privacy/operations/pilot scaffolds and repository governance automation; retained every production/legal/manual/pilot gate |
 | 1.6 | August 28, 2026 | Added a bounded synthetic analytics and logical object/data release: implemented 11 persona-filtered dynamic dashboard views with date/job/source/stage filters, reconciled KPI/breakdown/trend/detail views, 18 displayed metric definitions and visible source/grain/freshness/exclusion evidence over 48 deterministic application rows; added an interactive catalogue for all 92 logical object families, 111 expanded concepts, 48 `DAT-*` groups and 920 minimum logical data-point definitions with lifecycle, relationship, command, role, ownership, classification, retention and quality coverage; expanded component/axe/browser/visual evidence; retained 12 canonical screen families and explicit no-auth/no-network/no-persistence/no-physical-Salesforce/no-real-data boundaries |

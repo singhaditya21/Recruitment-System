@@ -16,6 +16,13 @@ import {
   objectCatalogSummary,
   objectDomains,
 } from "../data/objectCatalog";
+import {
+  atomicConcepts,
+  canonicalDataModelSummary,
+  conceptsForFamily,
+  relationshipsForConcept,
+  transitionsForConcept,
+} from "../data/canonicalDataModel";
 import { ExplainPanel, Pill } from "./Common";
 
 export function ObjectDataStudio({
@@ -27,6 +34,7 @@ export function ObjectDataStudio({
   const [domain, setDomain] = useState("all");
   const [lifecycle, setLifecycle] = useState("all");
   const [selectedId, setSelectedId] = useState("OBJ-001");
+  const [selectedConceptId, setSelectedConceptId] = useState("CON-001");
   const visible = useMemo(
     () =>
       objectCatalog.filter((item) => {
@@ -49,6 +57,20 @@ export function ObjectDataStudio({
   }, [selectedId, visible]);
   const selected =
     objectCatalog.find((item) => item.id === selectedId) ?? objectCatalog[0];
+  const familyConcepts = conceptsForFamily(selected.id);
+  useEffect(() => {
+    if (
+      familyConcepts.length &&
+      !familyConcepts.some((concept) => concept.id === selectedConceptId)
+    )
+      setSelectedConceptId(familyConcepts[0].id);
+  }, [familyConcepts, selectedConceptId]);
+  const selectedConcept =
+    atomicConcepts.find((concept) => concept.id === selectedConceptId) ??
+    familyConcepts[0] ??
+    atomicConcepts[0];
+  const conceptRelationships = relationshipsForConcept(selectedConcept.name);
+  const conceptTransitions = transitionsForConcept(selectedConcept.name);
   const coverage = Math.round(
     (objectCatalogSummary.lifecycleClassified / objectCatalogSummary.families) *
       100,
@@ -82,12 +104,12 @@ export function ObjectDataStudio({
         <article>
           <Braces size={20} />
           <span>
-            <strong>{objectCatalogSummary.minimumDataPoints}</strong>Logical
-            data points
+            <strong>{canonicalDataModelSummary.atomicConcepts}</strong>Atomic
+            concepts
           </span>
           <Pill tone="info">
-            {objectCatalogSummary.businessDataPoints} business +{" "}
-            {objectCatalogSummary.governanceDataPoints} governance
+            {canonicalDataModelSummary.inheritedAtomicConcepts} inherited +{" "}
+            {canonicalDataModelSummary.supportingConcepts} supporting
           </Pill>
         </article>
         <article>
@@ -104,13 +126,20 @@ export function ObjectDataStudio({
         <article>
           <KeyRound size={20} />
           <span>
-            <strong>
-              {objectCatalogSummary.commandClassified}/
-              {objectCatalogSummary.families}
-            </strong>
-            Command sets classified
+            <strong>{canonicalDataModelSummary.atomicFields}</strong>Atomic field
+            contracts
           </span>
-          <Pill tone="success">100%</Pill>
+          <Pill tone="info">
+            {canonicalDataModelSummary.businessFields} business
+          </Pill>
+        </article>
+        <article>
+          <ShieldCheck size={20} />
+          <span>
+            <strong>{canonicalDataModelSummary.physicalObjectsApproved}</strong>
+            Physical objects approved
+          </span>
+          <Pill tone="warning">Disposition proposed</Pill>
         </article>
       </section>
 
@@ -211,7 +240,7 @@ export function ObjectDataStudio({
             </div>
             <div className="chip-row">
               <Pill tone="info">{selected.lifecycleType}</Pill>
-              <Pill tone="success">Logical contract v1.7</Pill>
+              <Pill tone="success">Canonical contract v1.9</Pill>
             </div>
           </div>
           <div className="object-fact-grid">
@@ -235,6 +264,55 @@ export function ObjectDataStudio({
 
           <section className="object-subsection">
             <div className="object-subheading">
+              <Database size={17} />
+              <div>
+                <h3>Atomic concepts and physical disposition</h3>
+                <span>
+                  Family navigation is separated from persisted record grain
+                </span>
+              </div>
+            </div>
+            <div className="command-chips">
+              {familyConcepts.map((concept) => (
+                <button
+                  className={
+                    concept.id === selectedConcept.id
+                      ? "primary-button"
+                      : "secondary-button"
+                  }
+                  onClick={() => setSelectedConceptId(concept.id)}
+                  key={concept.id}
+                >
+                  {concept.name}
+                </button>
+              ))}
+            </div>
+            <div className="object-fact-grid">
+              <div>
+                <span>Atomic grain</span>
+                <strong>{selectedConcept.grain}</strong>
+              </div>
+              <div>
+                <span>Concept kind</span>
+                <strong>{selectedConcept.kind}</strong>
+              </div>
+              <div>
+                <span>Proposed persistence</span>
+                <strong>{selectedConcept.persistenceTarget}</strong>
+              </div>
+              <div>
+                <span>Proposed API name</span>
+                <strong>{selectedConcept.proposedApiName}</strong>
+              </div>
+            </div>
+            <p>
+              {selectedConcept.physicalDisposition}.{" "}
+              {selectedConcept.approvalStatus}.
+            </p>
+          </section>
+
+          <section className="object-subsection">
+            <div className="object-subheading">
               <Workflow size={17} />
               <div>
                 <h3>Lifecycle flow</h3>
@@ -244,11 +322,11 @@ export function ObjectDataStudio({
               </div>
             </div>
             <ol className="object-lifecycle">
-              {selected.states.map((state, index) => (
+              {selectedConcept.stateVocabulary.map((state, index) => (
                 <li key={state}>
                   <span>{index + 1}</span>
                   <strong>{state}</strong>
-                  {index < selected.states.length - 1 && (
+                  {index < selectedConcept.stateVocabulary.length - 1 && (
                     <ArrowRight size={15} />
                   )}
                 </li>
@@ -266,10 +344,12 @@ export function ObjectDataStudio({
                 </div>
               </div>
               <ul>
-                {selected.relationships.map((item) => (
-                  <li key={item}>
+                {conceptRelationships.slice(0, 8).map((relationship) => (
+                  <li key={relationship.id}>
                     <CheckCircle2 size={15} />
-                    {item}
+                    {relationship.from}.{relationship.field} →{" "}
+                    {relationship.to} · {relationship.cardinality} ·{" "}
+                    {relationship.deleteBehavior}
                   </li>
                 ))}
               </ul>
@@ -285,8 +365,10 @@ export function ObjectDataStudio({
                 </div>
               </div>
               <div className="command-chips">
-                {selected.commands.map((command) => (
-                  <span key={command}>{command}</span>
+                {conceptTransitions.slice(0, 8).map((transition) => (
+                  <span key={transition.id}>
+                    {transition.from} → {transition.to}
+                  </span>
                 ))}
               </div>
             </section>
@@ -296,18 +378,17 @@ export function ObjectDataStudio({
             <div className="object-subheading">
               <Braces size={17} />
               <div>
-                <h3>Logical business and governance data points</h3>
+                <h3>Atomic business and governance fields</h3>
                 <span>
-                  Six domain-specific business fields plus ten
-                  governance/provenance fields; physical API names remain
-                  unconfirmed
+                  Object-specific business fields plus shared governance,
+                  provenance, security and lifecycle contracts
                 </span>
               </div>
             </div>
             <div
               className="data-point-table"
               role="table"
-              aria-label={`${selected.name} logical data points`}
+              aria-label={`${selectedConcept.name} atomic field contracts`}
             >
               <div role="row" className="data-point-row data-point-head">
                 <span role="columnheader">Field ID</span>
@@ -317,7 +398,7 @@ export function ObjectDataStudio({
                 <span role="columnheader">Source</span>
                 <span role="columnheader">Quality rule</span>
               </div>
-              {selected.dataPoints.map((field) => (
+              {selectedConcept.fields.map((field) => (
                 <div role="row" className="data-point-row" key={field.id}>
                   <code role="cell" data-label="Field ID">
                     {field.id}
@@ -325,11 +406,11 @@ export function ObjectDataStudio({
                   <span role="cell" data-label="Data point">
                     <strong>{field.label}</strong>
                     <small>
-                      {field.key} · {field.category}
+                      {field.key} · {field.category} · {field.provenance}
                     </small>
                   </span>
                   <span role="cell" data-label="Type">
-                    {field.type}
+                    {field.dataType}
                   </span>
                   <span role="cell" data-label="Required">
                     {field.requiredWhen}
@@ -338,7 +419,7 @@ export function ObjectDataStudio({
                     {field.source}
                   </span>
                   <span role="cell" data-label="Quality rule">
-                    {field.qualityRule}
+                    {field.validation}
                   </span>
                 </div>
               ))}
@@ -390,7 +471,7 @@ export function ObjectDataStudio({
             className="secondary-button full-button"
             onClick={() =>
               announce(
-                `${selected.id} logical contract package prepared in memory; no Salesforce metadata or field was created.`,
+                `${selectedConcept.id} canonical contract package prepared in memory; its Salesforce disposition remains proposed and no metadata was deployed.`,
               )
             }
           >
@@ -400,14 +481,14 @@ export function ObjectDataStudio({
       </div>
       <ExplainPanel
         title="Logical coverage, physical gate retained"
-        source="OBJ/LFC/FLD wireframe catalogue · v1.7"
+        source="CON/AFLD/REL/DTR canonical model · v1.9"
       >
-        All 92 logical families have lifecycle, command, relationship,
-        ownership, data-group, six business-field and ten governance-field
-        definitions. The routed Object workspace provides List/New/Detail/Edit
-        journeys. ART-006, OD-16 and OD-20 must still approve Salesforce
-        objects, physical API names, indexes, sharing, encryption and archive
-        design.
+        The 92 navigation families now resolve to 111 inherited atomic concepts
+        plus 18 supporting control concepts. Every atomic concept has a precise
+        grain, object-specific fields, structured relationships, transitions,
+        security metadata, analytics lineage and a proposed persistence
+        disposition. Physical Salesforce deployment and accountable approval
+        remain intentionally separate gates.
       </ExplainPanel>
     </div>
   );

@@ -247,7 +247,7 @@ test("analytics portfolio filters seeded metrics and preserves provenance", asyn
   await expect(
     page.getByRole("heading", { name: "Metric definitions" }),
   ).toBeVisible();
-  await expect(page.getByText("SRC-ANALYTICS-FIXTURE-v1.7")).toBeVisible();
+  await expect(page.getByText("SRC-ANALYTICS-CANONICAL-v1.9")).toBeVisible();
   const overflow = await page.evaluate(
     () =>
       document.documentElement.scrollWidth -
@@ -263,6 +263,7 @@ test("object data studio covers all logical families and data groups", async ({
   await page.getByLabel("View as demo persona").selectOption("USR-CFG-001");
   await page.getByRole("tab", { name: "Object & data contract" }).click();
   await expect(page.getByText("92/92").first()).toBeVisible();
+  await expect(page.getByText("129").first()).toBeVisible();
   await expect(page.getByText("48/48")).toBeVisible();
   await page.getByLabel("Search object and data catalog").fill("OBJ-022");
   await page.getByRole("option", { name: /OBJ-022/ }).click();
@@ -270,7 +271,10 @@ test("object data studio covers all logical families and data groups", async ({
     page.getByRole("heading", { name: "Application" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("table", { name: "Application logical data points" }),
+    page.getByRole("table", { name: "Application atomic field contracts" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: /Candidate Id candidate_id/ }),
   ).toBeVisible();
   const overflow = await page.evaluate(
     () =>
@@ -332,10 +336,10 @@ test("data readiness uses its own reconciled object filters", async ({
     .getByLabel("Data readiness domain filter")
     .selectOption("Candidate, identity and application");
   await expect(page.locator(".analytics-result-count")).toContainText(
-    "object families",
+    "navigation families",
   );
   await expect(
-    page.getByRole("table", { name: "Filtered object readiness detail" }),
+    page.getByRole("table", { name: "Filtered atomic model readiness detail" }),
   ).toContainText("Candidate");
 });
 

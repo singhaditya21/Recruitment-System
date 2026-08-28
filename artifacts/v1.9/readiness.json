@@ -1,0 +1,57 @@
+{
+  "artifact": "ART-015-v1.9-canonical-data-model",
+  "version": "1.9.0",
+  "generatedAt": "2026-08-28T12:00:00.000Z",
+  "syntheticOnly": true,
+  "scope": "Canonical logical data-model, normalized in-memory runtime, relationship-backed authorization simulation and canonical analytics lineage",
+  "counts": {
+    "navigationFamilies": 92,
+    "inheritedAtomicConcepts": 111,
+    "supportingConcepts": 18,
+    "atomicConcepts": 129,
+    "atomicFields": 2350,
+    "governanceFields": 1677,
+    "businessFields": 673,
+    "relationships": 173,
+    "invariants": 15,
+    "transitions": 675,
+    "domainEvents": 13,
+    "humanRolePolicies": 13,
+    "analyticsContracts": 12,
+    "referenceDatasets": 12,
+    "dataQualityRules": 15,
+    "physicalSalesforceObjectsApproved": 0
+  },
+  "runtime": {
+    "canonicalRequisitions": 48,
+    "canonicalCandidates": 320,
+    "candidateIdentifiers": 640,
+    "consentRecords": 320,
+    "canonicalApplications": 640,
+    "applicationStageEvents": 640,
+    "workItems": 640,
+    "interviewSessions": 192,
+    "interviewerAssignments": 160,
+    "analyticsRowsWithCanonicalLineage": 324,
+    "supportedFilterCombinations": 600,
+    "emptyFilterCombinations": 0
+  },
+  "requirements": [
+    "Every inherited slash-combined family resolves to named atomic concepts with independent grain",
+    "Every atomic concept has at least 13 governance fields and three object-specific business fields",
+    "Relationships define source, field, target, cardinality, required status, delete behavior, ownership, temporal rule and invariant",
+    "Every concept exposes an explicit state vocabulary and transition contracts with guards, permissions, side effects, candidate communication, idempotency and recovery",
+    "Canonical application records contain identifiers and business facts; names, titles, stage labels and relative ages are projections",
+    "Every analytics row references a canonical application, source event and aggregate version",
+    "Row access uses organization, owner, assignment, role, purpose and effective-window relationships rather than deterministic sampling",
+    "Physical Salesforce targets and API names remain proposals until accountable approval and metadata implementation"
+  ],
+  "production": {
+    "salesforceMetadata": "not implemented",
+    "physicalSchemaApproved": false,
+    "backendPersistence": "not implemented",
+    "identityProvider": "not implemented",
+    "realDataAuthorized": false,
+    "pilot": "blocked"
+  }
+}

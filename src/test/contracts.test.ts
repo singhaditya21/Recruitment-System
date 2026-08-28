@@ -113,7 +113,7 @@ describe("v1.7 canonical scenario and reporting graph", () => {
       analyticsApplications.every(
         (row) =>
           row.id.startsWith("ANA-APP-") &&
-          row.candidate.startsWith("Synthetic candidate"),
+          row.candidate.startsWith("Synthetic subject"),
       ),
     ).toBe(true);
     expect(

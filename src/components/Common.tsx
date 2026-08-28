@@ -21,7 +21,7 @@ export function PrototypeBanner() {
       <span>
         No real jobs, people, authentication, uploads or external writes.
       </span>
-      <span className="banner-release">v1.8 dense data + core forms</span>
+      <span className="banner-release">v2.0 recruitment + onboarding</span>
     </div>
   );
 }
