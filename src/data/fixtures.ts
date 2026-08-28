@@ -3,8 +3,8 @@ export type Tone = "success" | "warning" | "danger" | "info" | "neutral";
 export const prototypeMeta = {
   employer: "Harbor & Pine Labs",
   candidate: "Maya Chen",
-  release: "v1.5-wireframe",
-  generatedAt: "2026-08-28T09:30:00.000Z",
+  release: "v1.6-wireframe",
+  generatedAt: "2026-08-28T12:00:00.000Z",
   fictional: true,
 } as const;
 
@@ -102,21 +102,21 @@ export const candidateApplications = [
   },
 ] as const;
 
-export type HrScreenKey = "actions" | "job" | "application" | "interview" | "scorecard" | "decision" | "automations" | "governance";
+export type HrScreenKey = "actions" | "analytics" | "job" | "application" | "interview" | "scorecard" | "decision" | "automations" | "governance";
 
 export const personaOperatingModels: Record<string, { screens: HrScreenKey[]; focus: string; queue: string }> = {
-  "USR-REC-001": { screens: ["actions", "job", "application", "interview", "scorecard", "decision"], focus: "Candidate progress and evidence readiness", queue: "Recruiter queue" },
-  "USR-COO-001": { screens: ["actions", "application", "interview"], focus: "Scheduling, messages and candidate wait time", queue: "Coordination queue" },
-  "USR-HM-001": { screens: ["actions", "job", "application", "scorecard", "decision"], focus: "Hiring plan, debrief and human decision", queue: "Hiring manager queue" },
-  "USR-INT-001": { screens: ["actions", "interview", "scorecard"], focus: "Assigned interviews and independent evidence", queue: "My assignments" },
-  "USR-APR-001": { screens: ["actions", "decision"], focus: "Immutable offer approval", queue: "Approval queue" },
-  "USR-SUP-001": { screens: ["actions", "application"], focus: "Candidate-safe support and communications", queue: "Support queue" },
-  "USR-INTG-001": { screens: ["actions", "application", "governance"], focus: "Restricted integrity cases", queue: "Integrity queue" },
-  "USR-CFG-001": { screens: ["actions", "automations", "governance"], focus: "Versioned workflow configuration", queue: "Configuration queue" },
-  "USR-ADM-001": { screens: ["actions", "automations", "governance"], focus: "Platform health and access", queue: "Platform queue" },
-  "USR-PRV-001": { screens: ["actions", "governance"], focus: "Privacy requests and policy gates", queue: "Privacy queue" },
-  "USR-HRI-001": { screens: ["actions", "decision", "automations"], focus: "Handoff reconciliation", queue: "HRIS queue" },
-  "USR-AUD-001": { screens: ["actions", "automations", "governance"], focus: "Read-only evidence and control review", queue: "Audit view" },
+  "USR-REC-001": { screens: ["actions", "analytics", "job", "application", "interview", "scorecard", "decision"], focus: "Candidate progress and evidence readiness", queue: "Recruiter queue" },
+  "USR-COO-001": { screens: ["actions", "analytics", "application", "interview"], focus: "Scheduling, messages and candidate wait time", queue: "Coordination queue" },
+  "USR-HM-001": { screens: ["actions", "analytics", "job", "application", "scorecard", "decision"], focus: "Hiring plan, debrief and human decision", queue: "Hiring manager queue" },
+  "USR-INT-001": { screens: ["actions", "analytics", "interview", "scorecard"], focus: "Assigned interviews and independent evidence", queue: "My assignments" },
+  "USR-APR-001": { screens: ["actions", "analytics", "decision"], focus: "Immutable offer approval", queue: "Approval queue" },
+  "USR-SUP-001": { screens: ["actions", "analytics", "application"], focus: "Candidate-safe support and communications", queue: "Support queue" },
+  "USR-INTG-001": { screens: ["actions", "analytics", "application", "governance"], focus: "Restricted integrity cases", queue: "Integrity queue" },
+  "USR-CFG-001": { screens: ["actions", "analytics", "automations", "governance"], focus: "Versioned workflow configuration", queue: "Configuration queue" },
+  "USR-ADM-001": { screens: ["actions", "analytics", "automations", "governance"], focus: "Platform health and access", queue: "Platform queue" },
+  "USR-PRV-001": { screens: ["actions", "analytics", "governance"], focus: "Privacy requests and policy gates", queue: "Privacy queue" },
+  "USR-HRI-001": { screens: ["actions", "analytics", "decision", "automations"], focus: "Handoff reconciliation", queue: "HRIS queue" },
+  "USR-AUD-001": { screens: ["actions", "analytics", "automations", "governance"], focus: "Read-only evidence and control review", queue: "Audit view" },
 };
 
 export type ApplicationRecord = {

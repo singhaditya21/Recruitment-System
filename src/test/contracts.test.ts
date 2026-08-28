@@ -7,6 +7,8 @@ import scenarios from "../../artifacts/v0.9/scenarios.json";
 import traceability from "../../artifacts/v0.9/traceability.json";
 import accessibility from "../../artifacts/v0.9/content-accessibility.json";
 import { scenarioStates } from "../data/fixtures";
+import { analyticsApplications, dashboardCatalog } from "../data/analytics";
+import { objectCatalog, objectCatalogSummary } from "../data/objectCatalog";
 
 describe("v0.9 executable artifacts", () => {
   it("keeps every screen traced to scenarios, requirements, tests and accessibility", () => {
@@ -36,7 +38,7 @@ describe("v0.9 executable artifacts", () => {
   });
 });
 
-describe("v1.5 canonical scenario graph", () => {
+describe("v1.6 canonical scenario and reporting graph", () => {
   it("defines a coherent projection for every inherited scenario", () => {
     expect(Object.keys(scenarioStates)).toHaveLength(12);
     for (const state of Object.values(scenarioStates)) {
@@ -52,5 +54,18 @@ describe("v1.5 canonical scenario graph", () => {
       }
       if (state.policyBlocked) expect(state.decisionState).toBe("Blocked");
     }
+  });
+
+  it("classifies every logical object family and minimum data point", () => {
+    expect(objectCatalog).toHaveLength(92);
+    expect(objectCatalogSummary).toMatchObject({ families: 92, expandedConcepts: 111, logicalDataGroups: 48, minimumDataPoints: 920, lifecycleClassified: 92, commandClassified: 92, relationshipClassified: 92 });
+    expect(objectCatalog.every((item) => item.states.length >= 4 && item.commands.length >= 5 && item.relationships.length >= 2 && item.dataPoints.length === 10)).toBe(true);
+  });
+
+  it("keeps the analytics snapshot bounded, synthetic and dashboard-complete", () => {
+    expect(analyticsApplications).toHaveLength(48);
+    expect(dashboardCatalog).toHaveLength(11);
+    expect(analyticsApplications.every((row) => row.id.startsWith("ANA-APP-") && row.candidate.startsWith("Synthetic candidate"))).toBe(true);
+    expect(new Set(dashboardCatalog.map((dashboard) => dashboard.id)).size).toBe(dashboardCatalog.length);
   });
 });

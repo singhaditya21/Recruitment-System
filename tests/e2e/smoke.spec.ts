@@ -134,3 +134,29 @@ test("offer approval creates only the allow-listed candidate offer task", async 
   await expect(page.getByRole("button", { name: "Review synthetic offer" })).toBeVisible();
   await expect(page.getByText("Offer ready for review", { exact: true }).first()).toBeVisible();
 });
+
+test("analytics portfolio filters seeded metrics and preserves provenance", async ({ page }) => {
+  await page.goto("/#/hr/analytics");
+  await expect(page.getByRole("heading", { name: "Reporting & analytics", level: 1 })).toBeVisible();
+  await page.getByLabel("Analytics job filter").selectOption("JOB-DEMO-003");
+  await page.getByLabel("Choose analytics dashboard").selectOption("sourcing");
+  await expect(page.getByText("Which approved sources create qualified progress without becoming a ranking signal?")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Metric definitions" })).toBeVisible();
+  await expect(page.getByText("SRC-ANALYTICS-FIXTURE-v1.6")).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test("object data studio covers all logical families and data groups", async ({ page }) => {
+  await page.goto("/#/hr/governance");
+  await page.getByLabel("View as demo persona").selectOption("USR-CFG-001");
+  await page.getByRole("tab", { name: "Object & data contract" }).click();
+  await expect(page.getByText("92/92").first()).toBeVisible();
+  await expect(page.getByText("48/48")).toBeVisible();
+  await page.getByLabel("Search object and data catalog").fill("OBJ-022");
+  await page.getByRole("option", { name: /OBJ-022/ }).click();
+  await expect(page.getByRole("heading", { name: "Application" })).toBeVisible();
+  await expect(page.getByRole("table", { name: "Application minimum logical data points" })).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(overflow).toBeLessThanOrEqual(1);
+});

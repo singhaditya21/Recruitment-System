@@ -7,7 +7,7 @@ export function PrototypeBanner() {
     <div className="prototype-banner" role="status">
       <span><Beaker size={15} aria-hidden="true" /> Synthetic prototype</span>
       <span>No real jobs, people, authentication, uploads or external writes.</span>
-      <span className="banner-release">v1.5 operational wireframe</span>
+      <span className="banner-release">v1.6 dynamic analytics wireframe</span>
     </div>
   );
 }

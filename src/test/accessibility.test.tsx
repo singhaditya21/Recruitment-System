@@ -1,5 +1,6 @@
 import axe from "axe-core";
-import { render } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import App from "../App";
 
@@ -25,5 +26,19 @@ describe("automated WCAG baseline", () => {
 
   it("passes the candidate control-center baseline", async () => {
     await expectNoAxeViolations("#/my-applications/APP-DEMO-001");
+  });
+
+  it("passes the dynamic analytics baseline", async () => {
+    await expectNoAxeViolations("#/hr/analytics");
+  });
+
+  it("passes the object and data contract baseline", async () => {
+    const user = userEvent.setup();
+    window.location.hash = "#/hr/governance";
+    const { container } = render(<App />);
+    await user.selectOptions(screen.getByRole("combobox", { name: "View as demo persona" }), "USR-CFG-001");
+    await user.click(screen.getByRole("tab", { name: "Object & data contract" }));
+    const results = await axe.run(container);
+    expect(results.violations.map(({ id, nodes }) => ({ id, nodes: nodes.length }))).toEqual([]);
   });
 });

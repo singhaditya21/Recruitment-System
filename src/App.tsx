@@ -14,6 +14,7 @@ function PrototypeRoutes() {
       <Route path="/my-applications" element={<CandidatePortal screen="hub" />} />
       <Route path="/my-applications/:id" element={<CandidatePortal screen="hub" />} />
       <Route path="/hr/action-center" element={<HrWorkspace screen="actions" />} />
+      <Route path="/hr/analytics" element={<HrWorkspace screen="analytics" />} />
       <Route path="/hr/jobs" element={<HrWorkspace screen="job" />} />
       <Route path="/hr/jobs/:jobId" element={<HrWorkspace screen="job" />} />
       <Route path="/hr/applications" element={<HrWorkspace screen="application" />} />

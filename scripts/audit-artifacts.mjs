@@ -56,7 +56,7 @@ assertSeries(findings.findings, "AUD", 18);
 const routeIds = new Set(routes.routes.map(({ id }) => id));
 const traceIds = new Set(traceability.rows.map(({ screenId }) => screenId));
 const accessibilityIds = new Set(content.screens.map(({ id }) => id));
-assert(routeIds.size === 12, "Expected 12 unique route contracts");
+assert(routeIds.size === 12, "Expected 12 unique canonical screen-family contracts");
 assert([...routeIds].every((id) => traceIds.has(id)), "Every route must have an ART-001 trace row");
 assert([...routeIds].every((id) => accessibilityIds.has(id)), "Every route must have an ART-021 row");
 
@@ -92,5 +92,8 @@ const forbiddenRuntimePatterns = [
 for (const [pattern, label] of forbiddenRuntimePatterns) assert(!pattern.test(source), `Forbidden prototype capability found: ${label}`);
 assert(source.includes("example.test"), "Synthetic contact values must use the reserved .test domain");
 assert(source.includes("No real jobs"), "A persistent synthetic-data notice is required");
+assert(source.includes("/hr/analytics"), "The v1.6 analytics route must be present");
+assert(source.includes("dashboardCatalog"), "The v1.6 dashboard catalogue must be present");
+assert(source.includes("objectCatalog"), "The v1.6 logical object catalogue must be present");
 
-console.log("Artifact audit passed: 12 routes, 12 scenarios, 15 transitions, 15 automations, 15 interfaces, 15 invariants, 10 error classes, 18 controlled findings.");
+console.log("Artifact audit passed: 12 canonical screen-family contracts, 12 scenarios, 15 transitions, 15 automations, 15 interfaces, 15 invariants, 10 error classes, 18 controlled findings, and v1.6 analytics/object catalogues.");

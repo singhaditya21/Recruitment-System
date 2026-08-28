@@ -166,4 +166,31 @@ describe("HR prototype controls", () => {
     expect(screen.getByRole("button", { name: "Review synthetic offer" })).toBeInTheDocument();
     expect(screen.getByText("Offer ready for review", { selector: ".pill" })).toBeInTheDocument();
   });
+
+  it("filters the persona-aware analytics portfolio and reconciles visible metrics", async () => {
+    const user = userEvent.setup();
+    open("#/hr/analytics");
+    expect(screen.getByRole("heading", { name: "Reporting & analytics", level: 1 })).toBeInTheDocument();
+    expect(screen.getByText("Is the recruiting portfolio moving safely and on time?")).toBeInTheDocument();
+    expect(screen.getByText(/of 48 records/)).toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText("Analytics job filter"), "JOB-DEMO-003");
+    expect(screen.getByText(/of 48 records/)).not.toHaveTextContent("48 of 48");
+    await user.selectOptions(screen.getByLabelText("Choose analytics dashboard"), "sourcing");
+    expect(screen.getByText("Which approved sources create qualified progress without becoming a ranking signal?")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Metric definitions" })).toBeInTheDocument();
+  });
+
+  it("covers every logical object family in the interactive data contract", async () => {
+    const user = userEvent.setup();
+    open("#/hr/governance");
+    await user.selectOptions(screen.getByRole("combobox", { name: "View as demo persona" }), "USR-CFG-001");
+    await user.click(screen.getByRole("tab", { name: "Object & data contract" }));
+    expect(screen.getAllByText("92/92")).toHaveLength(3);
+    expect(screen.getByText("48/48")).toBeInTheDocument();
+    await user.type(screen.getByLabelText("Search object and data catalog"), "OBJ-022");
+    await user.click(screen.getByRole("option", { name: /OBJ-022/ }));
+    expect(screen.getByRole("heading", { name: "Application" })).toBeInTheDocument();
+    expect(screen.getByRole("table", { name: "Application minimum logical data points" })).toBeInTheDocument();
+    expect(screen.getByText("Exactly one Candidate and one Requisition")).toBeInTheDocument();
+  });
 });
