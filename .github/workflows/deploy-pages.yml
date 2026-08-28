@@ -1,4 +1,4 @@
-name: Deploy v2.0 recruitment and onboarding wireframe to Pages
+name: Deploy v2.1 recruitment and onboarding wireframe to Pages
 
 on:
   workflow_dispatch:

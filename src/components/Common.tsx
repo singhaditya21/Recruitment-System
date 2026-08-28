@@ -21,7 +21,7 @@ export function PrototypeBanner() {
       <span>
         No real jobs, people, authentication, uploads or external writes.
       </span>
-      <span className="banner-release">v2.0 recruitment + onboarding</span>
+      <span className="banner-release">v2.1 complete lifecycle wireframe</span>
     </div>
   );
 }

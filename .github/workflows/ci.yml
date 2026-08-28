@@ -1,4 +1,4 @@
-name: v2.0 full recruitment and onboarding verification
+name: v2.1 surface-complete recruitment and onboarding verification
 
 on:
   push:
@@ -29,7 +29,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: v2.0-wireframe-verification-output
+          name: v2.1-wireframe-verification-output
           path: |
             dist
             playwright-report

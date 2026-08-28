@@ -103,6 +103,64 @@ export type NewHireDocument = {
   description: string;
 };
 
+export type LifecycleProgram = {
+  id: string;
+  name: string;
+  journeyType: "New hire" | "Rehire" | "Crossboarding" | "Contingent" | "Intern" | "Relocation" | "Offboarding";
+  population: string;
+  regions: string;
+  status: "Published" | "Draft" | "Retiring";
+  owner: string;
+  templateCount: number;
+  activeParticipants: number;
+  milestones: string[];
+};
+
+export type OnboardingComplianceCase = {
+  id: string;
+  newHireId: string;
+  newHire: string;
+  type: "Work authorization" | "Tax setup" | "Background contingency" | "Policy acknowledgement" | "Benefits eligibility" | "Worker classification";
+  state: "Not started" | "In progress" | "Review required" | "Complete" | "Blocked";
+  owner: string;
+  due: string;
+  visibility: "Restricted HR" | "Completion only" | "Candidate and HR";
+  nextAction: string;
+};
+
+export type OrientationSessionRecord = {
+  id: string;
+  title: string;
+  cohort: string;
+  date: string;
+  facilitator: string;
+  capacity: number;
+  enrolled: number;
+  format: "Virtual" | "Office" | "Hybrid";
+  status: "Planned" | "Confirmed" | "Full" | "Completed";
+};
+
+export type OnboardingCheckIn = {
+  id: string;
+  newHireId: string;
+  newHire: string;
+  milestone: "Day 1" | "Week 1" | "Day 30" | "Day 60" | "Day 90";
+  owner: string;
+  due: string;
+  state: "Planned" | "Ready" | "Complete" | "Overdue";
+  goal: string;
+};
+
+export type NewHireJourneyMilestone = {
+  id: string;
+  phase: string;
+  timing: string;
+  title: string;
+  owner: string;
+  state: "Complete" | "Active" | "Upcoming" | "Blocked";
+  evidence: string;
+};
+
 export const flagshipNewHire: NewHireRecord = {
   id: "NHR-DEMO-001",
   candidateId: "PER-DEMO-001",
@@ -325,6 +383,98 @@ export const newHireDocuments: NewHireDocument[] = [
   { id: "DOC-NH-006", title: "Employee handbook", type: "Read and acknowledge", version: "August 2026", status: "Complete", due: "Complete", retention: "Employment record", description: "Accessible handbook copy with acknowledgement timestamp." },
 ];
 
+export const lifecyclePrograms: LifecycleProgram[] = [
+  { id: "PRG-001", name: "US employee onboarding", journeyType: "New hire", population: "Regular employees", regions: "United States", status: "Published", owner: "People Operations", templateCount: 5, activeParticipants: 29, milestones: ["Offer accepted", "Preboarding", "Day one", "Day 30", "Day 60", "Day 90"] },
+  { id: "PRG-002", name: "Manager onboarding addendum", journeyType: "New hire", population: "New people managers", regions: "Global", status: "Published", owner: "Leadership Development", templateCount: 3, activeParticipants: 8, milestones: ["Manager expectations", "Team listening", "Day 30 plan", "Day 90 review"] },
+  { id: "PRG-003", name: "Employee rehire", journeyType: "Rehire", population: "Eligible former employees", regions: "United States", status: "Published", owner: "People Operations", templateCount: 2, activeParticipants: 4, milestones: ["Prior identity match", "Policy delta", "Access reactivation", "Rehire check-in"] },
+  { id: "PRG-004", name: "Internal role transition", journeyType: "Crossboarding", population: "Employees changing role or manager", regions: "Global", status: "Published", owner: "Talent Mobility", templateCount: 4, activeParticipants: 13, milestones: ["Transition approval", "Knowledge transfer", "Access delta", "30/60/90 goals"] },
+  { id: "PRG-005", name: "Contingent worker activation", journeyType: "Contingent", population: "Approved contractors", regions: "United States", status: "Published", owner: "Contingent Workforce", templateCount: 3, activeParticipants: 11, milestones: ["Classification", "Agreement", "Limited access", "End-date review"] },
+  { id: "PRG-006", name: "Intern cohort experience", journeyType: "Intern", population: "Summer interns", regions: "United States", status: "Draft", owner: "Early Careers", templateCount: 2, activeParticipants: 0, milestones: ["Cohort welcome", "Manager goals", "Buddy", "Final showcase"] },
+  { id: "PRG-007", name: "Location transition", journeyType: "Relocation", population: "Approved relocations", regions: "Configured countries", status: "Draft", owner: "Global Mobility", templateCount: 2, activeParticipants: 0, milestones: ["Policy review", "Tax assessment", "Move", "Location validation"] },
+  { id: "PRG-008", name: "Respectful departure", journeyType: "Offboarding", population: "Employees and contractors", regions: "Global", status: "Retiring", owner: "People Operations", templateCount: 3, activeParticipants: 7, milestones: ["Notice", "Knowledge transfer", "Access removal", "Asset return", "Alumni choice"] },
+];
+
+const complianceTypes: OnboardingComplianceCase["type"][] = [
+  "Work authorization",
+  "Tax setup",
+  "Background contingency",
+  "Policy acknowledgement",
+  "Benefits eligibility",
+  "Worker classification",
+];
+
+export const onboardingComplianceCases: OnboardingComplianceCase[] = Array.from(
+  { length: 24 },
+  (_, index) => {
+    const hire = newHireRecords[(index * 3) % newHireRecords.length];
+    const state: OnboardingComplianceCase["state"] =
+      index % 9 === 0
+        ? "Blocked"
+        : index % 7 === 0
+          ? "Review required"
+          : index % 4 === 0
+            ? "Complete"
+            : index % 2 === 0
+              ? "In progress"
+              : "Not started";
+    return {
+      id: `CMP-DEMO-${String(index + 1).padStart(3, "0")}`,
+      newHireId: hire.id,
+      newHire: hire.name,
+      type: complianceTypes[index % complianceTypes.length],
+      state,
+      owner: index % 3 === 0 ? "Restricted HR queue" : index % 3 === 1 ? "Owen Brooks" : "Priya Nair",
+      due: index < 5 ? "Today" : `Sep ${3 + (index % 14)}`,
+      visibility: index % 3 === 0 ? "Restricted HR" : index % 3 === 1 ? "Completion only" : "Candidate and HR",
+      nextAction: state === "Blocked" ? "Resolve prerequisite before re-opening" : state === "Review required" ? "Authorized human review" : state === "Complete" ? "No action" : "Complete assigned evidence",
+    };
+  },
+);
+
+export const orientationSessions: OrientationSessionRecord[] = Array.from(
+  { length: 16 },
+  (_, index) => ({
+    id: `ORI-DEMO-${String(index + 1).padStart(3, "0")}`,
+    title: index % 4 === 0 ? "Company welcome" : index % 4 === 1 ? "Security and tools" : index % 4 === 2 ? "Benefits introduction" : "Manager essentials",
+    cohort: `September cohort ${Math.floor(index / 4) + 1}`,
+    date: `Sep ${15 + (index % 10)} · ${9 + (index % 4)}:00 ${index % 2 ? "AM" : "PM"} PT`,
+    facilitator: ["Priya Nair", "Ben Carter", "Aisha Rahman", "Marcus Johnson"][index % 4],
+    capacity: [20, 16, 24, 12][index % 4],
+    enrolled: [17, 16, 12, 9][index % 4],
+    format: (["Virtual", "Office", "Hybrid"] as const)[index % 3],
+    status: index % 7 === 0 ? "Full" : index % 5 === 0 ? "Completed" : index % 2 === 0 ? "Confirmed" : "Planned",
+  }),
+);
+
+export const onboardingCheckIns: OnboardingCheckIn[] = Array.from(
+  { length: 48 },
+  (_, index) => {
+    const hire = newHireRecords[index % newHireRecords.length];
+    const milestones: OnboardingCheckIn["milestone"][] = ["Day 1", "Week 1", "Day 30", "Day 60", "Day 90"];
+    return {
+      id: `CHK-DEMO-${String(index + 1).padStart(3, "0")}`,
+      newHireId: hire.id,
+      newHire: hire.name,
+      milestone: milestones[index % milestones.length],
+      owner: index % 2 === 0 ? hire.manager : hire.owner,
+      due: `Sep ${15 + (index % 14)}`,
+      state: index % 11 === 0 ? "Overdue" : index % 4 === 0 ? "Complete" : index % 3 === 0 ? "Ready" : "Planned",
+      goal: index % 3 === 0 ? "Role clarity and first outcomes" : index % 3 === 1 ? "Connection, support and enablement" : "Learning progress and feedback",
+    };
+  },
+);
+
+export const newHireJourneyMilestones: NewHireJourneyMilestone[] = [
+  { id: "JRN-001", phase: "Accepted", timing: "T-30", title: "Offer and identity transition", owner: "People Operations", state: "Complete", evidence: "Accepted offer v4 · pre-hire created" },
+  { id: "JRN-002", phase: "Preboarding", timing: "T-21", title: "Personal details and required forms", owner: "Maya Chen", state: "Active", evidence: "2 of 4 documents complete" },
+  { id: "JRN-003", phase: "Enablement", timing: "T-14", title: "Equipment, accounts and access", owner: "IT + manager", state: "Blocked", evidence: "Waiting for HRIS location correction" },
+  { id: "JRN-004", phase: "Welcome", timing: "Day 1", title: "Orientation and team connection", owner: "Marcus Johnson", state: "Upcoming", evidence: "Agenda published · buddy assigned" },
+  { id: "JRN-005", phase: "Settle", timing: "Week 1", title: "Role clarity and first outcomes", owner: "Marcus Johnson", state: "Upcoming", evidence: "First-week plan v3" },
+  { id: "JRN-006", phase: "Grow", timing: "Day 30", title: "Progress and enablement check-in", owner: "Maya + manager", state: "Upcoming", evidence: "Goal and pulse survey planned" },
+  { id: "JRN-007", phase: "Contribute", timing: "Day 60", title: "Learning and stakeholder feedback", owner: "Maya + buddy", state: "Upcoming", evidence: "Learning path assigned" },
+  { id: "JRN-008", phase: "Thrive", timing: "Day 90", title: "Onboarding close and growth plan", owner: "People Operations", state: "Upcoming", evidence: "Closeout review and experience survey" },
+];
+
 export const onboardingSummary = {
   activeNewHires: newHireRecords.filter((record) => record.stage !== "Complete").length,
   starting14Days: newHireRecords.filter((_, index) => index % 2 === 0).length,
@@ -332,4 +482,8 @@ export const onboardingSummary = {
   openExceptions: onboardingExceptions.length,
   blockedProvisioning: provisioningRequests.filter((request) => request.status === "Blocked").length,
   averageProgress: Math.round(newHireRecords.reduce((sum, record) => sum + record.progress, 0) / newHireRecords.length),
+  programs: lifecyclePrograms.length,
+  complianceCases: onboardingComplianceCases.length,
+  orientationSessions: orientationSessions.length,
+  checkIns: onboardingCheckIns.length,
 };

@@ -7,16 +7,18 @@ import {
   ClipboardCheck,
   FileCheck2,
   FileSignature,
+  Flag,
   Home,
   LockKeyhole,
   MessageCircleQuestion,
   ShieldCheck,
   Sparkles,
+  Target,
   UserRound,
 } from "lucide-react";
 import { useMemo, useState, type FormEvent } from "react";
 import { NavLink, useLocation, useNavigate, useParams } from "react-router-dom";
-import { flagshipNewHire, flagshipOnboardingTasks, newHireDocuments } from "../data/onboarding";
+import { flagshipNewHire, flagshipOnboardingTasks, newHireDocuments, newHireJourneyMilestones } from "../data/onboarding";
 import { usePrototype } from "../prototype/PrototypeContext";
 import { Pill, PrototypeBanner, ScreenId } from "./Common";
 
@@ -26,6 +28,7 @@ const newHireNav = [
   ["/preboarding/documents", "Documents", FileSignature],
   ["/preboarding/profile", "My information", UserRound],
   ["/preboarding/day-one", "Day one", CalendarDays],
+  ["/preboarding/journey", "My journey", Flag],
   ["/preboarding/help", "Help", CircleHelp],
 ] as const;
 
@@ -105,6 +108,12 @@ function DayOneView() {
   return <section className="portal-page"><div className="portal-page-heading simple"><div><ScreenId>UI-NHR-006</ScreenId><span className="eyebrow">Day one</span><h1>Your first-day plan</h1><p>Monday, September 15 · Pacific Time · remote</p></div><button className="secondary-button">Add synthetic calendar</button></div><div className="day-one-layout"><section className="panel day-one-agenda">{agenda.map(([time, title, owner]) => <article key={time}><time>{time}</time><span /><div><h2>{title}</h2><p>{owner}</p></div><Pill tone="info">Video</Pill></article>)}</section><DayOneSidebar /></div></section>;
 }
 
+function JourneyView() {
+  const { announce } = usePrototype();
+  const [pulse, setPulse] = useState<number | null>(null);
+  return <section className="portal-page"><div className="portal-page-heading simple"><div><ScreenId>UI-NHR-008</ScreenId><span className="eyebrow">Your complete journey</span><h1>From accepted offer through day 90</h1><p>Tasks, learning, connections and goals remain visible after the first-day checklist is finished.</p></div><Pill tone="info">8 milestones</Pill></div><section className="journey-timeline panel">{newHireJourneyMilestones.map((milestone, index) => <article className={milestone.state.toLowerCase()} key={milestone.id}><span className="journey-index">{index + 1}</span><div><small>{milestone.timing} · {milestone.phase}</small><h2>{milestone.title}</h2><p>{milestone.evidence}</p><span>{milestone.owner}</span></div><Pill tone={milestone.state === "Complete" ? "success" : milestone.state === "Blocked" ? "warning" : milestone.state === "Active" ? "info" : "neutral"}>{milestone.state}</Pill></article>)}</section><div className="journey-support-grid"><section className="panel"><Target size={23} /><span className="eyebrow">30/60/90 goals</span><h2>Know what success means</h2><ul><li><strong>Day 30:</strong> Understand customers, team practices and the design system.</li><li><strong>Day 60:</strong> Own one scoped product problem with partner feedback.</li><li><strong>Day 90:</strong> Ship a measurable improvement and agree the growth plan.</li></ul><button className="secondary-button" onClick={() => announce("Goal check-in preview opened with private notes and manager-visible commitments separated.")}>Open goal check-in</button></section><section className="panel"><Sparkles size={23} /><span className="eyebrow">Learning and connection</span><h2>Your support network</h2><div className="new-hire-contact"><span>MJ</span><div><strong>Marcus Johnson</strong><small>Manager · weekly check-in</small></div></div><div className="new-hire-contact"><span>AB</span><div><strong>Avery Brooks</strong><small>Buddy · product orientation</small></div></div><div className="new-hire-contact"><span>PN</span><div><strong>Priya Nair</strong><small>People Operations</small></div></div><button className="secondary-button" onClick={() => announce("Learning path opened with three fictional modules and accessibility alternatives.")}>View learning path</button></section><section className="panel journey-pulse"><CircleHelp size={23} /><span className="eyebrow">Private experience pulse</span><h2>How supported do you feel?</h2><p>Your response is separated from hiring evidence and shown to managers only in aggregated, eligible groups.</p><div aria-label="New hire experience rating">{[1, 2, 3, 4, 5].map((rating) => <button aria-label={`Rate support ${rating} of 5`} aria-pressed={pulse === rating} onClick={() => setPulse(rating)} key={rating}>{rating}</button>)}</div>{pulse && <Pill tone="success">Rating {pulse}/5 saved in memory</Pill>}</section></div></section>;
+}
+
 function HelpView() {
   const { announce } = usePrototype();
   return <section className="portal-page"><div className="portal-page-heading simple"><div><ScreenId>UI-NHR-007</ScreenId><span className="eyebrow">Support and privacy</span><h1>How can we help?</h1><p>Questions and accommodation requests use separate, minimum-necessary support routes and never affect hiring decisions.</p></div></div><div className="help-card-grid"><article><MessageCircleQuestion size={24} /><h2>People Operations</h2><p>Start date, forms, policies or onboarding-plan questions.</p><button className="primary-button" onClick={() => announce("People Operations case SUP-DEMO-001 created in browser memory.")}>Start private request</button></article><article><LaptopIcon /><h2>Technology support</h2><p>Portal access, account setup, equipment or accessibility.</p><button className="secondary-button" onClick={() => announce("Technology support case ITS-DEMO-001 created in browser memory.")}>Get technology help</button></article><article><ShieldCheck size={24} /><h2>Privacy and data rights</h2><p>Understand, correct or request access to your pre-hire information.</p><button className="secondary-button" onClick={() => announce("Privacy request preview opened. No request was transmitted.")}>Review your rights</button></article></div></section>;
@@ -121,6 +130,7 @@ export function NewHirePortal() {
     if (location.pathname.endsWith("/documents")) return <DocumentCenter />;
     if (location.pathname.endsWith("/profile")) return <ProfileView />;
     if (location.pathname.endsWith("/day-one")) return <DayOneView />;
+    if (location.pathname.endsWith("/journey")) return <JourneyView />;
     if (location.pathname.endsWith("/help")) return <HelpView />;
     return <HomeView />;
   }, [location.pathname, taskId]);

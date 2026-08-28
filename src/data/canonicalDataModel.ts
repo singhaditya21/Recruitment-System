@@ -1,4 +1,4 @@
-import { objectCatalog, type ObjectContract } from "./objectCatalog";
+import { coreObjectCatalog as objectCatalog, type ObjectContract } from "./objectCatalog";
 
 export type ConceptKind =
   | "Canonical entity"

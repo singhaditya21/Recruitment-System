@@ -1,24 +1,30 @@
 import {
   ArrowRight,
   BriefcaseBusiness,
+  CalendarDays,
   CalendarRange,
   CheckCircle2,
   Filter,
   Globe2,
+  Handshake,
   Mail,
   Search,
   Send,
   Sparkles,
   Target,
+  UserPlus,
   UserSearch,
   UsersRound,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import {
+  agencyPartners,
+  careerEvents,
   internalOpportunities,
   jobDistributions,
   prospects,
+  referralRecords,
   talentCampaigns,
   talentCommunities,
   talentSummary,
@@ -31,13 +37,16 @@ const tabs = [
   ["/hr/talent", "Overview"],
   ["/hr/talent/crm", "Talent CRM"],
   ["/hr/talent/campaigns", "Campaigns"],
+  ["/hr/talent/events", "Events"],
+  ["/hr/talent/referrals", "Referrals"],
+  ["/hr/talent/partners", "Agency partners"],
   ["/hr/talent/distribution", "Job distribution"],
   ["/hr/talent/mobility", "Internal mobility"],
 ] as const;
 
 function TalentTabs({ role }: { role: string }) {
   const allowed = role === "Hiring Manager"
-    ? tabs.filter(([to]) => to === "/hr/talent" || to.endsWith("/distribution") || to.endsWith("/mobility"))
+    ? tabs.filter(([to]) => to === "/hr/talent" || to.endsWith("/referrals") || to.endsWith("/distribution") || to.endsWith("/mobility"))
     : role === "Configuration Admin"
       ? tabs.filter(([to]) => !to.endsWith("/crm"))
       : tabs;
@@ -89,6 +98,24 @@ function MobilityWorkspace({ announce }: { announce: (message: string) => void }
   return <div className="mobility-workspace"><section className="mobility-hero panel"><div><span className="eyebrow">Employee opportunity marketplace</span><h2>Make mobility discoverable without surprising employees.</h2><p>Eligibility, profile visibility and manager-notification milestones are explicit for every role, gig, project and mentorship.</p></div><button className="primary-button" onClick={() => announce("New internal opportunity form opened in preview with visibility and mobility-policy gates.")}>Create opportunity</button></section><div className="table-toolbar"><label><Filter size={15} /><select value={type} onChange={(event) => setType(event.target.value)}><option>All</option><option>Role</option><option>Gig</option><option>Project</option><option>Mentorship</option></select></label><Pill tone="info">{visible.length} opportunities</Pill></div><section className="opportunity-grid">{visible.map((opportunity) => <article key={opportunity.id}><header><span className="opportunity-icon">{opportunity.type === "Role" ? <BriefcaseBusiness size={20} /> : <CalendarRange size={20} />}</span><Pill tone="info">{opportunity.type}</Pill></header><small>{opportunity.id} · {opportunity.department}</small><h2>{opportunity.title}</h2><p>{opportunity.location} · closes {opportunity.closes}</p><div className="skill-row">{opportunity.skills.map((skill) => <span key={skill}>{skill}</span>)}</div><dl><div><dt>Manager</dt><dd>{opportunity.manager}</dd></div><div><dt>Visibility</dt><dd>{opportunity.visibility}</dd></div><div><dt>Applicants</dt><dd>{opportunity.applicants}</dd></div></dl><div className="mobility-policy">{opportunity.mobilityPolicy}</div><button className="secondary-button" onClick={() => announce(`${opportunity.id} preview opened; no employee profile or application was exposed.`)}>Preview employee view</button></article>)}</section></div>;
 }
 
+function EventsWorkspace({ announce }: { announce: (message: string) => void }) {
+  const [status, setStatus] = useState("All");
+  const rows = careerEvents.filter((event) => status === "All" || event.status === status);
+  return <div className="events-workspace"><section className="talent-hero panel"><div><span className="eyebrow">Recruiting events</span><h2>Turn events into governed relationships and measurable outcomes.</h2><p>Landing-page publication, registration, attendance, consent and prospect creation stay independently traceable.</p></div><button className="primary-button" onClick={() => announce("New event form opened in preview with capacity, accessibility, consent and QR registration fields.")}>Create event</button></section><div className="table-toolbar"><label><Filter size={15} /><select value={status} onChange={(event) => setStatus(event.target.value)}><option>All</option><option>Draft</option><option>Published</option><option>Full</option><option>Completed</option><option>Cancelled</option></select></label><Pill tone="info">{rows.length} events</Pill></div><section className="event-grid">{rows.map((event) => <article className="panel" key={event.id}><header><span className="program-icon"><CalendarDays size={20} /></span><Pill tone={event.status === "Completed" ? "success" : event.status === "Full" ? "warning" : event.status === "Draft" ? "neutral" : "info"}>{event.status}</Pill></header><small>{event.id} · {event.format}</small><h2>{event.name}</h2><p>{event.audience} · {event.date}</p><dl><div><dt>Registered</dt><dd>{event.registered}/{event.capacity}</dd></div><div><dt>Attended</dt><dd>{event.attended || "N/A"}</dd></div><div><dt>Prospects</dt><dd>{event.prospectsCreated || "N/A"}</dd></div></dl><span>{event.owner}</span><button className="secondary-button" onClick={() => announce(`${event.id} event detail opened with landing-page, attendee and consent evidence.`)}>Review event</button></article>)}</section></div>;
+}
+
+function ReferralWorkspace({ announce }: { announce: (message: string) => void }) {
+  const { persona } = usePrototype();
+  const [state, setState] = useState("All");
+  const rows = referralRecords.filter((referral) => state === "All" || referral.state === state);
+  const fullIdentity = ["Recruiter", "Recruiting Coordinator", "Privacy & Legal"].includes(persona.role);
+  return <section className="panel lifecycle-table-panel"><div className="panel-heading"><div><h2>Employee referral ledger</h2><span>Referral relationship, candidate permission, conflicts and rewards remain separate.</span></div><button disabled={!fullIdentity} className="primary-button" onClick={() => announce("Referral invitation form opened in preview; the candidate still controls whether an application is created.")}><UserPlus size={15} /> Invite referral</button></div><div className="table-toolbar"><label><Filter size={15} /><select value={state} onChange={(event) => setState(event.target.value)}><option>All</option><option>Invited</option><option>Submitted</option><option>Review</option><option>Converted</option><option>Not selected</option><option>Withdrawn</option></select></label><Pill tone="info">{rows.length} referrals</Pill></div><div className="referral-table" role="table"><div role="row"><span>Referral</span><span>Person and role</span><span>Relationship</span><span>State</span><span>Conflict</span><span>Reward</span></div>{rows.map((referral) => <div role="row" key={referral.id}><span><strong>{referral.id}</strong><small>{referral.submitted}</small></span><span><strong>{fullIdentity ? referral.prospect : `Restricted prospect · ${referral.id}`}</strong><small>{referral.job} · referred by {referral.referrer}</small></span><span>{referral.relationship}</span><span><Pill tone={referral.state === "Converted" ? "success" : referral.state === "Review" ? "warning" : "info"}>{referral.state}</Pill></span><span><Pill tone={referral.conflictCheck === "Review required" ? "warning" : "success"}>{referral.conflictCheck}</Pill></span><span>{referral.rewardState}</span></div>)}</div></section>;
+}
+
+function PartnerWorkspace({ announce }: { announce: (message: string) => void }) {
+  return <div className="partner-workspace"><section className="talent-hero panel"><div><span className="eyebrow">Agency and vendor portal contract</span><h2>Control who may submit, for which jobs and under which agreement.</h2><p>Ownership checks and duplicate prevention occur before an agency submission can become an application.</p></div><button className="primary-button" onClick={() => announce("Agency assignment form opened with job, fee, candidate-ownership and expiration controls.")}><Handshake size={16} /> New assignment</button></section><section className="partner-grid">{agencyPartners.map((partner) => <article className="panel" key={partner.id}><header><span className="program-icon"><Handshake size={20} /></span><Pill tone={partner.agreement === "Active" ? "success" : partner.agreement === "Paused" ? "danger" : "warning"}>{partner.agreement}</Pill></header><small>{partner.id} · {partner.regions}</small><h2>{partner.name}</h2><div className="skill-row">{partner.specialties.map((skill) => <span key={skill}>{skill}</span>)}</div><dl><div><dt>Open assignments</dt><dd>{partner.openAssignments}</dd></div><div><dt>Submissions</dt><dd>{partner.submissions}</dd></div><div><dt>Duplicates stopped</dt><dd>{partner.duplicatesPrevented}</dd></div></dl><span>{partner.owner}</span><button className="secondary-button" onClick={() => announce(`${partner.id} portal preview opened with scoped jobs, submissions, messages and agreement evidence.`)}>Preview partner portal</button></article>)}</section></div>;
+}
+
 export function TalentGrowthWorkspace({ announce }: { announce: (message: string) => void }) {
   const location = useLocation();
   const { persona } = usePrototype();
@@ -97,11 +124,18 @@ export function TalentGrowthWorkspace({ announce }: { announce: (message: string
       ? ["Recruiter", "Recruiting Coordinator", "Privacy & Legal", "Auditor"].includes(persona.role)
       : location.pathname.endsWith("/campaigns")
         ? ["Recruiter", "Recruiting Coordinator", "Configuration Admin", "Privacy & Legal", "Auditor"].includes(persona.role)
+        : location.pathname.endsWith("/referrals")
+          ? ["Recruiter", "Recruiting Coordinator", "Hiring Manager", "Privacy & Legal", "Auditor"].includes(persona.role)
+          : location.pathname.endsWith("/partners")
+            ? ["Recruiter", "Recruiting Coordinator", "Configuration Admin", "Privacy & Legal", "Auditor"].includes(persona.role)
         : true;
   let view: React.ReactNode;
   if (!routePermission) view = <section className="panel access-denied"><Target size={28} /><div><h2>Talent data is outside this role's scope</h2><p>{persona.role} may use the allowed talent views in the navigation without receiving prospect identities or campaign membership.</p></div><NavLink className="primary-button" to="/hr/talent">Return to talent overview</NavLink></section>;
   else if (location.pathname.endsWith("/crm")) view = <CrmWorkspace announce={announce} />;
   else if (location.pathname.endsWith("/campaigns")) view = <CampaignWorkspace announce={announce} />;
+  else if (location.pathname.endsWith("/events")) view = <EventsWorkspace announce={announce} />;
+  else if (location.pathname.endsWith("/referrals")) view = <ReferralWorkspace announce={announce} />;
+  else if (location.pathname.endsWith("/partners")) view = <PartnerWorkspace announce={announce} />;
   else if (location.pathname.endsWith("/distribution")) view = <DistributionWorkspace announce={announce} />;
   else if (location.pathname.endsWith("/mobility")) view = <MobilityWorkspace announce={announce} />;
   else view = <Overview />;

@@ -1,0 +1,71 @@
+{
+  "version": "2.1.0",
+  "releaseName": "Surface-complete recruitment and onboarding wireframe",
+  "syntheticOnly": true,
+  "generatedAt": "2026-08-28T16:30:00+05:30",
+  "surfaces": [
+    "Candidate careers, application, interview and offer center",
+    "Internal recruitment, talent relationship and lifecycle operations",
+    "New-hire preboarding and through-day-90 journey"
+  ],
+  "counts": {
+    "personas": 13,
+    "screenContracts": 25,
+    "routeDeclarations": 53,
+    "functionalDestinations": 51,
+    "redirectRoutes": 2,
+    "coreNavigationFamilies": 92,
+    "lifecycleExtensionFamilies": 46,
+    "combinedRoutedObjectFamilies": 138,
+    "routedObjectPageInstances": 552,
+    "seededObjectRecords": 1656,
+    "workspaceFieldContracts": 2208,
+    "coreAtomicConcepts": 129,
+    "lifecycleExtensionObjects": 46,
+    "combinedLogicalConcepts": 175,
+    "extensionKeyDataPoints": 186,
+    "extensionLifecycleStates": 238,
+    "physicalObjectsApproved": 0
+  },
+  "seededWireframe": {
+    "newHires": 36,
+    "onboardingTemplates": 8,
+    "lifecyclePrograms": 8,
+    "flagshipPlanTasks": 8,
+    "onboardingExceptions": 18,
+    "provisioningRequests": 72,
+    "complianceCases": 24,
+    "orientationSessions": 16,
+    "onboardingCheckIns": 48,
+    "newHireDocuments": 6,
+    "newHireJourneyMilestones": 8,
+    "talentProspects": 120,
+    "talentCommunities": 8,
+    "talentCampaigns": 6,
+    "careerEvents": 12,
+    "referrals": 24,
+    "agencyPartners": 8,
+    "jobDistributions": 24,
+    "internalOpportunities": 8
+  },
+  "implementedWireframeCapabilities": [
+    "list, new, detail and edit page contracts for every core and lifecycle family",
+    "candidate interview center, reschedule/support path and version-bound offer response",
+    "new-hire journey through day 90 with goals, learning, contacts and experience pulse",
+    "new-hire, rehire, crossboarding, contingent, intern, relocation and offboarding program library",
+    "forms, work authorization, tax, background-contingency, benefits and classification status ledger",
+    "orientation cohorts, manager check-ins and 30/60/90-day operating loop",
+    "recruiting events, employee referrals and agency partner workspaces",
+    "inherited recruitment, onboarding, CRM, distribution, mobility, analytics and platform controls"
+  ],
+  "production": {
+    "authentication": "not implemented",
+    "serverAuthorization": "not implemented",
+    "persistence": "browser memory only",
+    "integrations": "synthetic contracts only",
+    "physicalSchemaApproved": false,
+    "securityApproval": "not obtained",
+    "privacyLegalApproval": "not obtained",
+    "pilot": "blocked"
+  }
+}

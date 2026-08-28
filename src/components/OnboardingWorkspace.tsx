@@ -3,11 +3,15 @@ import {
   ArrowRight,
   BarChart3,
   Building2,
+  CalendarRange,
   CheckCircle2,
   ClipboardCheck,
   Clock3,
+  FileCheck2,
   FileSignature,
   Filter,
+  GraduationCap,
+  HeartHandshake,
   Laptop,
   Link2,
   RefreshCcw,
@@ -23,11 +27,15 @@ import { NavLink, useLocation, useParams } from "react-router-dom";
 import {
   flagshipNewHire,
   flagshipOnboardingTasks,
+  lifecyclePrograms,
   newHireRecords,
+  onboardingCheckIns,
+  onboardingComplianceCases,
   onboardingExceptions,
   onboardingIdentityChain,
   onboardingSummary,
   onboardingTemplates,
+  orientationSessions,
   provisioningRequests,
   type NewHireRecord,
 } from "../data/onboarding";
@@ -36,10 +44,13 @@ import { Pill } from "./Common";
 
 const onboardingTabs = [
   ["/hr/onboarding", "Overview"],
+  ["/hr/onboarding/programs", "Programs"],
   ["/hr/onboarding/new-hires", "New hires"],
   ["/hr/onboarding/templates", "Templates"],
+  ["/hr/onboarding/compliance", "Forms & compliance"],
   ["/hr/onboarding/exceptions", "Exceptions"],
   ["/hr/onboarding/provisioning", "Provisioning"],
+  ["/hr/onboarding/experience", "Orientation & check-ins"],
   ["/hr/onboarding/analytics", "Progress analytics"],
 ] as const;
 
@@ -222,6 +233,33 @@ function ProvisioningWorkspace() {
   return <div className="provisioning-workspace"><section className="onboarding-metrics"><article><Laptop size={19} /><span><strong>{provisioningRequests.filter((r) => r.function === "IT").length}</strong>IT requests</span></article><article><Building2 size={19} /><span><strong>{provisioningRequests.filter((r) => r.function === "Facilities").length}</strong>Facilities</span></article><article><UserRoundCheck size={19} /><span><strong>{provisioningRequests.filter((r) => r.function === "Manager").length}</strong>Manager-owned</span></article><article><AlertTriangle size={19} /><span><strong>{onboardingSummary.blockedProvisioning}</strong>Blocked</span></article></section><div className="table-toolbar"><label><Filter size={15} /><select value={fn} onChange={(event) => setFn(event.target.value)}><option>All</option><option>IT</option><option>Facilities</option><option>Manager</option></select></label><Pill tone="info">{rows.length} requests</Pill></div><section className="provisioning-board">{statuses.map((status) => <div key={status}><header><strong>{status}</strong><span>{rows.filter((request) => (completedProvisioningIds.includes(request.id) ? "Delivered" : request.status) === status).length}</span></header>{rows.filter((request) => (completedProvisioningIds.includes(request.id) ? "Delivered" : request.status) === status).slice(0, 8).map((request) => <article key={request.id}><small>{request.id} · {request.function}</small><h3>{request.item}</h3><NavLink to={`/hr/onboarding/new-hires/${request.newHireId}`}>{request.newHire}</NavLink><p>{request.owner} · due {request.due}</p>{request.status === "Blocked" && <Pill tone="danger">{request.dependency}</Pill>}{status === "Ready" && <button disabled={!canDeliver} className="text-button" onClick={() => completeProvisioning(request.id)}>Mark delivered</button>}</article>)}</div>)}</section></div>;
 }
 
+function ProgramWorkspace() {
+  const { announce, persona } = usePrototype();
+  const [type, setType] = useState("All");
+  const [builderOpen, setBuilderOpen] = useState(false);
+  const canConfigure = persona.role === "Configuration Admin";
+  const rows = lifecyclePrograms.filter((program) => type === "All" || program.journeyType === type);
+  return <div className="program-workspace"><section className="panel program-hero"><div><span className="eyebrow">Lifecycle program library</span><h2>Design for every worker transition—not only first-time hires.</h2><p>Programs bind population rules, approved templates, milestone timing, owners and transition-specific exception behavior.</p></div><button disabled={!canConfigure} className="primary-button" onClick={() => setBuilderOpen((open) => !open)}>New lifecycle program</button></section>
+    {builderOpen && <form className="panel inline-create-form" onSubmit={(event) => { event.preventDefault(); setBuilderOpen(false); announce("Draft lifecycle program PRG-MEM-001 created in browser memory with a version-pinned milestone preview."); }}><div><span className="eyebrow">Program builder</span><h2>Define population and journey</h2></div><label>Program name<input defaultValue="US employee onboarding · Product" /></label><label>Journey type<select defaultValue="New hire"><option>New hire</option><option>Rehire</option><option>Crossboarding</option><option>Contingent</option><option>Intern</option><option>Relocation</option><option>Offboarding</option></select></label><label>Population rule<input defaultValue="US · regular employee · Product" /></label><label>Effective template<select><option>US employee onboarding v5</option><option>Manager onboarding addendum v3</option></select></label><div className="inline-form-summary"><strong>Preview outcome</strong><span>6 milestones · 18 tasks · 5 accountable teams · 0 writes</span></div><div className="detail-action-strip"><button className="primary-button" type="submit">Save draft program</button><button className="secondary-button" type="button" onClick={() => setBuilderOpen(false)}>Cancel</button></div></form>}
+    <div className="table-toolbar"><label><Filter size={15} /><select value={type} onChange={(event) => setType(event.target.value)}><option>All</option>{[...new Set(lifecyclePrograms.map((program) => program.journeyType))].map((item) => <option key={item}>{item}</option>)}</select></label><Pill tone="info">{rows.length} programs</Pill></div>
+    <section className="program-grid">{rows.map((program) => <article className="panel" key={program.id}><header><span className="program-icon"><Workflow size={20} /></span><Pill tone={program.status === "Published" ? "success" : program.status === "Draft" ? "info" : "warning"}>{program.status}</Pill></header><small>{program.id} · {program.journeyType}</small><h2>{program.name}</h2><p>{program.population} · {program.regions}</p><dl><div><dt>Owner</dt><dd>{program.owner}</dd></div><div><dt>Templates</dt><dd>{program.templateCount}</dd></div><div><dt>Active</dt><dd>{program.activeParticipants}</dd></div></dl><div className="milestone-chip-row">{program.milestones.map((milestone) => <span key={milestone}>{milestone}</span>)}</div><button className="secondary-button" onClick={() => announce(`${program.id} program detail opened with selection, version and migration rules.`)}>Review program contract</button></article>)}</section></div>;
+}
+
+function ComplianceWorkspace() {
+  const { persona, announce } = usePrototype();
+  const [state, setState] = useState("All");
+  const canReview = ["HRIS Operator", "Privacy & Legal", "Recruiter"].includes(persona.role);
+  const rows = onboardingComplianceCases.filter((item) => state === "All" || item.state === state);
+  return <div className="compliance-workspace"><section className="onboarding-metrics"><article><FileCheck2 size={19} /><span><strong>{onboardingComplianceCases.length}</strong>Compliance cases</span></article><article><AlertTriangle size={19} /><span><strong>{onboardingComplianceCases.filter((item) => item.state === "Blocked").length}</strong>Blocked</span></article><article><ShieldCheck size={19} /><span><strong>{onboardingComplianceCases.filter((item) => item.visibility === "Restricted HR").length}</strong>Restricted</span></article><article><Clock3 size={19} /><span><strong>{onboardingComplianceCases.filter((item) => item.due === "Today").length}</strong>Due today</span></article></section><section className="panel lifecycle-table-panel"><div className="panel-heading"><div><h2>Forms, eligibility and contingency ledger</h2><span>Operational users see safe completion state; restricted values are never rendered.</span></div><button disabled={!canReview} className="secondary-button" onClick={() => announce("Authorized compliance review queue opened with restricted values still masked in this public wireframe.")}>Open review queue</button></div><div className="table-toolbar"><label><Filter size={15} /><select value={state} onChange={(event) => setState(event.target.value)}><option>All</option><option>Not started</option><option>In progress</option><option>Review required</option><option>Complete</option><option>Blocked</option></select></label><Pill tone="info">{rows.length} cases</Pill></div><div className="compliance-table" role="table"><div role="row"><span>Case and person</span><span>Type</span><span>State</span><span>Visibility</span><span>Owner / due</span><span>Next action</span></div>{rows.map((item) => <div role="row" key={item.id}><span><strong>{item.id}</strong><NavLink to={`/hr/onboarding/new-hires/${item.newHireId}`}>{item.visibility === "Restricted HR" && !["HRIS Operator", "Privacy & Legal"].includes(persona.role) ? "Restricted new hire" : item.newHire}</NavLink></span><span>{item.type}</span><span><Pill tone={item.state === "Blocked" ? "danger" : item.state === "Review required" ? "warning" : item.state === "Complete" ? "success" : "info"}>{item.state}</Pill></span><span>{item.visibility}</span><span>{item.owner}<small>{item.due}</small></span><span>{item.nextAction}</span></div>)}</div></section></div>;
+}
+
+function ExperienceWorkspace() {
+  const { announce } = usePrototype();
+  const [milestone, setMilestone] = useState("All");
+  const checks = onboardingCheckIns.filter((item) => milestone === "All" || item.milestone === milestone);
+  return <div className="experience-workspace"><section className="onboarding-metrics"><article><CalendarRange size={19} /><span><strong>{orientationSessions.length}</strong>Orientation sessions</span></article><article><HeartHandshake size={19} /><span><strong>{onboardingCheckIns.length}</strong>Check-ins</span></article><article><GraduationCap size={19} /><span><strong>14</strong>Learning paths</span></article><article><AlertTriangle size={19} /><span><strong>{onboardingCheckIns.filter((item) => item.state === "Overdue").length}</strong>Overdue</span></article></section><div className="detail-two-column"><section className="panel"><div className="panel-heading"><div><h2>Orientation cohorts</h2><span>Capacity, attendance and facilitator readiness</span></div><button className="secondary-button" onClick={() => announce("Orientation session form opened in preview with timezone, capacity and accessibility fields.")}>New session</button></div><div className="orientation-list">{orientationSessions.slice(0, 8).map((session) => <article key={session.id}><span className="program-icon"><CalendarRange size={18} /></span><div><strong>{session.title}</strong><small>{session.id} · {session.cohort} · {session.date}</small><span>{session.facilitator} · {session.format}</span></div><div><Pill tone={session.status === "Full" ? "warning" : session.status === "Completed" ? "success" : "info"}>{session.status}</Pill><small>{session.enrolled}/{session.capacity}</small></div></article>)}</div></section><section className="panel"><div className="panel-heading"><div><h2>30/60/90-day operating loop</h2><span>Manager and People Ops commitments remain visible after day one</span></div></div><div className="table-toolbar"><label><Filter size={15} /><select value={milestone} onChange={(event) => setMilestone(event.target.value)}><option>All</option><option>Day 1</option><option>Week 1</option><option>Day 30</option><option>Day 60</option><option>Day 90</option></select></label><Pill tone="info">{checks.length}</Pill></div><div className="checkin-list">{checks.slice(0, 12).map((item) => <article key={item.id}><div><strong>{item.newHire}</strong><small>{item.id} · {item.milestone} · due {item.due}</small><span>{item.goal}</span></div><div><Pill tone={item.state === "Overdue" ? "danger" : item.state === "Complete" ? "success" : "info"}>{item.state}</Pill><small>{item.owner}</small></div></article>)}</div></section></div></div>;
+}
+
 function AnalyticsWorkspace() {
   const riskCounts = ["On track", "Watch", "At risk"].map((risk) => ({ risk, count: newHireRecords.filter((record) => record.risk === risk).length }));
   const stageCounts = ["Transition", "Preboarding", "Day one", "First 30 days", "Complete"].map((stage) => ({ stage, count: newHireRecords.filter((record) => record.stage === stage).length }));
@@ -234,10 +272,13 @@ export function OnboardingOperations({ announce }: { announce: (message: string)
   const { newHireId } = useParams();
   let view: React.ReactNode;
   if (newHireId) view = <NewHireDetail id={newHireId} />;
+  else if (location.pathname.endsWith("/programs")) view = <ProgramWorkspace />;
   else if (location.pathname.endsWith("/new-hires")) view = <NewHireList />;
   else if (location.pathname.endsWith("/templates")) view = <TemplateWorkspace />;
+  else if (location.pathname.endsWith("/compliance")) view = <ComplianceWorkspace />;
   else if (location.pathname.endsWith("/exceptions")) view = <ExceptionWorkspace />;
   else if (location.pathname.endsWith("/provisioning")) view = <ProvisioningWorkspace />;
+  else if (location.pathname.endsWith("/experience")) view = <ExperienceWorkspace />;
   else if (location.pathname.endsWith("/analytics")) view = <AnalyticsWorkspace />;
   else view = <Overview announce={announce} />;
   return <><WorkspaceTabs />{view}<section className="simulation-footer"><RefreshCcw size={15} /><span>All transitions update browser memory only. No HRIS, e-sign, ITSM, identity or facilities provider is connected.</span></section></>;

@@ -57,6 +57,44 @@ export type InternalOpportunity = {
   mobilityPolicy: string;
 };
 
+export type CareerEventRecord = {
+  id: string;
+  name: string;
+  format: "Virtual" | "In person" | "Hybrid";
+  audience: string;
+  date: string;
+  capacity: number;
+  registered: number;
+  attended: number;
+  prospectsCreated: number;
+  status: "Draft" | "Published" | "Full" | "Completed" | "Cancelled";
+  owner: string;
+};
+
+export type ReferralRecord = {
+  id: string;
+  referrer: string;
+  prospect: string;
+  job: string;
+  relationship: string;
+  state: "Invited" | "Submitted" | "Review" | "Converted" | "Not selected" | "Withdrawn";
+  submitted: string;
+  conflictCheck: "Clear" | "Review required";
+  rewardState: "Not eligible" | "Pending" | "Approved" | "Paid";
+};
+
+export type AgencyPartner = {
+  id: string;
+  name: string;
+  specialties: string[];
+  regions: string;
+  agreement: "Active" | "Renewal due" | "Paused";
+  openAssignments: number;
+  submissions: number;
+  duplicatesPrevented: number;
+  owner: string;
+};
+
 const prospectNames = [
   "Aarav Mehta", "Olivia Parker", "Ibrahim Hassan", "Emma Collins", "Kenji Sato", "Fatima Noor",
   "Gabriel Silva", "Charlotte Evans", "Rohan Kapoor", "Grace Miller", "Samuel Okafor", "Yuna Park",
@@ -163,6 +201,59 @@ export const internalOpportunities: InternalOpportunity[] = [
   mobilityPolicy: "Policy MOB-v3 · manager notification occurs only at the approved milestone",
 }));
 
+export const careerEvents: CareerEventRecord[] = Array.from(
+  { length: 12 },
+  (_, index) => ({
+    id: `EVT-DEMO-${String(index + 1).padStart(3, "0")}`,
+    name: ["Design systems roundtable", "Data platform open house", "Early-career studio", "Security community meetup"][index % 4] + (index > 3 ? ` · cohort ${Math.floor(index / 4) + 1}` : ""),
+    format: (["Virtual", "In person", "Hybrid"] as const)[index % 3],
+    audience: ["Design community", "Engineering alumni", "Early career", "Security-interest prospects"][index % 4],
+    date: `Sep ${5 + index}, 2026`,
+    capacity: [80, 120, 60, 100][index % 4],
+    registered: [64, 97, 60, 72][index % 4],
+    attended: index % 5 === 0 ? [51, 78, 54, 61][index % 4] : 0,
+    prospectsCreated: index % 5 === 0 ? [13, 22, 18, 16][index % 4] : 0,
+    status: index % 6 === 0 ? "Completed" : index % 5 === 0 ? "Full" : index % 4 === 0 ? "Draft" : "Published",
+    owner: ["Alex Rivera", "Jordan Lee", "Priya Nair", "Ben Carter"][index % 4],
+  }),
+);
+
+export const referralRecords: ReferralRecord[] = Array.from(
+  { length: 24 },
+  (_, index) => ({
+    id: `REF-DEMO-${String(index + 1).padStart(3, "0")}`,
+    referrer: ["Taylor Morgan", "Jordan Lee", "Marcus Johnson", "Priya Shah"][index % 4],
+    prospect: prospects[(index * 5) % prospects.length].name,
+    job: distributedJobs[index % distributedJobs.length][1],
+    relationship: ["Former colleague", "Professional community", "Conference contact", "Former manager"][index % 4],
+    state: (["Invited", "Submitted", "Review", "Converted", "Not selected", "Withdrawn"] as const)[index % 6],
+    submitted: `Aug ${4 + (index % 24)}, 2026`,
+    conflictCheck: index % 9 === 0 ? "Review required" : "Clear",
+    rewardState: (["Not eligible", "Pending", "Approved", "Paid"] as const)[index % 4],
+  }),
+);
+
+export const agencyPartners: AgencyPartner[] = [
+  ["AGY-001", "Northstar Product Search", ["Product", "Design"], "US and Canada", "Active", 4, 21, 3, "Alex Rivera"],
+  ["AGY-002", "Synthetic Engineering Partners", ["Platform", "Security"], "US", "Active", 6, 34, 7, "Jordan Lee"],
+  ["AGY-003", "Beacon People Advisory", ["People Operations", "Executive"], "US and UK", "Renewal due", 2, 12, 2, "Priya Nair"],
+  ["AGY-004", "Atlas Finance Talent", ["Finance", "Operations"], "US", "Active", 3, 18, 1, "Owen Brooks"],
+  ["AGY-005", "Pacific Early Careers", ["Intern", "Graduate"], "US West", "Active", 5, 46, 8, "Priya Nair"],
+  ["AGY-006", "Harbor Customer Talent", ["Customer success", "Support"], "US", "Paused", 0, 9, 2, "Alex Rivera"],
+  ["AGY-007", "Global Mobility Search", ["International", "Leadership"], "Global", "Renewal due", 2, 11, 1, "Aisha Rahman"],
+  ["AGY-008", "Inclusive Technology Network", ["Engineering", "Product"], "US", "Active", 3, 17, 4, "Jordan Lee"],
+].map(([id, name, specialties, regions, agreement, openAssignments, submissions, duplicatesPrevented, owner]) => ({
+  id: String(id),
+  name: String(name),
+  specialties: specialties as string[],
+  regions: String(regions),
+  agreement: agreement as AgencyPartner["agreement"],
+  openAssignments: Number(openAssignments),
+  submissions: Number(submissions),
+  duplicatesPrevented: Number(duplicatesPrevented),
+  owner: String(owner),
+}));
+
 export const talentSummary = {
   prospects: prospects.length,
   contactable: prospects.filter((prospect) => prospect.consent === "Recruiting outreach").length,
@@ -170,4 +261,7 @@ export const talentSummary = {
   failedDistributions: jobDistributions.filter((distribution) => distribution.status === "Failed").length,
   internalOpportunities: internalOpportunities.length,
   internalApplicants: internalOpportunities.reduce((sum, opportunity) => sum + opportunity.applicants, 0),
+  careerEvents: careerEvents.length,
+  referrals: referralRecords.length,
+  agencies: agencyPartners.length,
 };

@@ -32,6 +32,7 @@ function PrototypeRoutes() {
       <Route path="/preboarding/documents" element={<NewHirePortal />} />
       <Route path="/preboarding/profile" element={<NewHirePortal />} />
       <Route path="/preboarding/day-one" element={<NewHirePortal />} />
+      <Route path="/preboarding/journey" element={<NewHirePortal />} />
       <Route path="/preboarding/help" element={<NewHirePortal />} />
       <Route
         path="/hr/action-center"
@@ -123,6 +124,10 @@ function PrototypeRoutes() {
         element={<HrWorkspace screen="onboarding" />}
       />
       <Route
+        path="/hr/onboarding/programs"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
         path="/hr/onboarding/new-hires/:newHireId"
         element={<HrWorkspace screen="onboarding" />}
       />
@@ -131,11 +136,19 @@ function PrototypeRoutes() {
         element={<HrWorkspace screen="onboarding" />}
       />
       <Route
+        path="/hr/onboarding/compliance"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
         path="/hr/onboarding/exceptions"
         element={<HrWorkspace screen="onboarding" />}
       />
       <Route
         path="/hr/onboarding/provisioning"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
+        path="/hr/onboarding/experience"
         element={<HrWorkspace screen="onboarding" />}
       />
       <Route

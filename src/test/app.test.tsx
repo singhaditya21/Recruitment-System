@@ -378,7 +378,7 @@ describe("HR prototype controls", () => {
     await user.click(
       screen.getByRole("tab", { name: "Object & data contract" }),
     );
-    expect(screen.getAllByText("92/92")).toHaveLength(2);
+    expect(screen.getAllByText("138/138")).toHaveLength(2);
     expect(screen.getByText("129")).toBeInTheDocument();
     expect(screen.getByText("48/48")).toBeInTheDocument();
     await user.type(

@@ -262,7 +262,7 @@ test("object data studio covers all logical families and data groups", async ({
   await page.goto("/#/hr/governance");
   await page.getByLabel("View as demo persona").selectOption("USR-CFG-001");
   await page.getByRole("tab", { name: "Object & data contract" }).click();
-  await expect(page.getByText("92/92").first()).toBeVisible();
+  await expect(page.getByText("138/138").first()).toBeVisible();
   await expect(page.getByText("129").first()).toBeVisible();
   await expect(page.getByText("48/48")).toBeVisible();
   await page.getByLabel("Search object and data catalog").fill("OBJ-022");
@@ -282,6 +282,58 @@ test("object data studio covers all logical families and data groups", async ({
       document.documentElement.clientWidth,
   );
   expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test("v2.1 candidate and new-hire journeys continue through offer and day 90", async ({
+  page,
+}) => {
+  await page.goto("/#/my-applications");
+  await page.getByRole("tab", { name: "Interviews & offer" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Product design conversation" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Senior Product Designer · offer v4" }),
+  ).toBeVisible();
+
+  await page.goto("/#/preboarding/journey");
+  await expect(
+    page.getByRole("heading", { name: "From accepted offer through day 90" }),
+  ).toBeVisible();
+  await expect(page.getByText("8 milestones")).toBeVisible();
+});
+
+test("v2.1 operations expose programs, compliance, experience and talent channels", async ({
+  page,
+}) => {
+  await page.goto("/#/hr/onboarding/programs");
+  await expect(
+    page.getByRole("heading", {
+      name: "Design for every worker transition—not only first-time hires.",
+    }),
+  ).toBeVisible();
+
+  await page.goto("/#/hr/onboarding/compliance");
+  await expect(
+    page.getByRole("heading", { name: "Forms, eligibility and contingency ledger" }),
+  ).toBeVisible();
+
+  await page.goto("/#/hr/onboarding/experience");
+  await expect(
+    page.getByRole("heading", { name: "30/60/90-day operating loop" }),
+  ).toBeVisible();
+
+  await page.goto("/#/hr/talent/referrals");
+  await expect(
+    page.getByRole("heading", { name: "Employee referral ledger" }),
+  ).toBeVisible();
+
+  await page.goto("/#/hr/talent/partners");
+  await expect(
+    page.getByRole("heading", {
+      name: "Control who may submit, for which jobs and under which agreement.",
+    }),
+  ).toBeVisible();
 });
 
 test("object workspace executes new, detail and edit states", async ({

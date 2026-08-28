@@ -2,24 +2,24 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Draft v2.0 — full recruitment, talent growth and onboarding wireframe contract |
+| Status | Draft v2.1 — surface-complete recruitment and onboarding wireframe contract |
 | Last updated | August 28, 2026 |
 | Product owner | Aditya Singh |
 | Initial market | San Francisco–based employer hiring in the United States |
 | Primary timezone | America/Los_Angeles |
 | Currency | USD |
-| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; the local v2.0 release candidate is not the deployed release until section 22.16 records the exact Pages commit and successful workflow |
+| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; the local v2.1 release candidate is not the deployed release until section 22.18 records the exact Pages commit and successful workflow |
 | Pilot/production candidate deployment | Approved external application host and backend-for-frontend; providers TBD |
 | Pilot/production HR deployment | Native Salesforce Lightning application |
 | Operational system of record | Salesforce custom recruitment application |
-| Implementation state | React/TypeScript/Vite synthetic prototype inherits the v1.9 canonical recruitment model (92 navigation families, 129 atomic concepts, 2,350 field contracts, 173 relationships, 675 guarded transitions and the normalized recruitment runtime) and adds a v2.0 logical/wireframe extension: 24 screen contracts, 49 declared routes/47 functional destinations, 46 lifecycle objects with 186 object-specific key data points and 238 lifecycle states, 36 new hires, 8 onboarding templates, 18 exceptions, 72 provisioning requests, 120 prospects, 6 campaigns, 24 channel distributions and 8 internal opportunities; every action is browser-memory-only; Salesforce metadata, approved physical fields/API names, production services/data, BFF/IdP, provider integrations and an approved pilot environment do not exist |
+| Implementation state | React/TypeScript/Vite synthetic prototype inherits the v1.9 canonical recruitment model and v2.0 lifecycle extension, then adds v2.1 surface completeness: 25 screen contracts, 53 declared routes/51 functional destinations, all 92 core plus 46 lifecycle families routed through 552 List/New/Detail/Edit page contracts with 2,208 field contracts and 1,656 seeded rows; eight lifecycle programs; 24 compliance cases; 16 orientation sessions; 48 check-ins; candidate interview/offer response; a through-day-90 new-hire journey; 12 career events, 24 referrals and eight agency partners; every action remains browser-memory-only and no production service or physical schema exists |
 | Pilot contract state | Proposed control envelope in section 7.6; employer, legal, provider, Salesforce, and named-owner decisions remain unapproved until their `OD-##` records close |
-| Full-audit state | [v2.0 completion audit](AUDIT-v2.0.md) reconciles the expanded wireframe; prior controlled findings remain formally Open until accountable dated review, and the platform control center explicitly retains six production gates |
-| v2.0 change boundary | Public-safe full-lifecycle wireframe release: onboarding, new-hire, talent relationship, job-distribution, internal-mobility and platform-control routes, fixtures, logical contracts, tests, artifacts and documentation may change; proposed physical dispositions and integrations are review inputs only; no deployable Salesforce metadata, production backend, authentication, provider write, real candidate/employee data, legal approval or pilot authorization is created |
+| Full-audit state | [v2.1 completion audit](AUDIT-v2.1.md) reconciles the expanded wireframe; prior controlled findings remain formally Open until accountable dated review, and the platform control center explicitly retains six production gates |
+| v2.1 change boundary | Public-safe surface-completeness release: lifecycle object pages, lifecycle programs, candidate interview/offer response, through-day-90 experience, onboarding compliance/orientation/check-ins, events, referrals and partner workspaces may change; no deployable Salesforce metadata, production backend, authentication, provider write, real candidate/employee data, legal approval or pilot authorization is created |
 
 ## 1. Executive summary
 
-Recruitment System is an end-to-end recruitment and onboarding platform for a San Francisco–based company. It gives HR and hiring teams one structured place to build talent relationships, create and distribute jobs, collect applications, screen candidates, run assessments, schedule interviews, capture evidence-based feedback, make decisions, issue offers, transition accepted candidates into pre-hires, orchestrate onboarding and provisioning, and retain a complete audit trail. Candidates get a clear, accessible experience from job discovery through application status and offer response; accepted candidates get a separate purpose-limited new-hire experience through day one and the first 30 days.
+Recruitment System is an end-to-end recruitment and onboarding platform for a San Francisco–based company. It gives HR and hiring teams one structured place to build talent relationships, create and distribute jobs, collect applications, screen candidates, run assessments, schedule interviews, capture evidence-based feedback, make decisions, issue offers, transition accepted candidates into pre-hires, orchestrate onboarding and provisioning, and retain a complete audit trail. Candidates get a clear, accessible experience from job discovery through application status, interview self-service and version-bound offer response; accepted candidates get a separate purpose-limited new-hire experience from preboarding through orientation and the first 90 days.
 
 The first release is a single-company product, not a multi-tenant SaaS platform. It should feel modern, calm, inclusive, and trustworthy. The system must reduce hiring coordination work without turning consequential hiring decisions over to opaque automation.
 
@@ -87,7 +87,7 @@ This brief is a review entrypoint, not a substitute for the numbered contract. A
 | What must be configurable? | Only approved versioned content, job plans, bounded stages/mappings, rubrics, queues/calendars and finite rules inside the `CFG-*` authority model | Named configuration/reviewer roles, physical catalog and release evidence |
 | How will value be judged? | Governed adoption, reduced active coordination/scheduling effort, complete evidence, candidate clarity/support, safe operation and a conservative ≥1.5× recurring benefit-to-cost with ≤24-month modeled payback | Employer baseline, finance assumptions and comparable pilot evidence; economics cannot offset failed rights/guardrails |
 | How will exposure grow? | Synthetic rehearsal → nonproduction qualification → one-job limited live cohort → measured multi-job cohort → full bounded pilot; each boundary ends in one `OUT-*` decision | Approved `ART-002/022/023`, role qualification, launch gates and prior-ramp evidence |
-| What exists now? | The v2.0 synthetic React full-lifecycle wireframe, inherited v1.9 canonical recruitment model/runtime, 46-object lifecycle extension, current PRD/matrices/artifacts, local automated evidence and GitHub Pages deployment workflow | Accountable physical-schema approval and every production Salesforce/BFF/IdP/provider layer remain unproven |
+| What exists now? | The v2.1 synthetic React full-lifecycle wireframe, inherited v1.9 canonical recruitment model/runtime, 46-object lifecycle extension, current PRD/matrices/artifacts, local automated evidence and GitHub Pages deployment workflow | Accountable physical-schema approval and every production Salesforce/BFF/IdP/provider layer remain unproven |
 | What does this PRD approval authorize? | Agreement on the product contract and recorded decisions only | It does not authorize development, procurement, real candidate data, production deployment or pilot launch without their independent gates |
 
 Executive decision requested:
@@ -195,6 +195,21 @@ v2.0 extends the complete recruitment wireframe through talent relationship mana
 | How are persona restrictions represented? | Navigation gates 12 internal roles; hiring-manager new-hire rows are relationship-scoped; prospect identities are minimized for privacy/audit views; mutating actions are disabled for read-only or non-owning roles | Browser rendering is not security. Every object/row/field/purpose denial must be reimplemented and proven server-side |
 
 v2.0 changes the product description from “complete ATS wireframe” to “full recruitment and onboarding wireframe.” It does not earn the description “production recruitment and onboarding platform” until the production gates in sections 7, 20 and 22.15 are closed with deployed evidence.
+
+### 1.10 v2.1 surface-completeness brief
+
+v2.1 converts the v2.0 lifecycle design into broader inspectable work. It does not add a database, API, authentication or production integration. [MATRIX-v2.1.md](MATRIX-v2.1.md) is the current surface/persona/object/seed ledger and [AUDIT-v2.1.md](AUDIT-v2.1.md) distinguishes first-class journeys from metadata-driven page coverage and production readiness.
+
+| Full-platform question | v2.1 wireframe answer | Remaining boundary |
+| --- | --- | --- |
+| Can every declared object be inspected and edited? | Yes. All 92 core plus 46 lifecycle object families resolve through role-aware List, New, Detail and Edit contracts: 138 families, 552 page instances, 1,656 seeded rows and 2,208 workspace fields | Complex operational families still require bespoke workflow UX before a reviewer should treat generic page coverage as journey completeness |
+| Does candidate self-service stop at application status? | No. The candidate hub adds interview confirmation/reschedule/accommodation flows and version-bound offer review, accept/decline confirmation and a synthetic receipt | Saved jobs, job alerts, event registration, referral submission and deeper assessment/background-check self-service remain later wireframe work |
+| Is onboarding just a task list? | No. Eight lifecycle programs cover new hire, manager addendum, rehire, crossboarding, contingent worker, internship, relocation and offboarding. Compliance cases, orientation sessions, 30/60/90 check-ins and an eight-milestone new-hire journey make the experience continuous through day 90 | Country-specific variants, substantive learning content and deeper crossboarding/offboarding persona experiences remain incomplete |
+| Are attraction channels represented? | Career events, referrals and agency partners now have operational views alongside communities, campaigns, distribution and internal mobility | Registration, referral reward, agency submission/ownership and high-volume/campus flows remain preview-level |
+| Are data and permission claims precise? | Each family exposes six business plus ten governance/provenance fields; roles carry declared population, row and data-group scope; compliance and referral views demonstrate masking and action denial | Browser enforcement is illustrative only; field dictionary depth varies and production authorization requires IdP, BFF and Salesforce evidence |
+| Is this a production application? | No. Every action and record remains synthetic and browser-memory-only, and the approved physical-object count remains zero | Production architecture, security, legal, integration, accessibility, operations and pilot gates remain blocking |
+
+The competitive design basis is current first-party product material: [Greenhouse structured interviewing and candidate self-scheduling](https://www.greenhouse.com/interviewing-decision-making), [Workday talent acquisition and candidate engagement](https://www.workday.com/en-us/products/talent-management/talent-acquisition.html), [Workday personalized preboarding](https://doc.workday.com/admin-guide/en-us/human-capital-management/recruiting/onboarding-experience/concept--preboarding-and-onboarding.html?toc=3.14.7), [SAP SuccessFactors onboarding journeys and 30/60/90 plans](https://www.sap.com/products/hcm/employee-onboarding/features.html) and [Rippling attribute-driven lifecycle workflows](https://www.rippling.com/en-GB/platform/workflows). Those references guide capability coverage; they do not authorize copying proprietary interfaces or claims.
 
 ## 2. Problem statement
 
@@ -3003,15 +3018,16 @@ Research integrity rules:
 
 ### 15.11 v1.2 product surface, persona, data and object matrix
 
-This section preserves the v1.2 baseline inventory and counting definitions. Section 15.18 and [MATRIX-v2.0.md](MATRIX-v2.0.md) supersede its current wireframe screen/route counts without changing the distinction between a screen, persona, data group, logical concept and physical object.
+This section preserves the v1.2 baseline inventory and counting definitions. Sections 15.18–15.19 and [MATRIX-v2.1.md](MATRIX-v2.1.md) supersede its current wireframe screen/route counts without changing the distinction between a screen, persona, data group, logical concept and physical object.
 
 #### Canonical totals and counting boundary
 
 | Dimension | Current exact PRD count | Counted unit | Important boundary |
 | --- | ---: | --- | --- |
 | Deployed product surfaces | 2 | External careers/candidate portal; native Salesforce Lightning HR workspace | The public synthetic prototype can demonstrate both, but is not a third production surface |
-| v1.2 contracted screen/route families | 12 | 4 candidate `UI-CAN-*` plus 8 internal `UI-HR-*` | Historical v1.2 baseline; superseded for the v2.0 wireframe by the next row |
-| Current v2.0 wireframe screen contracts | 24 | 4 candidate, 13 internal HR/platform and 7 new-hire `UI-*` contracts | 49 route declarations/47 functional destinations are separate route-pattern counts; components/states do not inflate screen count |
+| v1.2 contracted screen/route families | 12 | 4 candidate `UI-CAN-*` plus 8 internal `UI-HR-*` | Historical v1.2 baseline; superseded for the current wireframe by the rows below |
+| Historical v2.0 wireframe screen contracts | 24 | 4 candidate, 13 internal HR/platform and 7 new-hire `UI-*` contracts | 49 route declarations/47 functional destinations; retained as a release baseline |
+| Current v2.1 wireframe screen contracts | 25 | 4 candidate, 13 internal HR/platform and 8 new-hire `UI-*` contracts | 53 route declarations/51 functional destinations; components, tabs, states and the 552 generated object page instances do not inflate screen-contract count |
 | Atomic production pages/components | Not yet frozen | `ART-003` route, component and state inventory | Section 15.3 lists capability views but does not assign atomic IDs; claiming a larger exact screen count before `ART-003` would be false precision |
 | Human personas/operating roles | 13 | 1 candidate plus 12 internal human personas in section 5 | Machine/service identities, queues, approver pools and permission sets are not additional personas; one person may hold multiple reviewed roles |
 | Core roles in the older compact permission table | 7 | Recruiter, coordinator, hiring manager, interviewer, offer approver, HR configuration administrator and auditor | The six other personas remain governed below and cannot inherit access merely because the compact table omitted a column |
@@ -3317,7 +3333,7 @@ Task ownership supports new hire, People Ops, hiring manager, buddy, IT, facilit
 
 #### 15.18.3 New-hire portal, documents and forms
 
-The new-hire portal has seven canonical screen contracts and must expose loading, empty, ready, in-progress, validation error, provider unavailable, expired session, locked account, complete and support-recovery states.
+The v2.0 new-hire portal baseline had seven canonical screen contracts. v2.1 adds `UI-NHR-008` for the through-day-90 journey. All eight contracts must expose loading, empty, ready, in-progress, validation error, provider unavailable, expired session, locked account, complete and support-recovery states where applicable.
 
 | Screen | Minimum data/actions | Explicit exclusions |
 | --- | --- | --- |
@@ -3328,6 +3344,7 @@ The new-hire portal has seven canonical screen contracts and must expose loading
 | My information `UI-NHR-005` | Transfer-visible personal/contact/address facts, provenance and versioned correction request | Scorecards, disposition rationale, integrity/restricted cases |
 | Day one `UI-NHR-006` | Timezone-safe agenda, owner, location/link availability and calendar preview | Unapproved account credentials or restricted attendee information |
 | Help/privacy `UI-NHR-007` | People Ops, technology, accommodation and privacy routes; case/reference and response expectation | Sending a sensitive request through a general recruiting message thread |
+| Journey `UI-NHR-008` | Preboarding-to-day-90 milestones, support network, learning, goals, check-ins and private experience pulse | Performance ratings, recruiting evidence, other employees and internal risk labels |
 
 E-signature requires an immutable document hash/version, signer identity/assurance, envelope ID, sent/viewed/signed/declined/voided/expired events, provider receipt, timezone, consent/intent evidence and reconciliation. “Signed” is never inferred from task completion alone. Forms declare jurisdiction, content version, field classification, validation, source/destination, role visibility, correction/rejection state, retention and deletion/legal-hold behavior. Restricted values use a private service; ordinary workflow stores completion and opaque evidence references only.
 
@@ -3361,6 +3378,39 @@ Onboarding dashboards operate on plan, task, exception, provisioning and event g
 Recruiters/People Ops can assign and operate plans in approved populations. Hiring managers see only effective reports and manager-safe fields. HRIS operators can correct/replay destination records but not recruiting feedback. Configuration admins version templates/rules but do not inherit new-hire private form values. Privacy/legal and auditors receive purpose-limited minimized/read-only evidence. Platform/security users operate connections and incidents without gaining business-content access. Candidate Support receives safe context and support cases, not employee conversion or evaluation details. New hires see only their own portal-scoped data and tasks.
 
 The browser persona switcher demonstrates these contracts but is never enforcement evidence. Production requires object, row, field, purpose, organization and effective-time authorization at the service and source-system layers, including negative API tests and export controls.
+
+### 15.19 v2.1 executable surface-completeness contract
+
+#### 15.19.1 Object and page coverage
+
+The executable object registry contains 138 routable families: 92 inherited recruitment/core families plus all 46 v2.0 lifecycle-extension families. Each family has four page contracts—List, New, Detail and Edit—for 552 generated page instances. Each receives 12 deterministic records, six domain-specific business-field contracts and ten shared governance/provenance-field contracts. Therefore the current generated workspace contains 1,656 records and 2,208 logical field contracts: 828 business and 1,380 governance/provenance.
+
+This page coverage is a completeness floor, not proof that each family has an ideal bespoke experience. A generated page proves inspectability, minimum data, permission disposition, validation and state handling. A first-class journey additionally requires domain-specific sequencing, dependencies, confirmation, failure, cancellation, retry, audit and cross-persona continuity. [MATRIX-v2.1.md](MATRIX-v2.1.md) identifies which surfaces meet each level.
+
+#### 15.19.2 Continuous recruitment and onboarding journeys
+
+| Journey | Required v2.1 surface | Key logic/data contract |
+| --- | --- | --- |
+| Attraction and relationship | Events, referrals, agency partners, prospects, communities, campaigns, distribution and mobility | Authority/source, audience/ownership, consent/suppression, attribution, status, dates, owner, result and audit |
+| Candidate interview | Interview summary, format/timezone, participants, preparation, confirmation, reschedule request and accommodation support | Candidate-safe context only; reschedule is a request until capacity and ownership are confirmed |
+| Offer response | Current version, compensation/start/expiry, contingencies, accessible document preview, decline confirmation and response receipt | Response binds to immutable current version/hash; superseded or expired versions cannot be accepted |
+| Identity transition | Candidate → application → accepted offer → pre-hire → pending worker → employee | Separate identifiers, purpose-limited projection, validation, idempotency, correction, reconciliation and cancellation |
+| Program assignment | Eight program types plus population rule, owner, stages, tasks, effective version and active-plan policy | New hire, rehire, crossboarding, contingent, internship, relocation and offboarding never share one unqualified task list |
+| Compliance and forms | Owned cases, jurisdiction, document/form version, due date, evidence status, review state and safe escalation | Restricted values remain separated; a workflow task alone never proves legal completion or signature |
+| Provisioning | Manager, IT, facilities, payroll/benefits and security requests | Attribute/effective-date driven, dependency-aware, least-privilege, cancellable and reconciled |
+| Experience through day 90 | Orientation, buddy/manager/support network, learning, goals and 30/60/90 check-ins | Milestone ownership, due/complete state, next action and private experience pulse are distinct from performance evaluation |
+
+#### 15.19.3 Required first-class states
+
+Every new v2.1 journey must show at least ready, in-progress, completed, blocked/overdue, empty and permission-denied states where applicable. Consequential actions require an explicit confirmation and an on-screen synthetic receipt. Provider-backed actions must say preview/simulation and cannot imply that an email, signature, HRIS update, account, shipment, badge or calendar event occurred. Restricted persona views mask identity or fields rather than merely hiding a navigation item.
+
+#### 15.19.4 Seed and measurement rules
+
+The lifecycle surface is deterministically seeded with eight programs, 24 compliance cases, 16 orientation sessions, 48 check-ins, eight day-90 journey milestones, 12 career events, 24 referrals and eight agency partners in addition to the v2.0 and core registries. Dashboards and cards must calculate from their displayed grain, display `N/A` for a zero eligible denominator, retain source/as-of/restatement context and reconcile to the same filtered population as their details. Counts are test fixtures, not business targets or market claims.
+
+#### 15.19.5 Explicit next wireframe depth
+
+The next wireframe increment should prioritize high-volume/campus and evergreen recruiting; event registration; job alerts/saved jobs; referral submission/reward rules; agency submission, duplicate ownership and fee controls; candidate assessment/reference/background/adverse-action status; bespoke complex-object create/edit/detail journeys; distinct manager, IT/facilities, agency and referrer portal shells; multi-country content variants; and exhaustive empty/error/expiry/cancellation/concurrency states. These remain wireframe work and require no production service to design or test.
 
 ## 16. Analytics and instrumentation
 
@@ -4376,10 +4426,39 @@ v2.0 is accepted as a **synthetic full recruitment and onboarding wireframe** on
 | Deployment evidence | Not yet claimed for v2.0; the exact GitHub Pages commit and workflow run must be added after successful publication |
 | Production boundary | No real authentication, Salesforce metadata, approved schema, BFF/API, persistent datastore, provider credential/effect, real data, security/legal approval or pilot authorization is introduced |
 
+### 22.17 Definition of v2.1 surface-complete wireframe acceptance
+
+v2.1 is accepted as a **synthetic surface-complete recruitment and onboarding wireframe release candidate** only when:
+
+1. [MATRIX-v2.1.md](MATRIX-v2.1.md), [AUDIT-v2.1.md](AUDIT-v2.1.md) and `artifacts/v2.1/*` reconcile to 13 personas, 25 screen contracts, 53 route declarations/51 functional destinations and two redirects.
+2. All 138 routed object families resolve through List, New, Detail and Edit page contracts, totaling 552 page instances, 1,656 seeded rows and 2,208 logical field contracts.
+3. Candidate self-service includes interview confirmation/reschedule/accommodation and current-version offer preview/accept/decline/receipt without exposing internal evaluation.
+4. Eight lifecycle programs cover new hire, manager addendum, rehire, crossboarding, contingent worker, internship, relocation and offboarding with population, version, owner, stage and task context.
+5. Internal onboarding exposes 24 compliance cases, 16 orientation sessions and 48 check-ins; the new-hire portal exposes eight milestones through day 90 and keeps experience input separate from evaluation.
+6. Attraction operations expose 12 events, 24 referrals and eight agency partners in addition to the inherited CRM, community, campaign, distribution and mobility views.
+7. Compliance/referral identity and action controls demonstrate masking, role denial and relationship scope; they are labeled browser-side simulations rather than security evidence.
+8. Every added action is browser-memory-only, every record is synthetic, no restricted value persists across refresh and no provider/system effect is implied.
+9. Artifact audits, TypeScript, unit/component/contract/automated-accessibility tests and the production build pass against the same count contract.
+10. The public site may be described as v2.1 only after the exact release commit is pushed, required GitHub checks and Pages deployment succeed, and the served assets expose the v2.1 release marker.
+11. The approved physical-object count remains zero. Production Salesforce metadata, BFF/API, identity, server authorization, persistence, integrations, security/legal approval, operations and pilot evidence remain blocking.
+12. “Surface complete” does not mean every family is a bespoke journey. The remaining depth register in [AUDIT-v2.1.md](AUDIT-v2.1.md) remains part of the release truth.
+
+### 22.18 v2.1 release-candidate evidence
+
+| Evidence | Current result |
+| --- | --- |
+| Count and route ledger | [MATRIX-v2.1.md](MATRIX-v2.1.md), `artifacts/v2.1/readiness.json` and `artifacts/v2.1/routes.json` bind 25 screen contracts, 53 declared routes/51 functional destinations, two redirects and every new seed set |
+| Object/page coverage | `src/data/objectCatalog.ts` binds 92 core plus 46 lifecycle families to 138 routed families, 552 page instances, 1,656 rows and 2,208 generated workspace fields |
+| Functional surface | Candidate interview/offer response, program library/builder, compliance ledger, orientation/check-ins, day-90 journey, events, referrals and agency partners render as role-aware seeded workflows |
+| Automated local evidence | `pnpm verify` passes the v2.1 artifact audit, TypeScript, 70 unit/component/contract/automated-accessibility tests and the production build; `pnpm test:e2e` passes 46 desktop/mobile Chromium journeys including the new candidate, onboarding, talent and 138-family surfaces; the build retains one bundle-size advisory |
+| Deployment evidence | Not yet claimed for v2.1; the exact GitHub Pages commit and successful workflow must be added after publication |
+| Production boundary | No real authentication, Salesforce metadata, approved schema, BFF/API, persistent datastore, provider credential/effect, real data, security/legal approval or pilot authorization is introduced |
+
 ## 23. Change log
 
 | Version | Date | Summary |
 | --- | --- | --- |
+| 2.1 | August 28, 2026 | Expanded v2.0 into a surface-complete synthetic release candidate: routed all 92 core and 46 lifecycle families through 552 List/New/Detail/Edit page contracts with 1,656 seeded rows and 2,208 generated workspace fields; added candidate interview self-service and version-bound offer response; an eight-program lifecycle library/builder; compliance, orientation and 30/60/90 check-in workspaces; an eight-milestone new-hire journey through day 90; career-event, referral and agency-partner workspaces; 25 screen contracts and 53 route declarations/51 functional destinations; retained browser-memory-only behavior, zero approved physical objects and every production/security/legal/pilot gate; explicitly preserved a next-depth register for complex bespoke journeys |
 | 2.0 | August 28, 2026 | Extended the synthetic product from recruitment through onboarding and talent growth: added 24 total screen contracts and 49 route declarations/47 functional destinations; candidate-to-pre-hire-to-pending-worker-to-employee lineage; onboarding plan/template/version/stage/task, exception, provisioning and progress workspaces; a seven-screen new-hire portal with forms, documents and simulated signatures; HRIS correction/replay; 36 new hires, 8 templates, 18 exceptions and 72 provisioning requests; CRM with 120 prospects, communities/campaigns, 24 job distributions and 8 internal opportunities; identity/integration/persistence/security control views; a 46-object lifecycle extension with 186 key data points and 238 states; persona-scoped/minimized views, tests and artifacts; retained memory-only behavior, zero approved physical objects and every production/legal/security/pilot gate |
 | 1.9 | August 28, 2026 | Replaced navigation-family templates as the data authority with 129 atomic logical concepts, 2,350 typed field contracts, 173 structured relationships, 15 invariants, 675 guarded transitions, 13 domain events, 13 role-security policies, 12 analytics contracts/reference datasets and 15 quality rules; added normalized seeded runtime records and projections, canonical dashboard event/version lineage, relationship/effective-time row access, identity/consent separation, supporting access/duplicate/quality/migration concepts, interactive model-studio detail, machine-readable artifacts and acceptance tests; preserved the 92-family/29-route UI and explicitly retained zero approved physical Salesforce objects and every production/legal/manual/pilot gate |
 | 1.8 | August 28, 2026 | Added dense deterministic core data (48 jobs, 320 candidates, 640 applications, 192 interviews and 160 assignments) and expanded the generic workspace to 12 records per each of 92 families (1,104); added role-scoped search/filter/20-row pagination and empty recovery; implemented object-specific Job, Candidate and Application List/New/Detail/Edit journeys with Draft-only job creation, reserved-domain/duplicate candidate validation, explicit candidate–job application linkage and mutation permission denial; documented workflow-generated interview/scorecard/decision/offer/handoff creation; reconciled 29 functional route patterns in `MATRIX-v1.8`; retained memory-only/public-safe and every production/legal/manual/pilot gate |

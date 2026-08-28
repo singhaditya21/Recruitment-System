@@ -1,4 +1,4 @@
-name: v2.0 security and dependency review
+name: v2.1 security and dependency review
 
 on:
   push:

@@ -273,13 +273,14 @@ function ObjectMatrix() {
 
       <ExplainPanel
         title="Current matrix position"
-        source="v1.7 metadata-driven route and field registry"
+        source="v2.1 metadata-driven core and lifecycle registry"
       >
-        The product now distinguishes four counts: 92 logical object families,
-        111 expanded business concepts, 1,472 logical fields, and 368
-        family-specific page instances. These are synthetic wireframe contracts;
-        approved Salesforce API names and physical field/security metadata
-        remain a separate implementation gate.
+        The workspace now covers 92 inherited recruitment families plus 46
+        lifecycle-extension families: 138 routed families, 2,208 field
+        contracts, 1,656 seeded rows and 552 list/new/detail/edit page instances.
+        These are synthetic wireframe contracts; approved Salesforce API names
+        and physical field/security metadata remain a separate implementation
+        gate.
       </ExplainPanel>
     </div>
   );

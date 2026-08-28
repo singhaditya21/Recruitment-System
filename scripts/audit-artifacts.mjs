@@ -125,6 +125,18 @@ const v20Model = JSON.parse(
     "utf8",
   ),
 );
+const v21 = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v2.1/readiness.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v21Routes = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v2.1/routes.json", import.meta.url),
+    "utf8",
+  ),
+);
 
 assertSeries(
   routes.routes.filter(({ id }) => id.startsWith("UI-CAN")),
@@ -383,6 +395,44 @@ assert(
     v20.production.pilot === "blocked",
   "v2.0 must preserve the physical, identity and pilot production gates",
 );
+assert(
+  v21.version === "2.1.0" && v21.syntheticOnly === true,
+  "v2.1 must identify the surface-complete wireframe as synthetic-only",
+);
+assert(
+  v21.counts.personas === 13 &&
+    v21.counts.screenContracts === 25 &&
+    v21.counts.routeDeclarations === 53 &&
+    v21.counts.functionalDestinations === 51 &&
+    v21Routes.screenContracts.length === 25 &&
+    v21Routes.routeDeclarationCount === 53,
+  "v2.1 persona, screen and route counts must reconcile",
+);
+assert(
+  v21.counts.coreNavigationFamilies === 92 &&
+    v21.counts.lifecycleExtensionFamilies === 46 &&
+    v21.counts.combinedRoutedObjectFamilies === 138 &&
+    v21.counts.routedObjectPageInstances === 552 &&
+    v21.counts.seededObjectRecords === 1656 &&
+    v21.counts.workspaceFieldContracts === 2208,
+  "v2.1 core plus lifecycle object-page coverage must reconcile",
+);
+assert(
+  v21.seededWireframe.lifecyclePrograms === 8 &&
+    v21.seededWireframe.complianceCases === 24 &&
+    v21.seededWireframe.orientationSessions === 16 &&
+    v21.seededWireframe.onboardingCheckIns === 48 &&
+    v21.seededWireframe.careerEvents === 12 &&
+    v21.seededWireframe.referrals === 24 &&
+    v21.seededWireframe.agencyPartners === 8,
+  "v2.1 program, onboarding-experience and talent-channel seeds must reconcile",
+);
+assert(
+  v21.counts.physicalObjectsApproved === 0 &&
+    v21.production.authentication === "not implemented" &&
+    v21.production.pilot === "blocked",
+  "v2.1 must preserve the physical, identity and pilot production gates",
+);
 
 const sourcePaths = await sourceFiles(new URL("../src/", import.meta.url));
 const source = (
@@ -450,13 +500,13 @@ assert(
   "The v1.9 canonical model, runtime, relationship access and event lineage must be present",
 );
 assert(
-  source.includes("v2.0 recruitment + onboarding") &&
+  source.includes("v2.1 complete lifecycle wireframe") &&
     source.includes("lifecycleObjectContracts") &&
     source.includes("newHireRecords") &&
     source.includes("talentCampaigns"),
-  "The v2.0 release marker and full-lifecycle data contracts must be visible in the wireframe",
+  "The v2.1 release marker and full-lifecycle data contracts must be visible in the wireframe",
 );
 
 console.log(
-  "Artifact audit passed: v2.0 inherits the v1.9 canonical recruitment model and adds 46 logical lifecycle/platform objects, 24 screen contracts, 47 functional destinations, dense onboarding/talent fixtures and zero approved physical objects or production connections.",
+  "Artifact audit passed: v2.1 routes all 138 core/lifecycle families through 552 page contracts, adds complete program, candidate, onboarding-experience and talent-channel surfaces, and preserves zero approved physical objects or production connections.",
 );

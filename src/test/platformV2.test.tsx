@@ -4,16 +4,23 @@ import { beforeEach, describe, expect, it } from "vitest";
 import App from "../App";
 import {
   flagshipOnboardingTasks,
+  lifecyclePrograms,
   newHireDocuments,
   newHireRecords,
+  onboardingCheckIns,
+  onboardingComplianceCases,
   onboardingExceptions,
   onboardingTemplates,
+  orientationSessions,
   provisioningRequests,
 } from "../data/onboarding";
 import {
+  agencyPartners,
+  careerEvents,
   internalOpportunities,
   jobDistributions,
   prospects,
+  referralRecords,
   talentCampaigns,
   talentCommunities,
 } from "../data/talentGrowth";
@@ -21,6 +28,8 @@ import {
   lifecycleModelSummary,
   lifecycleObjectContracts,
 } from "../data/lifecyclePlatform";
+import { objectCatalogSummary } from "../data/objectCatalog";
+import { objectWorkspaceSummary } from "../data/objectWorkspace";
 
 function open(hash: string) {
   window.location.hash = hash;
@@ -41,6 +50,13 @@ describe("v2.0 full lifecycle contracts", () => {
       campaigns: talentCampaigns.length,
       distributions: jobDistributions.length,
       opportunities: internalOpportunities.length,
+      programs: lifecyclePrograms.length,
+      compliance: onboardingComplianceCases.length,
+      orientation: orientationSessions.length,
+      checkIns: onboardingCheckIns.length,
+      events: careerEvents.length,
+      referrals: referralRecords.length,
+      agencies: agencyPartners.length,
     }).toEqual({
       newHires: 36,
       templates: 8,
@@ -53,6 +69,13 @@ describe("v2.0 full lifecycle contracts", () => {
       campaigns: 6,
       distributions: 24,
       opportunities: 8,
+      programs: 8,
+      compliance: 24,
+      orientation: 16,
+      checkIns: 48,
+      events: 12,
+      referrals: 24,
+      agencies: 8,
     });
   });
 
@@ -73,6 +96,19 @@ describe("v2.0 full lifecycle contracts", () => {
         (object) => object.grain && object.parent && object.keyFields.length >= 4 && object.states.length >= 4,
       ),
     ).toBe(true);
+  });
+
+  it("routes all core and lifecycle objects through list, new, detail and edit pages", () => {
+    expect(objectCatalogSummary).toMatchObject({
+      families: 138,
+      coreFamilies: 92,
+      lifecycleFamilies: 46,
+      minimumDataPoints: 2208,
+    });
+    expect(objectWorkspaceSummary).toMatchObject({
+      routedPageInstances: 552,
+      seededRecords: 1656,
+    });
   });
 });
 
@@ -110,6 +146,20 @@ describe("v2.0 onboarding and new-hire journeys", () => {
     expect(screen.getByText("Maya Chen")).toBeInTheDocument();
     expect(screen.queryByText("Liam Patel")).not.toBeInTheDocument();
   });
+
+  it("renders programs, compliance, experience and the through-day-90 new-hire journey", () => {
+    const programsView = open("#/hr/onboarding/programs");
+    expect(screen.getByRole("heading", { name: "Design for every worker transition—not only first-time hires." })).toBeInTheDocument();
+    programsView.unmount();
+    const complianceView = open("#/hr/onboarding/compliance");
+    expect(screen.getByRole("heading", { name: "Forms, eligibility and contingency ledger" })).toBeInTheDocument();
+    complianceView.unmount();
+    const experienceView = open("#/hr/onboarding/experience");
+    expect(screen.getByRole("heading", { name: "Orientation cohorts" })).toBeInTheDocument();
+    experienceView.unmount();
+    open("#/preboarding/journey");
+    expect(screen.getByRole("heading", { name: "From accepted offer through day 90" })).toBeInTheDocument();
+  });
 });
 
 describe("v2.0 growth and platform controls", () => {
@@ -131,5 +181,16 @@ describe("v2.0 growth and platform controls", () => {
     expect(screen.getByText("0", { selector: "strong" })).toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "PreHire" })).toBeInTheDocument();
     expect(screen.getByText("Logical", { selector: ".pill" })).toBeInTheDocument();
+  });
+
+  it("renders events, referrals and agency partner operating surfaces", () => {
+    const eventsView = open("#/hr/talent/events");
+    expect(screen.getByRole("heading", { name: "Turn events into governed relationships and measurable outcomes." })).toBeInTheDocument();
+    eventsView.unmount();
+    const referralView = open("#/hr/talent/referrals");
+    expect(screen.getByRole("heading", { name: "Employee referral ledger" })).toBeInTheDocument();
+    referralView.unmount();
+    open("#/hr/talent/partners");
+    expect(screen.getByRole("heading", { name: "Control who may submit, for which jobs and under which agreement." })).toBeInTheDocument();
   });
 });

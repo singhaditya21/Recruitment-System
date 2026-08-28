@@ -193,7 +193,7 @@ export function ObjectDataStudio({
           <div className="panel-heading">
             <div>
               <h2>Logical object catalogue</h2>
-              <span>92 families · 111 expanded concepts</span>
+              <span>{objectCatalogSummary.coreFamilies} core + {objectCatalogSummary.lifecycleFamilies} lifecycle families · {objectCatalogSummary.expandedConcepts} expanded workspace concepts</span>
             </div>
             <Pill tone="info">Select a family</Pill>
           </div>
