@@ -8,7 +8,7 @@
 | Initial market | San Francisco–based employer hiring in the United States |
 | Primary timezone | America/Los_Angeles |
 | Currency | USD |
-| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; v1.6 is live and v1.7 deployment is governed by the repository Pages workflow |
+| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; v1.7 HTTPS deployment verified from commit `9c85f20` on August 28, 2026 |
 | Pilot/production candidate deployment | Approved external application host and backend-for-frontend; providers TBD |
 | Pilot/production HR deployment | Native Salesforce Lightning application |
 | Operational system of record | Salesforce custom recruitment application |
@@ -136,7 +136,7 @@ v1.7 turns the earlier matrix and audit into an executable wireframe contract wh
 | Does Data Readiness reconcile? | It has its own object-domain/lifecycle filters and one filtered object population for cards, charts and detail; it no longer mixes application filters with catalog KPIs | Approved physical metadata readiness and org validation remain open |
 | Is reporting actionable? | Six saved reports, a governed builder, drill-through, schedule preview, delivery/revocation audit, controlled aggregate export, targets and restatements are seeded | Production report engine, recipient identity, distribution, storage and approval remain open |
 | Are architecture/security/operations specified? | Proposed OpenAPI, AsyncAPI, logical Salesforce map, ADR, threat model, privacy flows, SLO/observability, incident, cutover/rollback/restore and pilot evidence plans exist | These are review scaffolds, not deployed or exercised evidence |
-| Is repository governance adequate? | CODEOWNERS, Dependabot, dependency review, CodeQL, security policy and PR checklist are defined | Main-branch protection and accountable required-review policy must be enabled and verified in GitHub |
+| Is repository governance adequate? | `main` is protected with strict `verify`/`codeql` checks, CODEOWNER review, admin enforcement, linear history, conversation resolution and force-push/deletion prevention; Dependabot, dependency review, CodeQL, secret scanning/push protection, security updates, a security policy and PR checklist are enabled | Controls must remain maintained and their alerts/upgrade PRs require accountable review |
 
 The v1.7 definition of “fixed” is deliberately layered: a synthetic product/contract defect may be implemented and tested while the corresponding production finding remains Open until the accountable reviewer accepts dated evidence from the selected org, services, providers and pilot environment.
 
@@ -4076,7 +4076,7 @@ Passing v1.7 does not close a production finding by itself. All 18 controlled `A
 | Reporting | Six seeded saved reports plus builder, drill-through, schedule, delivery audit, controlled aggregate export, targets and restatement previews |
 | Architecture/assurance | Proposed API/event/Salesforce mapping plus architecture, privacy, threat, SLO, incident, cutover/rollback/restore and manual/pilot evidence plans; no deployed production service or approval is claimed |
 | Formal audit | [AUDIT-v1.7.md](AUDIT-v1.7.md) distinguishes synthetic remediation from accountable production closure; `artifacts/v0.9/audit-findings.json` retains all 18 formal Open statuses until review |
-| Final commit, CI, Pages and browser evidence | Filled only after the v1.7 release commit is pushed and the exact GitHub workflow/deployment runs complete |
+| Commit, CI, security, Pages and browser evidence | Implementation commit [`9c85f20`](https://github.com/singhaditya21/Recruitment-System/commit/9c85f2051d20072c9f1396d53f9b32c3c68a6113); [CI run 33150074344](https://github.com/singhaditya21/Recruitment-System/actions/runs/33150074344) passed artifact audit, typecheck, 40 unit/component/contract/axe checks, build and 36 desktop/mobile Chromium journeys; [security run 33150074340](https://github.com/singhaditya21/Recruitment-System/actions/runs/33150074340) passed CodeQL; [Pages run 33150074337](https://github.com/singhaditya21/Recruitment-System/actions/runs/33150074337) deployed the release, which returns HTTPS 200 and contains the v1.7 release marker |
 
 ## 23. Change log
 
