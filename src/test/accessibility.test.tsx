@@ -18,4 +18,12 @@ describe("automated WCAG baseline", () => {
   it("passes the HR action-center baseline", async () => {
     await expectNoAxeViolations("#/hr/action-center");
   });
+
+  it("passes the operational application baseline", async () => {
+    await expectNoAxeViolations("#/hr/applications/APP-DEMO-001");
+  });
+
+  it("passes the candidate control-center baseline", async () => {
+    await expectNoAxeViolations("#/my-applications/APP-DEMO-001");
+  });
 });

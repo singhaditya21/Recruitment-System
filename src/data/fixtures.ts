@@ -3,8 +3,8 @@ export type Tone = "success" | "warning" | "danger" | "info" | "neutral";
 export const prototypeMeta = {
   employer: "Harbor & Pine Labs",
   candidate: "Maya Chen",
-  release: "v1.4-wireframe",
-  generatedAt: "2026-08-27T09:30:00.000Z",
+  release: "v1.5-wireframe",
+  generatedAt: "2026-08-28T09:30:00.000Z",
   fictional: true,
 } as const;
 
@@ -143,6 +143,36 @@ export const applicationRecords: ApplicationRecord[] = [
   { id: "APP-DEMO-011", candidateId: "PER-DEMO-011", candidate: "Leila Haddad", initials: "LH", jobId: "JOB-DEMO-003", job: "Staff Data Platform Engineer", stage: "Offer approval", owner: "Elena Garcia", stageAge: "6 hours", updated: "Yesterday", tone: "success", version: "v7", nextInternalAction: "Approve offer version 4" },
 ];
 
+export const applicationMessages = [
+  { id: "MSG-DEMO-021", direction: "outbound", channel: "Email", subject: "Portfolio interview confirmed", preview: "Your portfolio conversation is confirmed for Aug 27 at 11:00 AM PT.", time: "Aug 24 · 2:14 PM", state: "Delivered", tone: "success" as Tone, candidateVisible: true },
+  { id: "MSG-DEMO-022", direction: "inbound", channel: "Email", subject: "Re: Portfolio interview confirmed", preview: "Thank you — I have the calendar invitation and accessibility details.", time: "Aug 24 · 2:41 PM", state: "Reply matched", tone: "info" as Tone, candidateVisible: true },
+  { id: "MSG-DEMO-023", direction: "scheduled", channel: "Email", subject: "Process update", preview: "Your interview is complete. The team expects to share an update by Aug 29.", time: "Scheduled Aug 28 · 9:00 AM PT", state: "Queued · cancelable", tone: "warning" as Tone, candidateVisible: true },
+] as const;
+
+export const applicationActivity = [
+  { id: "EVT-DEMO-121", time: "Today · 10:20 AM", actor: "Readiness service", event: "Decision readiness recalculated", detail: "Blocked by one required scorecard · calculation v18", tone: "warning" as Tone },
+  { id: "EVT-DEMO-120", time: "Aug 27 · 12:02 PM", actor: "Interview projection", event: "Portfolio session completed", detail: "Attendance recorded separately from evidence", tone: "success" as Tone },
+  { id: "EVT-DEMO-119", time: "Aug 24 · 2:41 PM", actor: "Maya Chen", event: "Candidate reply matched", detail: "MSG-DEMO-022 · candidate-visible", tone: "info" as Tone },
+  { id: "EVT-DEMO-118", time: "Aug 24 · 2:14 PM", actor: "Priya Nair", event: "Interview confirmation delivered", detail: "Template v4 · delivery attempt 1", tone: "success" as Tone },
+] as const;
+
+export const applicationDocuments = [
+  { id: "DOC-DEMO-001", name: "maya-chen-synthetic-resume.pdf", category: "Resume", version: "v2", state: "Clean fixture", access: "Recruiting team", updated: "Aug 22" },
+  { id: "DOC-DEMO-002", name: "application-response-snapshot.pdf", category: "Application", version: "v5", state: "Immutable", access: "Recruiting team", updated: "Aug 22" },
+  { id: "DOC-DEMO-003", name: "candidate-notice-acknowledgement.pdf", category: "Notice evidence", version: "Policy v2", state: "Recorded", access: "Restricted audit", updated: "Aug 22" },
+] as const;
+
+export const applicationTasks = [
+  { id: "TASK-DEMO-031", title: "Collect Jordan Lee’s scorecard", owner: "Alex Rivera", due: "6h overdue", state: "Blocked", tone: "danger" as Tone, source: "ASN-DEMO-001" },
+  { id: "TASK-DEMO-032", title: "Review candidate-safe update", owner: "Priya Nair", due: "Before Aug 28 · 9:00 AM", state: "Ready", tone: "warning" as Tone, source: "MSG-DEMO-023" },
+  { id: "TASK-DEMO-033", title: "Prepare human-led debrief", owner: "Marcus Johnson", due: "After evidence complete", state: "Waiting", tone: "neutral" as Tone, source: "TRN-005" },
+] as const;
+
+export const relatedApplications = [
+  { id: "APP-DEMO-001", job: "Senior Product Designer", stage: "Interviews", relationship: "Current consideration", access: "Full recruiting access" },
+  { id: "APP-DEMO-002", job: "Design Systems Lead", stage: "Recruiter review", relationship: "Separate application", access: "Shared identity only" },
+] as const;
+
 export const interviewRecords = [
   { id: "INT-DEMO-001", applicationId: "APP-DEMO-001", candidate: "Maya Chen", job: "Senior Product Designer", type: "Portfolio review", interviewer: "Jordan Lee", time: "Aug 27 · 11:00 AM PT", state: "Complete", tone: "success" as Tone },
   { id: "INT-DEMO-004", applicationId: "APP-DEMO-004", candidate: "Noah Williams", job: "Recruiting Operations Partner", type: "Recruiter screen", interviewer: "Alex Rivera", time: "Awaiting proposal", state: "Needs scheduling", tone: "warning" as Tone },
@@ -256,6 +286,19 @@ export const automationRuns = [
   { id: "RUN-402", rule: "AUT-008 · Scorecard reminder", state: "Succeeded", tone: "success" as Tone, key: "ASN-18:2026-08-25T08:00:reminder", attempts: "1 attempt" },
   { id: "RUN-403", rule: "AUT-014 · Communication eligibility", state: "Suppressed", tone: "neutral" as Tone, key: "PER-09:EVD-7:eligibility", attempts: "Policy guard" },
   { id: "RUN-404", rule: "AUT-015 · Integration reconciliation", state: "Needs review", tone: "danger" as Tone, key: "calendar:evt-demo-18:project", attempts: "Duplicate ignored · conflict retained" },
+] as const;
+
+export const automationRuleDetails = [
+  { id: "AUT-001", name: "Application confirmation", event: "Application submitted v1", condition: "Current submission and eligible email preference", action: "Queue confirmation and recruiter review work", delay: "Immediate after commit", cancel: "Superseded submission or withdrawal", version: "v5", state: "Active", tone: "success" as Tone },
+  { id: "AUT-008", name: "Scorecard reminder", event: "Scorecard due threshold crossed", condition: "Assignment open, interviewer active, quiet hours clear", action: "Queue one reminder and preserve owner work", delay: "6 business hours", cancel: "Submitted, waived or assignment canceled", version: "v3", state: "Active", tone: "success" as Tone },
+  { id: "AUT-010", name: "Opening reservation", event: "Current offer accepted", condition: "One approved opening and verified current response", action: "Reserve opening and create handoff readiness work", delay: "Immediate with lock", cancel: "Offer termination releases once", version: "v4", state: "Active", tone: "success" as Tone },
+  { id: "AUT-015", name: "Integration reconciliation", event: "Provider event or checkpoint due", condition: "Signature, schema and aggregate version valid", action: "Apply valid result or create owned reconciliation work", delay: "Retry policy v2", cancel: "Duplicate is suppressed; conflict stays owned", version: "v6", state: "Needs review", tone: "danger" as Tone },
+] as const;
+
+export const offerApprovalSteps = [
+  { id: "APR-DEMO-041", role: "Recruiting lead", approver: "Alex Rivera", state: "Approved", detail: "Role, level and start-date context", time: "Yesterday · 4:16 PM", tone: "success" as Tone },
+  { id: "APR-DEMO-042", role: "Finance partner", approver: "Elena Garcia", state: "Action required", detail: "Base salary is inside the approved band", time: "Due in 4h", tone: "warning" as Tone },
+  { id: "APR-DEMO-043", role: "People operations", approver: "Nina Patel", state: "Waiting", detail: "Begins after finance approval", time: "Not started", tone: "neutral" as Tone },
 ] as const;
 
 export const auditEvents = [

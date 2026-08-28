@@ -36,7 +36,7 @@ describe("v0.9 executable artifacts", () => {
   });
 });
 
-describe("v1.4 canonical scenario graph", () => {
+describe("v1.5 canonical scenario graph", () => {
   it("defines a coherent projection for every inherited scenario", () => {
     expect(Object.keys(scenarioStates)).toHaveLength(12);
     for (const state of Object.values(scenarioStates)) {

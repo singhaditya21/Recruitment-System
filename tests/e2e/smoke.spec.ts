@@ -79,4 +79,58 @@ test("candidate availability remains safe and recoverable", async ({ page }) => 
   await page.getByRole("button", { name: "Share demo availability" }).click();
   await page.getByRole("button", { name: "Save availability in demo" }).click();
   await expect(page.getByText("Availability shared · demo")).toBeVisible();
+  await page.evaluate(() => { window.location.hash = "#/hr/interviews/INT-DEMO-004"; });
+  await expect(page.getByText("Submitted candidate availability is ready for coordination.")).toBeVisible();
+});
+
+test("application cockpit exposes functional messages, activity and documents", async ({ page }) => {
+  await page.goto("/#/hr/applications/APP-DEMO-001");
+  await page.getByRole("tab", { name: "Messages" }).click();
+  await expect(page.getByRole("heading", { name: "Candidate conversation" })).toBeVisible();
+  await page.getByRole("button", { name: "Queue message preview" }).click();
+  await expect(page.getByRole("button", { name: "Queued in memory" })).toBeDisabled();
+  await page.getByRole("tab", { name: "Activity" }).click();
+  await expect(page.getByText("Decision readiness recalculated")).toBeVisible();
+  await page.getByRole("tab", { name: "Documents & forms" }).click();
+  await expect(page.getByText("application-response-snapshot.pdf")).toBeVisible();
+});
+
+test("candidate profile controls and message preferences remain candidate scoped", async ({ page }) => {
+  await page.goto("/#/my-applications/APP-DEMO-001");
+  await page.getByRole("tab", { name: "Profile & privacy" }).click();
+  await page.getByLabel("Preferred channel").selectOption("Support-assisted contact");
+  await page.getByRole("button", { name: "Save profile in memory" }).click();
+  await expect(page.getByText("Synthetic profile saved for this browser view.")).toBeVisible();
+  await page.getByRole("tab", { name: "Messages" }).click();
+  await expect(page.getByText("Current channel:")).toContainText("Support-assisted contact");
+});
+
+test("interviewer briefing blinds peer feedback until scorecard submission", async ({ page }) => {
+  await page.goto("/#/hr/assignments/ASN-DEMO-001");
+  await page.getByRole("tab", { name: "Feedback visibility" }).click();
+  await expect(page.getByText("Blinded until submission")).toBeVisible();
+  await page.getByRole("button", { name: "Submit scorecard" }).click();
+  await expect(page.getByText("Submitted · eligible for debrief view")).toBeVisible();
+});
+
+test("automation operator can inspect a collision and replay a failed fixture", async ({ page }) => {
+  await page.goto("/#/hr/automations");
+  await page.getByLabel("View as demo persona").selectOption("USR-CFG-001");
+  await page.getByRole("button", { name: "Run impact simulation" }).click();
+  await expect(page.getByText("1collision")).toBeVisible();
+  await page.getByRole("button", { name: "Preview replay" }).click();
+  await expect(page.getByText("Replayed · reconciled")).toBeVisible();
+});
+
+test("offer approval creates only the allow-listed candidate offer task", async ({ page }) => {
+  await page.goto("/#/hr/action-center");
+  await page.getByRole("combobox", { name: "Choose synthetic scenario" }).selectOption("SCN-006");
+  await openHrNavigation(page, "Offers & handoff");
+  await page.getByRole("link", { name: /Leila Haddad/ }).click();
+  await page.getByRole("button", { name: "Approve current offer" }).click();
+  await expect(page.locator(".pill", { hasText: "Approved v4" })).toBeVisible();
+  await page.getByRole("link", { name: "Candidate Site" }).click();
+  await page.getByRole("link", { name: "My applications" }).click();
+  await expect(page.getByRole("button", { name: "Review synthetic offer" })).toBeVisible();
+  await expect(page.getByText("Offer ready for review", { exact: true }).first()).toBeVisible();
 });

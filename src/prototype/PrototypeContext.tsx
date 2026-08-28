@@ -17,6 +17,10 @@ type PrototypeContextValue = {
   clearNotice: () => void;
   scorecardResolved: boolean;
   resolveScorecard: (message?: string) => void;
+  availabilitySubmitted: boolean;
+  shareAvailability: (message?: string) => void;
+  offerApproved: boolean;
+  approveOffer: (message?: string) => void;
   resetKey: number;
   resetPrototype: () => void;
 };
@@ -28,6 +32,8 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
   const [personaId, setPersonaId] = useState<string>(demoPersonas[0].id);
   const [notice, setNotice] = useState<string | null>(null);
   const [scorecardResolved, setScorecardResolved] = useState(false);
+  const [availabilitySubmitted, setAvailabilitySubmitted] = useState(false);
+  const [offerApproved, setOfferApproved] = useState(false);
   const [resetKey, setResetKey] = useState(0);
   const scenario = scenarioArtifact.scenarios.find((item) => item.id === scenarioId) ?? scenarioArtifact.scenarios[0];
   const persona = demoPersonas.find((item) => item.id === personaId) ?? demoPersonas[0];
@@ -44,6 +50,8 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
       setScenarioId: (id: string) => {
         setScenarioId(id);
         setScorecardResolved(false);
+        setAvailabilitySubmitted(false);
+        setOfferApproved(false);
         setNotice(null);
       },
       personaId,
@@ -57,16 +65,28 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         setScorecardResolved(true);
         setNotice(message);
       },
+      availabilitySubmitted,
+      shareAvailability: (message = "Availability saved in memory. The coordinator workspace now shows the submitted window.") => {
+        setAvailabilitySubmitted(true);
+        setNotice(message);
+      },
+      offerApproved,
+      approveOffer: (message = "Offer version 4 approved in memory. The candidate-safe offer task is now available.") => {
+        setOfferApproved(true);
+        setNotice(message);
+      },
       resetKey,
       resetPrototype: () => {
         setScenarioId("SCN-005");
         setPersonaId(demoPersonas[0].id);
         setScorecardResolved(false);
+        setAvailabilitySubmitted(false);
+        setOfferApproved(false);
         setNotice("Prototype reset to the coherent missing-scorecard scenario.");
         setResetKey((key) => key + 1);
       },
     }),
-    [notice, persona, personaId, resetKey, scenario, scenarioState, scorecardResolved],
+    [availabilitySubmitted, notice, offerApproved, persona, personaId, resetKey, scenario, scenarioState, scorecardResolved],
   );
 
   return <PrototypeContext.Provider value={value}>{children}</PrototypeContext.Provider>;

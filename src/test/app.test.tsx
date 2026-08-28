@@ -43,6 +43,19 @@ describe("candidate prototype journeys", () => {
     await user.click(within(dialog).getByRole("button", { name: "Save availability in demo" }));
     expect(screen.getByText("Availability shared · demo")).toBeInTheDocument();
   });
+
+  it("lets the candidate manage permitted profile and communication controls", async () => {
+    const user = userEvent.setup();
+    open("#/my-applications/APP-DEMO-001");
+    await user.click(screen.getByRole("tab", { name: "Profile & privacy" }));
+    expect(screen.getByRole("heading", { name: "Contact and preferences" })).toBeInTheDocument();
+    await user.selectOptions(screen.getByLabelText("Preferred channel"), "Support-assisted contact");
+    await user.click(screen.getByRole("button", { name: "Save profile in memory" }));
+    expect(screen.getByText("Synthetic profile saved for this browser view.")).toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: "Messages" }));
+    expect(screen.getByRole("heading", { name: "Messages about this application" })).toBeInTheDocument();
+    expect(screen.getByText("Support-assisted contact")).toBeInTheDocument();
+  });
 });
 
 describe("HR prototype controls", () => {
@@ -105,5 +118,52 @@ describe("HR prototype controls", () => {
     await user.click(screen.getByRole("link", { name: /Maya Chen/ }));
     expect(screen.getByText("Scorecards complete")).toBeInTheDocument();
     expect(screen.getByText("Debrief").closest("li")).toHaveTextContent("Current");
+  });
+
+  it("turns application tabs into operational panels", async () => {
+    const user = userEvent.setup();
+    open("#/hr/applications/APP-DEMO-001");
+    await user.click(screen.getByRole("tab", { name: "Messages" }));
+    expect(screen.getByRole("heading", { name: "Candidate conversation" })).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Queue message preview" }));
+    expect(screen.getByRole("button", { name: "Queued in memory" })).toBeDisabled();
+    await user.click(screen.getByRole("tab", { name: "Activity" }));
+    expect(screen.getByText("Decision readiness recalculated")).toBeInTheDocument();
+    await user.click(screen.getByRole("tab", { name: "Documents & forms" }));
+    expect(screen.getByText("application-response-snapshot.pdf")).toBeInTheDocument();
+  });
+
+  it("exposes interviewer briefing and keeps other feedback blinded before submission", async () => {
+    const user = userEvent.setup();
+    open("#/hr/assignments/ASN-DEMO-001");
+    await user.click(screen.getByRole("tab", { name: "Feedback visibility" }));
+    expect(screen.getByText("Other feedback is hidden")).toBeInTheDocument();
+    expect(screen.getByText("Blinded until submission")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Submit scorecard" }));
+    expect(screen.getByText("Submitted · eligible for debrief view")).toBeInTheDocument();
+  });
+
+  it("simulates automation collisions and replay recovery for an authorized persona", async () => {
+    const user = userEvent.setup();
+    open("#/hr/automations");
+    await user.selectOptions(screen.getByRole("combobox", { name: "View as demo persona" }), "USR-CFG-001");
+    await user.click(screen.getByRole("button", { name: "Run impact simulation" }));
+    expect(screen.getByText("Collision:")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "Preview replay" }));
+    expect(screen.getByText("Replayed · reconciled")).toBeInTheDocument();
+  });
+
+  it("projects an approved immutable offer into a candidate-safe task", async () => {
+    const user = userEvent.setup();
+    open("#/hr/action-center");
+    await user.selectOptions(screen.getByRole("combobox", { name: "Choose synthetic scenario" }), "SCN-006");
+    await user.click(screen.getByRole("link", { name: "Offers & handoff" }));
+    await user.click(screen.getByRole("link", { name: /Leila Haddad/ }));
+    await user.click(screen.getByRole("button", { name: "Approve current offer" }));
+    expect(screen.getByText("Approved v4", { selector: ".pill" })).toBeInTheDocument();
+    await user.click(screen.getByRole("link", { name: "Candidate Site" }));
+    await user.click(screen.getByRole("link", { name: "My applications" }));
+    expect(screen.getByRole("button", { name: "Review synthetic offer" })).toBeInTheDocument();
+    expect(screen.getByText("Offer ready for review", { selector: ".pill" })).toBeInTheDocument();
   });
 });

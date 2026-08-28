@@ -2,8 +2,8 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Draft v1.4 — semantic operating wireframe and implementation-alignment contract |
-| Last updated | August 27, 2026 |
+| Status | Draft v1.5 — operational interaction wireframe and implementation-alignment contract |
+| Last updated | August 28, 2026 |
 | Product owner | Aditya Singh |
 | Initial market | San Francisco–based employer hiring in the United States |
 | Primary timezone | America/Los_Angeles |
@@ -12,10 +12,10 @@
 | Pilot/production candidate deployment | Approved external application host and backend-for-frontend; providers TBD |
 | Pilot/production HR deployment | Native Salesforce Lightning application |
 | Operational system of record | Salesforce custom recruitment application |
-| Implementation state | React/TypeScript/Vite synthetic prototype now includes a high-fidelity Salesforce Lightning-style internal shell, both product surfaces, all 12 contracted screen families, a canonical cross-route scenario state, route-bound seeded records, persistent role-scoped persona context, recoverable candidate/HR tasks, automated WCAG contrast checks and responsive record cards; Salesforce metadata, BFF/auth, provider integration and approved pilot environment do not exist |
+| Implementation state | React/TypeScript/Vite synthetic prototype now includes a high-fidelity Salesforce Lightning-style internal shell, both product surfaces, all 12 contracted screen families, a canonical cross-route scenario state, functional application cockpit tabs, saved operational views, candidate profile/privacy/communication controls, scheduling constraints and link lifecycle, blinded interviewer briefing, version-bound offer approval, automation collision/replay operations, automated WCAG contrast checks and responsive record cards; Salesforce metadata, BFF/auth, provider integration and approved pilot environment do not exist |
 | Pilot contract state | Proposed control envelope in section 7.6; employer, legal, provider, Salesforce, and named-owner decisions remain unapproved until their `OD-##` records close |
 | Full-audit state | [v0.9 executable-artifact audit](AUDIT-v0.9.md) complete for local repository evidence; all 18 controlled findings remain Open pending accountable dated review, and real-candidate work remains blocked |
-| v1.4 change boundary | Public-safe semantic wireframe release: application source, deterministic fixtures, tests, visual evidence, README, Pages deployment evidence and this PRD may change; no Salesforce metadata/org, production backend, authentication, provider write, real candidate data or pilot authorization is created |
+| v1.5 change boundary | Public-safe operational interaction wireframe release: application source, deterministic fixtures, tests, visual evidence, README, Pages deployment evidence and this PRD may change; no Salesforce metadata/org, production backend, authentication, provider write, real candidate data or pilot authorization is created |
 
 ## 1. Executive summary
 
@@ -3910,10 +3910,42 @@ Failure of any item keeps v1.4 unaccepted but does not weaken the earlier produc
 | Visual evidence | Five reviewed desktop/mobile captures are versioned under `artifacts/screenshots/v1.4`; the 390 px action-center and candidate-hub compositions use labeled cards and have no page-level overflow |
 | Deployment | Pages run [`33096891987`](https://github.com/singhaditya21/Recruitment-System/actions/runs/33096891987) succeeded for the implementation commit; [https://singhaditya21.github.io/Recruitment-System/](https://singhaditya21.github.io/Recruitment-System/) returned HTTPS `200`, loaded the generated v1.4 JS/CSS assets, rendered HR and candidate hash routes at 390 px with zero page overflow and produced no browser console errors |
 
+### 22.5 Definition of v1.5 operational interaction acceptance
+
+v1.5 is accepted as an **operational interaction wireframe** only when the v1.4 semantic, access, public-safety and deployment conditions continue to pass and the exact deployed release demonstrates all of the following:
+
+1. The application workspace is the primary internal cockpit. Summary, Interviews, Messages, Activity, Documents & forms, Tasks, and Related applications are functioning tab panels rather than labels or toast-only previews.
+2. The application identity header shows job-specific context, owner, stage age, application version, synthetic contact, candidate timezone/local time, source and consent version without treating another application as shared process truth.
+3. Candidate communication exposes thread direction, purpose, channel, delivery/scheduled state, candidate visibility, template/evidence context and an eligibility-checked, cancelable memory-only queue action.
+4. Candidate scheduling distinguishes availability requests from direct booking and exposes one-active-link semantics, timezone, notice, buffers, booking window, expiry, reschedule policy, resource capacity, canonical confirmation and projection recovery.
+5. The interviewer workspace provides minimum-necessary briefing, approved question ownership, synthetic résumé preview, peer-feedback blinding before submission, a locked submitted version and attributed-amendment behavior.
+6. Offer approval exposes ordered steps, policy/quorum, due/escalation, subject fingerprint, send-back, version comparison and material-change invalidation; approval changes only the allow-listed candidate offer task and does not imply acceptance, reservation, handoff or Hired.
+7. Automation operations expose event-condition-action logic, guard/cancellation/idempotency facts, version/release context, impact simulation, collision resolution, run/effect ownership and same-key replay without performing an external side effect.
+8. The candidate hub provides application status/tasks plus candidate-controlled synthetic profile, communication preference, document metadata, privacy-request previews, candidate-safe message history, support and decision-separated experience feedback.
+9. The action center provides named saved operational views over the same governed work records; no saved view becomes a second work ledger.
+10. Candidate availability, scorecard readiness and offer approval remain coherent across candidate/internal routes in the same browser-memory session and reset safely.
+11. Every new action navigates, changes shared/local synthetic state, opens a labeled preview or disables with a reason. No candidate or internal control implies authentication, persistence, file delivery, provider execution or real communication.
+12. Artifact audit, TypeScript, component/contract/axe checks, production build and desktop/mobile Chromium journeys pass; reviewed 1440 px and 390 px captures have no page-level overflow or browser console errors.
+
+Passing v1.5 provides stronger interaction and usability evidence for `WP-02`; it does not establish Salesforce feasibility, production accessibility, authentication/security, provider behavior, moderated usability or permission to process real candidate data.
+
+### 22.6 v1.5 local release-candidate evidence
+
+| Evidence | Current result |
+| --- | --- |
+| Operational application | Seven functional application panels are backed by seeded job-specific messages, activity, documents, tasks, interviews and related-application context; record navigation and message queuing are memory-only |
+| Cross-route interaction | Shared prototype context carries candidate availability, scorecard completion/readiness and offer approval/candidate-task projection until scenario/reset/refresh |
+| Scheduling and evidence | Availability/direct-booking modes, hard/soft constraints, active-link invalidation, participant capacity, session lifecycle, interviewer briefing, feedback blinding and attributed amendment are executable synthetic states |
+| Approval and automation | Ordered offer steps, send-back/approval, immutable version comparison, candidate-safe consequence, event-condition-action rule detail, collision simulation and failed-run replay are executable without external writes |
+| Automated local checks | `pnpm verify` passes the 12-route/12-scenario artifact audit, TypeScript, 23 component/contract/axe checks and production build; `pnpm test:e2e` passes 26 desktop/mobile Chromium journeys |
+| Visual evidence | Six reviewed desktop/mobile captures are versioned under `artifacts/screenshots/v1.5`; inspected routes report zero page-level overflow and zero browser console errors |
+| Deployment | Pending exact-commit CI and GitHub Pages evidence; local success alone does not accept the public release |
+
 ## 23. Change log
 
 | Version | Date | Summary |
 | --- | --- | --- |
+| 1.5 | August 28, 2026 | Converted the semantic wireframe into an operational interaction release without adding production capability or new screen families: implemented seven functional application cockpit tabs with seeded communication, activity, document, task, interview and related-application data; added saved operational views and record navigation; added candidate profile, document, communication preference, privacy request, message-thread and experience controls; distinguished availability requests from direct booking with link/constraint/capacity/lifecycle behavior; added minimum-necessary interviewer briefing, peer-feedback blinding and attributed amendment; added ordered version-bound offer approval with candidate-safe task projection; added event-condition-action automation detail, impact collision simulation and replay recovery; expanded shared cross-route memory state, responsive styling, visual evidence, component/axe coverage and desktop/mobile browser journeys; retained synthetic/no-auth/no-network/no-persistence boundaries and every real-pilot gate |
 | 1.4 | August 27, 2026 | Converted the public wireframe into a semantic operating model without adding production capability or new screen families: introduced one cross-route scenario state for candidate/application/interview/scorecard/decision/offer/handoff/opening/policy facts; route-bound job/application/interview/assignment/decision registries and list views; persistent persona scope with role-specific navigation, queues and safe denial; functioning synthetic record search and explicit top-bar/utility previews; recoverable application blocker actions and cross-route scorecard resolution; candidate-safe scenario labels, application detail/timeline/update and availability preview; honest human-entered scorecard evidence; labeled mobile record cards, non-overlaying utilities, larger support text, visible focus and enabled automated color-contrast testing; retained memory-only/no-network behavior and every production/pilot gate |
 | 1.3 | August 27, 2026 | Implemented the approved public-safe wireframe and reconciled it into the PRD: replaced the internal custom dashboard shell with a high-fidelity Salesforce Lightning-style React composition while remaining explicitly not a Salesforce org; preserved the separate employer-branded candidate portal and all 12 contracted screen families; added 12 switchable internal persona fixtures, seeded recent-application/interview/privacy tables and deterministic coverage across jobs, applications, queues, interviews, scorecards, decisions, offers, handoff, communications, automations, providers, policy, access and audit; added responsive/overflow, persona, privacy and visual evidence requirements; retained memory-only/no-network behavior and every production/pilot gate |
 | 1.2 | August 27, 2026 | PRD-only approval, configuration and human-decision assurance release with no development changes: added an executive decision brief and five-view review architecture; defined 44 canonical `TERM-*` entries, 20 `CFG-*` authority classes, 12 finite `WAV-*` classes, 12 `HDA-*` meaningful-human-decision clauses, 8 `REV-*` candidate process-error classes, 12 `RES-*` research/sampling clauses and 10 expiring `DEBT-*` classes; added the complete two-surface/12-screen-family/13-persona/48-data-group/92-object-family (111 expanded concepts) matrix with explicit unresolved atomic-page and physical-object/field boundaries; extended the companion register through `ART-027`, launch evidence through `EVD-012`, and assigned all 18 existing ballots exactly once across four accountable `WS-*` workshops without adding or approving any `OD-*` decision |
