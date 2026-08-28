@@ -338,3 +338,57 @@ test("data readiness uses its own reconciled object filters", async ({
     page.getByRole("table", { name: "Filtered object readiness detail" }),
   ).toContainText("Candidate");
 });
+
+test("recruiter creates separate job, candidate and application records", async ({
+  page,
+}) => {
+  await page.goto("/#/hr/jobs/new");
+  await page.getByLabel("Job title").fill("Synthetic Reliability Lead");
+  await page.getByLabel("Team").fill("Platform Reliability");
+  await page.getByLabel("Job location").fill("United States · Remote");
+  await page.getByRole("button", { name: "Create draft requisition" }).click();
+  await expect(page.getByText("Draft", { exact: true }).first()).toBeVisible();
+  await expect(page.getByText(/JOB-MEM-001/).first()).toBeVisible();
+
+  await openHrNavigation(page, "Candidates");
+  await page.getByRole("link", { name: "New candidate identity" }).click();
+  await page.getByLabel("Candidate full name").fill("Synthetic Flow Person");
+  await page
+    .getByLabel("Candidate synthetic email")
+    .fill("synthetic.flow.person@example.test");
+  await page.getByRole("button", { name: "Create candidate identity" }).click();
+  await expect(page.getByText("No role-visible applications")).toBeVisible();
+  await page.getByRole("link", { name: "Create application" }).click();
+  await page.getByLabel("Application candidate").selectOption("PER-MEM-001");
+  await page.getByLabel("Application job").selectOption("JOB-MEM-001");
+  await page.getByRole("button", { name: "Create application" }).click();
+  await expect(page.getByText(/APP-MEM-001/).first()).toBeVisible();
+  await expect(page.getByText(/Synthetic Reliability Lead · Recruiter review/)).toBeVisible();
+});
+
+test("heavy candidate list remains searchable and contained on mobile", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/#/hr/candidates");
+  await expect(page.getByText("Page 1 of 16 · 20 rows shown")).toBeVisible();
+  await page.getByRole("textbox", { name: "Search candidates" }).fill("PER-SEED-315");
+  await expect(page.getByText(/PER-SEED-315/)).toBeVisible();
+  const overflow = await page.evaluate(
+    () =>
+      document.documentElement.scrollWidth -
+      document.documentElement.clientWidth,
+  );
+  expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test("persona mutation permissions deny candidate creation safely", async ({
+  page,
+}) => {
+  await page.goto("/#/hr/candidates/new");
+  await page.getByLabel("View as demo persona").selectOption("USR-COO-001");
+  await expect(
+    page.getByRole("heading", { name: "Mutation is not permitted" }),
+  ).toBeVisible();
+  await expect(page.getByLabel("Candidate full name")).toHaveCount(0);
+});

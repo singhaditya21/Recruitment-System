@@ -22,7 +22,7 @@ describe("candidate prototype journeys", () => {
       screen.getByText("No demo roles match those filters"),
     ).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "Clear filters" }));
-    expect(screen.getAllByRole("article")).toHaveLength(3);
+    expect(screen.getAllByRole("article")).toHaveLength(21);
   });
 
   it("blocks review until the synthetic-answer declaration is confirmed", async () => {
@@ -87,6 +87,74 @@ describe("candidate prototype journeys", () => {
 });
 
 describe("HR prototype controls", () => {
+  it("creates and edits a draft job through the object-specific form", async () => {
+    const user = userEvent.setup();
+    open("#/hr/jobs");
+    await user.click(screen.getByRole("link", { name: "New job requisition" }));
+    await user.type(screen.getByLabelText("Job title"), "Synthetic QA Lead");
+    await user.type(screen.getByLabelText("Team"), "Quality Engineering");
+    await user.type(screen.getByLabelText("Job location"), "United States · Remote");
+    await user.click(screen.getByRole("button", { name: "Create draft requisition" }));
+    expect(screen.getByText("JOB-MEM-001")).toBeInTheDocument();
+    expect(screen.getAllByText("Draft", { selector: ".pill" }).length).toBeGreaterThan(0);
+    await user.click(screen.getByRole("link", { name: "Edit" }));
+    expect(screen.getByLabelText("Job lifecycle state")).toBeDisabled();
+    await user.type(screen.getByLabelText("Role summary"), "Structured synthetic quality leadership role.");
+    await user.click(screen.getByRole("button", { name: "Save job changes" }));
+    expect(screen.getByText(/Posting v2 · in-memory/)).toBeInTheDocument();
+  });
+
+  it("creates a candidate identity without silently creating an application", async () => {
+    const user = userEvent.setup();
+    open("#/hr/candidates/new");
+    await user.type(screen.getByLabelText("Candidate full name"), "Synthetic Test Person");
+    await user.type(screen.getByLabelText("Candidate synthetic email"), "synthetic.test.person@example.test");
+    await user.type(screen.getByLabelText("Candidate location"), "Pune, India");
+    await user.click(screen.getByRole("button", { name: "Create candidate identity" }));
+    expect(screen.getByText("PER-MEM-001")).toBeInTheDocument();
+    expect(screen.getByText("0 role-visible links")).toBeInTheDocument();
+    expect(screen.getByText("No role-visible applications")).toBeInTheDocument();
+  });
+
+  it("creates an application as an explicit candidate-job junction", async () => {
+    const user = userEvent.setup();
+    open("#/hr/applications/new");
+    await user.selectOptions(screen.getByLabelText("Application candidate"), "PER-SEED-002");
+    await user.selectOptions(screen.getByLabelText("Application job"), "JOB-DEMO-003");
+    await user.click(screen.getByRole("button", { name: "Create application" }));
+    expect(screen.getAllByText(/APP-MEM-001/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Staff Data Platform Engineer · Recruiter review/)).toBeInTheDocument();
+  });
+
+  it("blocks real-looking email domains and duplicate active applications", async () => {
+    const user = userEvent.setup();
+    open("#/hr/candidates/new");
+    await user.type(screen.getByLabelText("Candidate full name"), "Unsafe Input");
+    await user.type(screen.getByLabelText("Candidate synthetic email"), "person@unsafe.invalid");
+    await user.click(screen.getByRole("button", { name: "Create candidate identity" }));
+    expect(screen.getByRole("alert")).toHaveTextContent("@example.test");
+  });
+
+  it("keeps governed lifecycle, stage and application bindings out of edit forms", () => {
+    const { unmount } = open("#/hr/jobs/JOB-DEMO-001/edit");
+    expect(screen.getByLabelText("Job lifecycle state")).toBeDisabled();
+    unmount();
+    open("#/hr/applications/APP-DEMO-001/edit");
+    expect(screen.getByLabelText("Application candidate")).toBeDisabled();
+    expect(screen.getByLabelText("Application job")).toBeDisabled();
+    expect(screen.getByLabelText("Application stage")).toBeDisabled();
+    expect(screen.getByLabelText("Application owner")).toBeEnabled();
+  });
+
+  it("paginates and filters the heavy candidate collection", async () => {
+    const user = userEvent.setup();
+    open("#/hr/candidates");
+    expect(screen.getByText("Page 1 of 16 · 20 rows shown")).toBeInTheDocument();
+    await user.type(screen.getByRole("textbox", { name: "Search candidates" }), "PER-SEED-315");
+    expect(screen.getByText(/PER-SEED-315/)).toBeInTheDocument();
+    expect(screen.queryByText("Page 1 of 16 · 20 rows shown")).not.toBeInTheDocument();
+  });
+
   it("switches seeded personas and keeps list records populated", async () => {
     const user = userEvent.setup();
     open("#/hr/action-center");

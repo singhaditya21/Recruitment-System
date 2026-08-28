@@ -65,4 +65,15 @@ describe("automated WCAG baseline", () => {
   it("passes the governed reporting baseline", async () => {
     await expectNoAxeViolations("#/hr/reports");
   });
+
+  it("passes the dense candidate and core mutation baselines", async () => {
+    for (const hash of [
+      "#/hr/candidates",
+      "#/hr/candidates/new",
+      "#/hr/jobs/new",
+      "#/hr/applications/new",
+    ]) {
+      await expectNoAxeViolations(hash);
+    }
+  });
 });

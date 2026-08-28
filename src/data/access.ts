@@ -7,6 +7,12 @@ import {
   type ApplicationRecord,
 } from "./fixtures";
 import type { ObjectContract, ObjectDataPoint } from "./objectCatalog";
+import type {
+  AssignmentRecord,
+  CandidateRecord,
+  InterviewRecord,
+  JobRecord,
+} from "./coreRecords";
 
 export type DataScope = {
   population: string;
@@ -155,7 +161,7 @@ export const roleDataScopes: Record<string, DataScope> = {
   },
 };
 
-const applicationIdsByRole: Record<string, string[]> = {
+const anchorApplicationIdsByRole: Record<string, string[]> = {
   Recruiter: applicationRecords.map((row) => row.id),
   "Recruiting Coordinator": ["APP-DEMO-001", "APP-DEMO-004", "APP-DEMO-009"],
   "Hiring Manager": [
@@ -176,13 +182,52 @@ const applicationIdsByRole: Record<string, string[]> = {
 };
 
 export function visibleApplicationsForRole(role: string): ApplicationRecord[] {
-  const ids = new Set(applicationIdsByRole[role] ?? []);
-  return applicationRecords.filter((row) => ids.has(row.id));
+  return visibleApplications(role, applicationRecords);
+}
+
+export function visibleApplications(
+  role: string,
+  records: ApplicationRecord[],
+): ApplicationRecord[] {
+  const anchors = new Set(anchorApplicationIdsByRole[role] ?? []);
+  if (["Recruiter", "Auditor"].includes(role)) return records;
+  const inStableSample = (id: string, divisor: number) =>
+    [...id].reduce((total, character) => total + character.charCodeAt(0), 0) %
+      divisor ===
+    0;
+  return records.filter((row) => {
+    if (anchors.has(row.id)) return true;
+    if (role === "Recruiting Coordinator")
+      return ["Scheduling", "Interviews", "Debrief"].includes(row.stage);
+    if (role === "Hiring Manager")
+      return ["JOB-DEMO-001", "JOB-DEMO-003"].includes(row.jobId) ||
+        inStableSample(row.jobId, 4);
+    if (role === "Offer Approver") return row.stage === "Offer";
+    if (role === "Candidate Support")
+      return (
+        ["Scheduling", "Withdrawn"].includes(row.stage) &&
+        inStableSample(row.id, 3)
+      );
+    if (role === "Application Integrity Reviewer")
+      return row.stage === "Screening" && inStableSample(row.id, 7);
+    if (role === "Platform Admin") return inStableSample(row.id, 17);
+    if (role === "Privacy & Legal") return inStableSample(row.id, 11);
+    if (role === "HRIS Operator") return ["Offer", "Hired"].includes(row.stage);
+    return false;
+  });
 }
 
 export function visibleJobsForRole(role: string) {
+  return visibleJobs(role, jobs as unknown as JobRecord[], applicationRecords);
+}
+
+export function visibleJobs(
+  role: string,
+  records: JobRecord[],
+  applications: ApplicationRecord[],
+) {
   const applicationJobIds = new Set(
-    visibleApplicationsForRole(role).map((row) => row.jobId),
+    visibleApplications(role, applications).map((row) => row.jobId),
   );
   if (
     [
@@ -193,22 +238,83 @@ export function visibleJobsForRole(role: string) {
       "Auditor",
     ].includes(role)
   )
-    return [...jobs];
-  return jobs.filter((row) => applicationJobIds.has(row.id));
+    return records;
+  return records.filter((row) => applicationJobIds.has(row.id));
 }
 
 export function visibleInterviewsForRole(role: string) {
+  return visibleInterviews(
+    role,
+    interviewRecords as unknown as InterviewRecord[],
+    applicationRecords,
+  );
+}
+
+export function visibleInterviews(
+  role: string,
+  records: InterviewRecord[],
+  applications: ApplicationRecord[],
+) {
   if (role === "Interviewer")
-    return interviewRecords.filter((row) => row.interviewer === "Jordan Lee");
-  const ids = new Set(visibleApplicationsForRole(role).map((row) => row.id));
-  return interviewRecords.filter((row) => ids.has(row.applicationId));
+    return records.filter((row) => row.interviewer === "Jordan Lee");
+  const ids = new Set(visibleApplications(role, applications).map((row) => row.id));
+  return records.filter((row) => ids.has(row.applicationId));
 }
 
 export function visibleAssignmentsForRole(role: string) {
+  return visibleAssignments(
+    role,
+    assignmentRecords as unknown as AssignmentRecord[],
+    applicationRecords,
+  );
+}
+
+export function visibleAssignments(
+  role: string,
+  records: AssignmentRecord[],
+  applications: ApplicationRecord[],
+) {
   if (role === "Interviewer")
-    return assignmentRecords.filter((row) => row.interviewer === "Jordan Lee");
-  const ids = new Set(visibleApplicationsForRole(role).map((row) => row.id));
-  return assignmentRecords.filter((row) => ids.has(row.applicationId));
+    return records.filter((row) => row.interviewer === "Jordan Lee");
+  const ids = new Set(visibleApplications(role, applications).map((row) => row.id));
+  return records.filter((row) => ids.has(row.applicationId));
+}
+
+export function visibleCandidates(
+  role: string,
+  candidates: CandidateRecord[],
+  applications: ApplicationRecord[],
+) {
+  if (role === "Recruiter" || role === "Auditor") return candidates;
+  const candidateIds = new Set(
+    visibleApplications(role, applications).map((row) => row.candidateId),
+  );
+  return candidates.filter((candidate) => candidateIds.has(candidate.id));
+}
+
+export type CoreRecordKind = "job" | "candidate" | "application";
+
+export const coreRecordPermissions: Record<
+  CoreRecordKind,
+  { create: string[]; edit: string[] }
+> = {
+  job: {
+    create: ["Recruiter", "Hiring Manager"],
+    edit: ["Recruiter", "Hiring Manager"],
+  },
+  candidate: { create: ["Recruiter"], edit: ["Recruiter"] },
+  application: {
+    create: ["Recruiter"],
+    edit: ["Recruiter", "Recruiting Coordinator"],
+  },
+};
+
+export function canManageCoreRecord(
+  role: string,
+  kind: CoreRecordKind,
+  action: "create" | "edit",
+) {
+  return coreRecordPermissions[kind][action].includes(role);
 }
 
 export function displayCandidateForRole(

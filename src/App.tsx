@@ -50,11 +50,31 @@ function PrototypeRoutes() {
       <Route path="/hr/jobs" element={<HrWorkspace screen="job" />} />
       <Route path="/hr/jobs/:jobId" element={<HrWorkspace screen="job" />} />
       <Route
+        path="/hr/jobs/:jobId/:action"
+        element={<HrWorkspace screen="job" />}
+      />
+      <Route
+        path="/hr/candidates"
+        element={<HrWorkspace screen="candidate" />}
+      />
+      <Route
+        path="/hr/candidates/:candidateId"
+        element={<HrWorkspace screen="candidate" />}
+      />
+      <Route
+        path="/hr/candidates/:candidateId/:action"
+        element={<HrWorkspace screen="candidate" />}
+      />
+      <Route
         path="/hr/applications"
         element={<HrWorkspace screen="application" />}
       />
       <Route
         path="/hr/applications/:applicationId"
+        element={<HrWorkspace screen="application" />}
+      />
+      <Route
+        path="/hr/applications/:applicationId/:action"
         element={<HrWorkspace screen="application" />}
       />
       <Route

@@ -1,0 +1,20 @@
+{
+  "artifact": "ART-001-TRACE-v1.8",
+  "version": "1.8.0",
+  "rows": [
+    { "screenId": "UI-CAN-001", "component": "CandidatePortal/CareersScreen", "tests": ["published-only dense jobs", "search/empty recovery", "mobile"] },
+    { "screenId": "UI-CAN-002", "component": "CandidatePortal/JobScreen", "tests": ["candidate application journey"] },
+    { "screenId": "UI-CAN-003", "component": "CandidatePortal/ApplyScreen", "tests": ["declaration validation", "candidate application journey"] },
+    { "screenId": "UI-CAN-004", "component": "CandidatePortal/HubScreen", "tests": ["availability safety", "profile controls", "offer projection"] },
+    { "screenId": "UI-HR-001", "component": "HrWorkspace/ActionCenter", "tests": ["persona switching", "dense row scope"] },
+    { "screenId": "UI-HR-002", "component": "HrWorkspace/JobWorkspace+JobForm", "tests": ["draft create", "edit/version", "policy block"] },
+    { "screenId": "UI-HR-003", "component": "HrWorkspace/CandidateWorkspace+ApplicationWorkspace", "tests": ["candidate identity create", "application junction create", "duplicate/reference validation", "pagination", "permission denial"] },
+    { "screenId": "UI-HR-004", "component": "HrWorkspace/InterviewWorkspace", "tests": ["workflow provenance", "availability recovery", "role scope"] },
+    { "screenId": "UI-HR-005", "component": "HrWorkspace/ScorecardWorkspace", "tests": ["workflow provenance", "feedback blinding", "readiness recalculation"] },
+    { "screenId": "UI-HR-006", "component": "HrWorkspace/DecisionWorkspace", "tests": ["workflow provenance", "offer approval", "candidate projection"] },
+    { "screenId": "UI-HR-007", "component": "HrWorkspace/AutomationWorkspace", "tests": ["collision simulation", "replay recovery"] },
+    { "screenId": "UI-HR-008", "component": "HrWorkspace/GovernanceWorkspace", "tests": ["privacy scope", "object-data studio"] },
+    { "screenId": "UI-HR-009", "component": "AnalyticsDashboard+ReportWorkspace", "tests": ["600 filter combinations", "zero-denominator N/A", "reporting registries"] },
+    { "screenId": "UI-HR-010", "component": "ObjectWorkspace", "tests": ["92 slugs", "368 page instances", "1,104 records", "1,472 fields", "role/field metadata"] }
+  ]
+}
