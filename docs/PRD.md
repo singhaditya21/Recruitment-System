@@ -8,7 +8,7 @@
 | Initial market | San Francisco–based employer hiring in the United States |
 | Primary timezone | America/Los_Angeles |
 | Currency | USD |
-| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; the local v3.0 release candidate is not the deployed release until section 22.22 records the exact Pages commit and successful workflow |
+| Prototype deployment | [Public GitHub Pages v3.0 wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; application commit `b7682267a8b04b60f163b665cc9316a9cffd011c` merged through [PR #10](https://github.com/singhaditya21/Recruitment-System/pull/10), and verification, security, Pages run `33193262391` and served-site validation succeeded as recorded in section 22.22 |
 | Pilot/production candidate deployment | Approved external application host and backend-for-frontend; providers TBD |
 | Pilot/production HR deployment | Native Salesforce Lightning application |
 | Operational system of record | Salesforce custom recruitment application |
@@ -4632,7 +4632,8 @@ v3.0 is accepted as a **synthetic full-system recruitment and onboarding interac
 | Automated local evidence | `pnpm test` passes 108 tests; `pnpm test:e2e` passes 65 desktop/mobile tests with one intentional duplicate-crawl skip; TypeScript and the production build pass |
 | Responsive/visual evidence | Keyboard skip-to-main and representative 320px reflow checks pass; eight canonical-route v3.0 baselines are generated and visually inspected |
 | Honest evidence limits | Manual screen-reader/moderated usability and all-route pixel-diff evidence are not run; the safely split static bundle retains one documented entry-size advisory |
-| Repository/deployment evidence | Not yet claimed for v3.0; exact commit, PR/check state, Pages workflow and served marker must be appended only after each succeeds |
+| Repository evidence | [PR #10](https://github.com/singhaditya21/Recruitment-System/pull/10) merged application commit `b7682267a8b04b60f163b665cc9316a9cffd011c`; required PR checks passed; main verification run `33193262292` and security run `33193262345` succeeded; the one-owner review exception was temporary and the exact one-approval/code-owner/last-push rule was restored immediately |
+| Deployment evidence | [Pages run `33193262391`](https://github.com/singhaditya21/Recruitment-System/actions/runs/33193262391) succeeded; the public site exposes `v3.0 full-system wireframe`, renders the privileged administration heading and passed a live 1,018-destination crawl with zero route defects/browser errors; machine-readable evidence is in `artifacts/v3.0/deployment.json` |
 | Production boundary | No authentication, server authorization, Salesforce metadata, approved schema, BFF/API, persistent datastore, provider credential/effect, real data, security/legal approval or pilot authorization is introduced |
 
 ## 23. Change log

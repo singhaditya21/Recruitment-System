@@ -173,6 +173,12 @@ const v30Visuals = JSON.parse(
     "utf8",
   ),
 );
+const v30Deployment = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v3.0/deployment.json", import.meta.url),
+    "utf8",
+  ),
+);
 
 assertSeries(
   routes.routes.filter(({ id }) => id.startsWith("UI-CAN")),
@@ -571,6 +577,23 @@ assert(
     v30.production.manualAssistiveTechnology === "not run" &&
     v30.production.pilot === "blocked",
   "v3.0 must retain every production and human-evidence gate",
+);
+assert(
+  v30Deployment.applicationCommit ===
+      "b7682267a8b04b60f163b665cc9316a9cffd011c" &&
+    v30Deployment.pullRequest.number === 10 &&
+    v30Deployment.pullRequest.state === "merged" &&
+    v30Deployment.pages.workflowRunId === 33193262391 &&
+    v30Deployment.pages.conclusion === "success" &&
+    v30Deployment.mainChecks.verificationConclusion === "success" &&
+    v30Deployment.mainChecks.securityConclusion === "success" &&
+    v30Deployment.servedValidation.renderedInternalDestinations === 1018 &&
+    v30Deployment.servedValidation.routeDefects === 0 &&
+    v30Deployment.servedValidation.browserErrors === 0 &&
+    v30Deployment.branchProtectionAfterMerge.requireCodeOwnerReviews === true &&
+    v30Deployment.branchProtectionAfterMerge.requireLastPushApproval === true &&
+    v30Deployment.branchProtectionAfterMerge.requiredApprovingReviewCount === 1,
+  "v3.0 merged-commit, Pages, served-site and restored-protection evidence must reconcile",
 );
 
 const sourcePaths = await sourceFiles(new URL("../src/", import.meta.url));

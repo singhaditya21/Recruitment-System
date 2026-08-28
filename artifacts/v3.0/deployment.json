@@ -1,0 +1,36 @@
+{
+  "version": "3.0.0",
+  "applicationCommit": "b7682267a8b04b60f163b665cc9316a9cffd011c",
+  "pullRequest": {
+    "number": 10,
+    "url": "https://github.com/singhaditya21/Recruitment-System/pull/10",
+    "state": "merged",
+    "mergedAt": "2026-08-28T17:08:04Z"
+  },
+  "pages": {
+    "url": "https://singhaditya21.github.io/Recruitment-System/",
+    "workflowRunId": 33193262391,
+    "workflowUrl": "https://github.com/singhaditya21/Recruitment-System/actions/runs/33193262391",
+    "conclusion": "success"
+  },
+  "mainChecks": {
+    "verificationRunId": 33193262292,
+    "verificationConclusion": "success",
+    "securityRunId": 33193262345,
+    "securityConclusion": "success"
+  },
+  "servedValidation": {
+    "validatedAt": "2026-08-28T22:41:00+05:30",
+    "releaseMarker": "v3.0 full-system wireframe",
+    "renderedInternalDestinations": 1018,
+    "routeDefects": 0,
+    "browserErrors": 0,
+    "representativePrivilegedHeading": "Administration and platform control"
+  },
+  "branchProtectionAfterMerge": {
+    "dismissStaleReviews": true,
+    "requireCodeOwnerReviews": true,
+    "requireLastPushApproval": true,
+    "requiredApprovingReviewCount": 1
+  }
+}
