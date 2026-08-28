@@ -8,7 +8,7 @@
 | Initial market | San Francisco–based employer hiring in the United States |
 | Primary timezone | America/Los_Angeles |
 | Currency | USD |
-| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; HTTPS deployment verified August 27, 2026 |
+| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; v1.6 HTTPS deployment verified August 28, 2026 |
 | Pilot/production candidate deployment | Approved external application host and backend-for-frontend; providers TBD |
 | Pilot/production HR deployment | Native Salesforce Lightning application |
 | Operational system of record | Salesforce custom recruitment application |
@@ -3995,12 +3995,13 @@ Passing v1.6 means 100% of this bounded synthetic wireframe contract is demonstr
 
 | Evidence | Current result |
 | --- | --- |
+| Implementation source | Commit [`6c299d248f7f5eb1c216cfcf66f15c488cf3ca57`](https://github.com/singhaditya21/Recruitment-System/commit/6c299d248f7f5eb1c216cfcf66f15c488cf3ca57) (`Build v1.6 dynamic analytics wireframe`) |
 | Dynamic reporting | 11 persona-filtered dashboard views share four global filters, reconciled cards/breakdowns/trend/detail rows, 18 displayed metric definitions and one visible synthetic source/freshness/exclusion contract over 48 deterministic application rows |
 | Logical object/data coverage | Interactive governance view covers 92 logical object families, 111 expanded concepts, all 48 `DAT-*` groups and 920 minimum logical data-point definitions; 92/92 families have lifecycle, command, relationship/invariant and data-quality coverage |
 | Safety boundary | Reporting source and every record remain fictional and code-bundled; report packages and traceability packages are memory-only previews; no authentication, persistence, Salesforce connection, network request, file export or external write is introduced |
 | Automated local checks | `pnpm verify` passes the 12 canonical-screen-family/12-scenario artifact audit, TypeScript, 29 component/contract/axe checks and production build; `pnpm test:e2e` passes 30 desktop/mobile Chromium journeys |
 | Visual evidence | Four reviewed analytics/object-data desktop/mobile captures are versioned under `artifacts/screenshots/v1.6`; inspected routes report zero page-level overflow and zero browser console errors |
-| Deployment | Pending exact release commit, CI run, Pages run and live-build validation; local acceptance does not substitute for deployed evidence |
+| Deployment | Verification run [`33133733957`](https://github.com/singhaditya21/Recruitment-System/actions/runs/33133733957) and Pages run [`33133733954`](https://github.com/singhaditya21/Recruitment-System/actions/runs/33133733954) succeeded for implementation commit `6c299d248f7f5eb1c216cfcf66f15c488cf3ca57`; [the public wireframe](https://singhaditya21.github.io/Recruitment-System/) and generated v1.6 JS/CSS assets returned HTTPS `200`; live analytics and object/data journeys rendered and interacted correctly at 1440 px and 390 px with zero page-level overflow and zero browser console errors |
 
 ## 23. Change log
 
