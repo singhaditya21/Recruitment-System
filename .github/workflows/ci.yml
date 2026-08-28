@@ -1,4 +1,4 @@
-name: v2.2 deep recruitment and onboarding verification
+name: v3.0 full-system recruitment and onboarding verification
 
 on:
   push:
@@ -21,6 +21,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm audit:artifacts
+      - run: pnpm audit:interactions
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
@@ -29,7 +30,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: v2.2-wireframe-verification-output
+          name: v3.0-wireframe-verification-output
           path: |
             dist
             playwright-report

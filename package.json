@@ -1,7 +1,7 @@
 {
   "name": "recruitment-system-wireframe",
   "private": true,
-  "version": "2.2.0",
+  "version": "3.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "audit:artifacts": "node scripts/audit-artifacts.mjs",
-    "verify": "pnpm audit:artifacts && pnpm typecheck && pnpm test && pnpm build"
+    "audit:interactions": "node scripts/audit-interactions.mjs",
+    "verify": "pnpm audit:artifacts && pnpm audit:interactions && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {
     "lucide-react": "^1.34.0",

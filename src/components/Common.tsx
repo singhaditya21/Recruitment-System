@@ -14,15 +14,31 @@ import { resolveScenarioState, type Tone } from "../data/fixtures";
 
 export function PrototypeBanner() {
   return (
-    <div className="prototype-banner" role="status">
-      <span>
-        <Beaker size={15} aria-hidden="true" /> Synthetic prototype
-      </span>
-      <span>
-        No real jobs, people, authentication, uploads or external writes.
-      </span>
-      <span className="banner-release">v2.2 deep lifecycle wireframe</span>
-    </div>
+    <>
+      <a
+        className="skip-link"
+        href="#main-content"
+        onClick={(event) => {
+          event.preventDefault();
+          const main = document.getElementById("main-content");
+          if (main) {
+            main.tabIndex = -1;
+            main.focus();
+          }
+        }}
+      >
+        Skip to main content
+      </a>
+      <div className="prototype-banner" role="status">
+        <span>
+          <Beaker size={15} aria-hidden="true" /> Synthetic prototype
+        </span>
+        <span>
+          No real jobs, people, authentication, uploads or external writes.
+        </span>
+        <span className="banner-release">v3.0 full-system wireframe</span>
+      </div>
+    </>
   );
 }
 

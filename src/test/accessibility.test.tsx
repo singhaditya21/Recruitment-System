@@ -87,4 +87,21 @@ describe("automated WCAG baseline", () => {
   ])("passes the v2.2 deep-journey baseline at %s", async (hash) => {
     await expectNoAxeViolations(hash);
   });
+
+  it.each([
+    "#/sign-in",
+    "#/my-tasks/CTK-004",
+    "#/preboarding/benefits",
+    "#/hr/events",
+    "#/hr/high-volume/HVC-001",
+    "#/referrer",
+    "#/facilities",
+    "#/manager/recruiting",
+    "#/interviewer/IVP-DEMO-001",
+    "#/admin",
+    "#/admin/integrations/ICG-DEMO-001",
+    "#/admin/imports/IMP-DEMO-001/correct",
+  ])("passes the v3.0 full-system baseline at %s", async (hash) => {
+    await expectNoAxeViolations(hash);
+  });
 });

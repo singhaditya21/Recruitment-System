@@ -232,7 +232,7 @@ function workSubjectForRole(role: string, item: (typeof actionItems)[number]) {
   return `${displayCandidateForRole(role, application)} · ${context}`;
 }
 
-function HrShell({
+export function HrShell({
   title,
   eyebrow,
   screenId,
@@ -403,7 +403,13 @@ function HrShell({
                 <NavLink to="/preboarding">New-hire portal</NavLink>
                 <NavLink to="/manager">Manager portal</NavLink>
                 <NavLink to="/it">IT fulfilment portal</NavLink>
+                <NavLink to="/facilities">Facilities portal</NavLink>
                 <NavLink to="/agency">Agency portal</NavLink>
+                <NavLink to="/interviewer">Interviewer portal</NavLink>
+                <NavLink to="/referrer">Referral portal</NavLink>
+                <NavLink to="/buddy">Buddy portal</NavLink>
+                <NavLink to="/mobility">Internal mobility</NavLink>
+                <NavLink to="/admin">Administration</NavLink>
               </>
             ) : topPanel === "help" ? (
               <>
@@ -416,16 +422,14 @@ function HrShell({
             ) : topPanel === "setup" ? (
               <>
                 <strong>Setup is preview-only</strong>
-                <p>
-                  Configuration changes are unavailable on public GitHub Pages.
-                </p>
+                <p>Configuration changes are memory-only on public GitHub Pages.</p>
+                <NavLink to="/admin">Open administration wireframes</NavLink>
               </>
             ) : (
               <>
                 <strong>3 owned demo alerts</strong>
-                <p>
-                  Scorecard overdue · candidate waiting · integration review.
-                </p>
+                <p>Scorecard overdue · candidate waiting · integration review.</p>
+                <NavLink to="/admin/notifications">Open notification center</NavLink>
               </>
             )}
           </div>

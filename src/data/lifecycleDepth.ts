@@ -156,9 +156,9 @@ export const screeningCases: ScreeningCase[] = Array.from({ length: 32 }, (_, in
 });
 
 export const savedJobs: SavedJob[] = [
-  ["SVJ-001", "senior-product-designer", "Senior Product Designer", "California · Remote", "Remote", "Aug 27", "Open"],
-  ["SVJ-002", "staff-data-platform-engineer", "Staff Data Platform Engineer", "US · Remote", "Remote", "Aug 24", "Open"],
-  ["SVJ-003", "recruiting-operations-partner", "Recruiting Operations Partner", "San Francisco, CA", "Hybrid", "Aug 20", "Closing soon"],
+  ["SVJ-001", "product-designer-remote-demo", "Senior Product Designer", "California · Remote", "Remote", "Aug 27", "Open"],
+  ["SVJ-002", "data-platform-demo", "Staff Data Platform Engineer", "US · Remote", "Remote", "Aug 24", "Open"],
+  ["SVJ-003", "recruiting-operations-demo", "Recruiting Operations Partner", "San Francisco, CA", "Hybrid", "Aug 20", "Closing soon"],
   ["SVJ-004", "security-engineer", "Security Engineer", "Austin, TX", "Hybrid", "Aug 14", "Closed"],
 ].map(([id, publicId, title, location, workplace, savedAt, state]) => ({ id, publicId, title, location, workplace, savedAt, state: state as SavedJob["state"] }));
 
