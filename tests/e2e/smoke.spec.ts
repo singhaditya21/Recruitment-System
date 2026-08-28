@@ -247,7 +247,7 @@ test("analytics portfolio filters seeded metrics and preserves provenance", asyn
   await expect(
     page.getByRole("heading", { name: "Metric definitions" }),
   ).toBeVisible();
-  await expect(page.getByText("SRC-ANALYTICS-FIXTURE-v1.7")).toBeVisible();
+  await expect(page.getByText("SRC-ANALYTICS-CANONICAL-v1.9")).toBeVisible();
   const overflow = await page.evaluate(
     () =>
       document.documentElement.scrollWidth -
@@ -262,7 +262,8 @@ test("object data studio covers all logical families and data groups", async ({
   await page.goto("/#/hr/governance");
   await page.getByLabel("View as demo persona").selectOption("USR-CFG-001");
   await page.getByRole("tab", { name: "Object & data contract" }).click();
-  await expect(page.getByText("92/92").first()).toBeVisible();
+  await expect(page.getByText("138/138").first()).toBeVisible();
+  await expect(page.getByText("129").first()).toBeVisible();
   await expect(page.getByText("48/48")).toBeVisible();
   await page.getByLabel("Search object and data catalog").fill("OBJ-022");
   await page.getByRole("option", { name: /OBJ-022/ }).click();
@@ -270,7 +271,10 @@ test("object data studio covers all logical families and data groups", async ({
     page.getByRole("heading", { name: "Application" }),
   ).toBeVisible();
   await expect(
-    page.getByRole("table", { name: "Application logical data points" }),
+    page.getByRole("table", { name: "Application atomic field contracts" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("cell", { name: /Candidate Id candidate_id/ }),
   ).toBeVisible();
   const overflow = await page.evaluate(
     () =>
@@ -278,6 +282,108 @@ test("object data studio covers all logical families and data groups", async ({
       document.documentElement.clientWidth,
   );
   expect(overflow).toBeLessThanOrEqual(1);
+});
+
+test("v2.1 candidate and new-hire journeys continue through offer and day 90", async ({
+  page,
+}) => {
+  await page.goto("/#/my-applications");
+  await page.getByRole("tab", { name: "Interviews & offer" }).click();
+  await expect(
+    page.getByRole("heading", { name: "Product design conversation" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Senior Product Designer · offer v4" }),
+  ).toBeVisible();
+
+  await page.goto("/#/preboarding/journey");
+  await expect(
+    page.getByRole("heading", { name: "From accepted offer through day 90" }),
+  ).toBeVisible();
+  await expect(page.getByText("8 milestones")).toBeVisible();
+});
+
+test("v2.1 operations expose programs, compliance, experience and talent channels", async ({
+  page,
+}) => {
+  await page.goto("/#/hr/onboarding/programs");
+  await expect(
+    page.getByRole("heading", {
+      name: "Design for every worker transition—not only first-time hires.",
+    }),
+  ).toBeVisible();
+
+  await page.goto("/#/hr/onboarding/compliance");
+  await expect(
+    page.getByRole("heading", { name: "Forms, eligibility and contingency ledger" }),
+  ).toBeVisible();
+
+  await page.goto("/#/hr/onboarding/experience");
+  await expect(
+    page.getByRole("heading", { name: "30/60/90-day operating loop" }),
+  ).toBeVisible();
+
+  await page.goto("/#/hr/talent/referrals");
+  await expect(
+    page.getByRole("heading", { name: "Employee referral ledger" }),
+  ).toBeVisible();
+
+  await page.goto("/#/hr/talent/partners");
+  await expect(
+    page.getByRole("heading", {
+      name: "Control who may submit, for which jobs and under which agreement.",
+    }),
+  ).toBeVisible();
+});
+
+test("v2.2 candidate controls saved jobs, event registration and checks", async ({ page }) => {
+  await page.goto("/#/saved-jobs");
+  await expect(page.getByRole("heading", { name: "Keep track without losing control." })).toBeVisible();
+  await page.getByRole("button", { name: "Remove" }).first().click();
+  await expect(page.getByText("SVJ-001 · saved Aug 27")).toHaveCount(0);
+
+  await page.goto("/#/events/EVT-DEMO-002");
+  await page.getByRole("checkbox").check();
+  await page.getByRole("button", { name: "Register in demo" }).click();
+  await expect(page.getByText("ERG-MEM-001 · memory only")).toBeVisible();
+
+  await page.goto("/#/my-tasks");
+  await expect(page.getByRole("heading", { name: "Know what is requested and how to get help." })).toBeVisible();
+  await expect(page.getByText(/NOTICE-ASSESS-v4 is bound to this task/)).toBeVisible();
+});
+
+test("v2.2 regulated, high-volume, localized and recovery work is executable", async ({ page }) => {
+  await page.goto("/#/hr/cases/SCR-DEMO-004");
+  await expect(page.getByRole("heading", { name: "Consequential-decision guardrail" })).toBeVisible();
+
+  await page.goto("/#/hr/talent/referrals");
+  await expect(page.getByRole("heading", { name: "Referral eligibility, milestones and disputes" })).toBeVisible();
+
+  await page.goto("/#/hr/high-volume");
+  await page.getByRole("button", { name: "Preview bounded bulk action" }).click();
+  await expect(page.getByRole("heading", { name: "Preview invitation for 48 eligible fixtures" })).toBeVisible();
+
+  await page.goto("/#/hr/locales");
+  await expect(page.getByRole("heading", { name: "Country, language and worker-type variants" })).toBeVisible();
+
+  await page.goto("/#/hr/recovery");
+  await page.getByRole("button", { name: "Reconcile safely" }).first().click();
+  await expect(page.getByText(/reconciled in memory using idem_demo_/)).toBeVisible();
+});
+
+test("v2.2 manager, IT and agency portals enforce distinct scoped shells", async ({ page }) => {
+  await page.goto("/#/manager");
+  await expect(page.getByRole("heading", { name: "Make every start intentional." })).toBeVisible();
+
+  await page.goto("/#/it");
+  await expect(page.getByRole("heading", { name: "Ready on time. Least privilege by default." })).toBeVisible();
+
+  await page.goto("/#/agency/submissions/new");
+  await page.getByRole("button", { name: "Submit to validation" }).click();
+  await expect(page.getByText("Submission AGS-MEM-001 created")).toBeVisible();
+
+  await page.goto("/#/agency/submissions/AGS-DEMO-002");
+  await expect(page.getByRole("heading", { name: "Submission outside this agency scope" })).toBeVisible();
 });
 
 test("object workspace executes new, detail and edit states", async ({
@@ -332,10 +438,10 @@ test("data readiness uses its own reconciled object filters", async ({
     .getByLabel("Data readiness domain filter")
     .selectOption("Candidate, identity and application");
   await expect(page.locator(".analytics-result-count")).toContainText(
-    "object families",
+    "navigation families",
   );
   await expect(
-    page.getByRole("table", { name: "Filtered object readiness detail" }),
+    page.getByRole("table", { name: "Filtered atomic model readiness detail" }),
   ).toContainText("Candidate");
 });
 

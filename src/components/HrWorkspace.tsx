@@ -45,6 +45,7 @@ import {
   ShieldCheck,
   Sparkles,
   UsersRound,
+  UserRoundCheck,
   Workflow,
   X,
   XCircle,
@@ -84,6 +85,10 @@ import { AnalyticsDashboard } from "./AnalyticsDashboard";
 import { ObjectDataStudio } from "./ObjectDataStudio";
 import { ObjectWorkspace } from "./ObjectWorkspace";
 import { ReportWorkspace } from "./ReportWorkspace";
+import { OnboardingOperations } from "./OnboardingWorkspace";
+import { TalentGrowthWorkspace } from "./TalentGrowthWorkspace";
+import { PlatformControlWorkspace } from "./PlatformControlWorkspace";
+import { RecruitmentDepthWorkspace } from "./RecruitmentDepthWorkspace";
 import {
   displayCandidateForRole,
   roleDataScopes,
@@ -159,6 +164,30 @@ const hrNav = [
     icon: FileCheck2,
   },
   {
+    to: "/hr/onboarding",
+    label: "Onboarding",
+    screen: "onboarding" as const,
+    icon: UserRoundCheck,
+  },
+  {
+    to: "/hr/talent",
+    label: "Talent growth",
+    screen: "talent" as const,
+    icon: UsersRound,
+  },
+  {
+    to: "/hr/cases",
+    label: "Assessment & checks",
+    screen: "cases" as const,
+    icon: ShieldAlert,
+  },
+  {
+    to: "/hr/high-volume",
+    label: "High-volume",
+    screen: "high-volume" as const,
+    icon: Workflow,
+  },
+  {
     to: "/hr/automations",
     label: "Automation ops",
     screen: "automations" as const,
@@ -169,6 +198,12 @@ const hrNav = [
     label: "Governance",
     screen: "governance" as const,
     icon: ShieldCheck,
+  },
+  {
+    to: "/hr/platform",
+    label: "Platform controls",
+    screen: "platform" as const,
+    icon: Settings2,
   },
 ] as const;
 
@@ -360,11 +395,15 @@ function HrShell({
             </button>
             {topPanel === "launcher" ? (
               <>
-                <strong>Recruitment applications</strong>
+                <strong>Talent lifecycle applications</strong>
                 <NavLink to="/hr/action-center">
                   Talent Operations Console
                 </NavLink>
                 <NavLink to="/careers">Candidate site</NavLink>
+                <NavLink to="/preboarding">New-hire portal</NavLink>
+                <NavLink to="/manager">Manager portal</NavLink>
+                <NavLink to="/it">IT fulfilment portal</NavLink>
+                <NavLink to="/agency">Agency portal</NavLink>
               </>
             ) : topPanel === "help" ? (
               <>
@@ -409,8 +448,8 @@ function HrShell({
             <AppWindow size={20} />
           </span>
           <div>
-            <strong>Recruitment</strong>
-            <small>Talent Operations Console</small>
+            <strong>Talent Lifecycle</strong>
+            <small>Recruitment &amp; Onboarding Console</small>
           </div>
         </div>
         <nav
@@ -444,7 +483,7 @@ function HrShell({
       <div className="hr-shell">
         <main className="hr-main" id="main-content">
           <div className="lightning-breadcrumbs">
-            <NavLink to="/hr/action-center">Recruitment</NavLink>
+            <NavLink to="/hr/action-center">Talent Lifecycle</NavLink>
             <span>/</span>
             <span>{eyebrow}</span>
             <span className="wireframe-disclaimer">
@@ -4343,6 +4382,108 @@ function GovernanceWorkspace() {
   );
 }
 
+function OnboardingWorkspace() {
+  const { announce } = usePrototype();
+  return (
+    <HrShell
+      title="Onboarding command center"
+      eyebrow="Pre-hire, new-hire and worker transition"
+      screenId="UI-HR-011"
+      screen="onboarding"
+      actions={
+        <>
+          <NavLink className="secondary-button" to="/preboarding">
+            New-hire view
+          </NavLink>
+          <button
+            className="primary-button"
+            onClick={() =>
+              announce(
+                "Plan assignment preview opened. No onboarding plan was assigned.",
+              )
+            }
+          >
+            Assignment policy
+          </button>
+        </>
+      }
+    >
+      <OnboardingOperations announce={announce} />
+    </HrShell>
+  );
+}
+
+function TalentWorkspace() {
+  const { announce } = usePrototype();
+  return (
+    <HrShell
+      title="Talent growth workspace"
+      eyebrow="CRM, campaigns, distribution and mobility"
+      screenId="UI-HR-012"
+      screen="talent"
+      actions={
+        <button
+          className="primary-button"
+          onClick={() =>
+            announce(
+              "Create flow opened in preview with purpose, consent and audience gates.",
+            )
+          }
+        >
+          <Plus size={15} /> Create
+        </button>
+      }
+    >
+      <TalentGrowthWorkspace announce={announce} />
+    </HrShell>
+  );
+}
+
+function PlatformWorkspace() {
+  const { announce } = usePrototype();
+  return (
+    <HrShell
+      title="Platform control center"
+      eyebrow="Identity, integrations, data and security"
+      screenId="UI-HR-013"
+      screen="platform"
+      actions={
+        <button
+          className="secondary-button"
+          onClick={() =>
+            announce(
+              "Evidence export preview opened. No production control was marked complete.",
+            )
+          }
+        >
+          <FileText size={15} /> Evidence pack
+        </button>
+      }
+    >
+      <PlatformControlWorkspace announce={announce} />
+    </HrShell>
+  );
+}
+
+function RecruitmentDepth({ screen }: { screen: "cases" | "high-volume" }) {
+  const { announce } = usePrototype();
+  return (
+    <HrShell
+      title={screen === "cases" ? "Assessment and screening operations" : "Scaled recruiting operations"}
+      eyebrow={screen === "cases" ? "Assessment, reference, background and adverse action" : "Evergreen, campus, event and seasonal cohorts"}
+      screenId={screen === "cases" ? "UI-HR-014" : "UI-HR-015"}
+      screen={screen}
+      actions={
+        <button className="secondary-button" onClick={() => announce("Controlled workflow preview opened with version, population, owner and failure-state evidence.")}>
+          <FileText size={15} /> Review contract
+        </button>
+      }
+    >
+      <RecruitmentDepthWorkspace />
+    </HrShell>
+  );
+}
+
 export function HrWorkspace({ screen }: { screen: HrScreen }) {
   if (screen === "actions") return <ActionCenter />;
   if (screen === "analytics") return <AnalyticsWorkspace />;
@@ -4354,6 +4495,11 @@ export function HrWorkspace({ screen }: { screen: HrScreen }) {
   if (screen === "interview") return <InterviewWorkspace />;
   if (screen === "scorecard") return <ScorecardWorkspace />;
   if (screen === "decision") return <DecisionWorkspace />;
+  if (screen === "onboarding") return <OnboardingWorkspace />;
+  if (screen === "talent") return <TalentWorkspace />;
+  if (screen === "cases") return <RecruitmentDepth screen="cases" />;
+  if (screen === "high-volume") return <RecruitmentDepth screen="high-volume" />;
+  if (screen === "platform") return <PlatformWorkspace />;
   if (screen === "automations") return <AutomationWorkspace />;
   return <GovernanceWorkspace />;
 }

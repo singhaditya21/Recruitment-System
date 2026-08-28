@@ -99,19 +99,19 @@ describe("v1.8 metric and filter contracts", () => {
 });
 
 describe("v1.8 object workspace contract", () => {
-  it("instantiates list, new, detail and edit contracts for all 92 families", () => {
+  it("instantiates list, new, detail and edit contracts for all core and lifecycle families", () => {
     expect(objectWorkspaceSummary).toEqual({
-      objectFamilies: 92,
+      objectFamilies: 138,
       pageTemplates: 4,
-      routedPageInstances: 368,
-      seededRecords: 1104,
-      logicalFields: 1472,
-      businessFields: 552,
-      governanceFields: 920,
+      routedPageInstances: 552,
+      seededRecords: 1656,
+      logicalFields: 2208,
+      businessFields: 828,
+      governanceFields: 1380,
     });
     expect(
       new Set(objectCatalog.map((object) => objectSlug(object.name))).size,
-    ).toBe(92);
+    ).toBe(138);
     for (const object of objectCatalog) {
       const base = objectListPath(object);
       expect(objectForSlug(base.split("/").at(-1))).toBe(object);
@@ -134,10 +134,10 @@ describe("v1.8 object workspace contract", () => {
     }
   });
 
-  it("reconciles the 920 legacy claim as governance metadata, not all business fields", () => {
-    expect(objectCatalogSummary.governanceDataPoints).toBe(920);
-    expect(objectCatalogSummary.businessDataPoints).toBe(552);
-    expect(objectCatalogSummary.minimumDataPoints).toBe(1472);
+  it("reconciles the legacy core claim while adding lifecycle business and governance fields", () => {
+    expect(objectCatalogSummary.governanceDataPoints).toBe(1380);
+    expect(objectCatalogSummary.businessDataPoints).toBe(828);
+    expect(objectCatalogSummary.minimumDataPoints).toBe(2208);
   });
 });
 

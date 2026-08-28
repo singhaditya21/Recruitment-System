@@ -1,3 +1,5 @@
+import { lifecycleObjectContracts } from "./lifecyclePlatform";
+
 export type LifecycleType =
   | "Stateful business record"
   | "Versioned configuration"
@@ -1687,7 +1689,7 @@ function dataQualityFor(type: LifecycleType) {
 }
 
 let objectIndex = 0;
-export const objectCatalog: ObjectContract[] = domains.flatMap((domain) =>
+export const coreObjectCatalog: ObjectContract[] = domains.flatMap((domain) =>
   domain.objects.map((name) => {
     objectIndex += 1;
     const id = `OBJ-${String(objectIndex).padStart(3, "0")}`;
@@ -1721,7 +1723,212 @@ export const objectCatalog: ObjectContract[] = domains.flatMap((domain) =>
   }),
 );
 
-export const objectDomains = domains.map((domain) => domain.name);
+const lifecycleRoles: Record<
+  (typeof lifecycleObjectContracts)[number]["domain"],
+  string[]
+> = {
+  Onboarding: [
+    "Recruiter",
+    "Recruiting Coordinator",
+    "Hiring Manager",
+    "Configuration Admin",
+    "HRIS Operator",
+    "Privacy & Legal",
+    "Auditor",
+  ],
+  "Talent relationship": [
+    "Recruiter",
+    "Recruiting Coordinator",
+    "Configuration Admin",
+    "Privacy & Legal",
+    "Auditor",
+  ],
+  "Internal mobility": [
+    "Recruiter",
+    "Hiring Manager",
+    "Configuration Admin",
+    "Privacy & Legal",
+    "Auditor",
+  ],
+  Platform: [
+    "Platform Admin",
+    "Configuration Admin",
+    "HRIS Operator",
+    "Privacy & Legal",
+    "Auditor",
+  ],
+};
+
+const lifecycleDataGroups: Record<
+  (typeof lifecycleObjectContracts)[number]["domain"],
+  string[]
+> = {
+  Onboarding: dat(37, 38, 39, 40, 41, 42),
+  "Talent relationship": dat(20, 21, 22, 36, 47),
+  "Internal mobility": dat(16, 20, 23, 36, 46),
+  Platform: dat(16, 41, 42, 43, 44, 45, 46, 47, 48),
+};
+
+function lifecycleTypeForExtension(name: string): LifecycleType {
+  if (/Template|Definition|Contract|Connection|ApiClient|ServiceIdentity|KeyReference/.test(name))
+    return "Versioned configuration";
+  if (/Conversion|Submission|Envelope|Response|Change|Incident|Review/.test(name))
+    return "Append-only evidence";
+  if (/Profile/.test(name)) return "Derived snapshot / projection";
+  return "Stateful business record";
+}
+
+function labelForLifecycleKey(key: string) {
+  return key
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function typeForLifecycleKey(key: string) {
+  if (key.endsWith("_at")) return "DateTime";
+  if (key.endsWith("_date") || key.endsWith("_from") || key.endsWith("_to"))
+    return "Date";
+  if (key.endsWith("_id") || key.endsWith("_reference")) return "Lookup / ID";
+  if (/count|capacity|rating|version_number|sequence/.test(key)) return "Number";
+  if (/rule|graph|snapshot|evidence|payload|scope|skill/.test(key)) return "Structured JSON";
+  if (/state|status|type|protocol|purpose/.test(key)) return "Controlled picklist";
+  return "Text";
+}
+
+function lifecycleObjectDataPoints(
+  objectId: string,
+  contract: (typeof lifecycleObjectContracts)[number],
+): ObjectDataPoint[] {
+  const readers = lifecycleRoles[contract.domain];
+  const writers = readers.filter((role) => role !== "Auditor");
+  const businessKeys = [
+    ...contract.keyFields,
+    "parent_reference",
+    "business_owner_reference",
+  ].slice(0, 6);
+  const governanceKeys = [
+    "stable_id",
+    "lifecycle_state",
+    "business_version",
+    "effective_time",
+    "source_system",
+    "owner_or_service",
+    "classification",
+    "retention_class",
+    "legal_hold_state",
+    "evidence_fingerprint",
+  ];
+  const classification = contract.restricted
+    ? "Restricted lifecycle data"
+    : "Internal lifecycle data";
+  const business = businessKeys.map((key, index) => ({
+    id: `FLD-${objectId.slice(4)}-${String(index + 1).padStart(2, "0")}`,
+    key,
+    label: labelForLifecycleKey(key),
+    type: typeForLifecycleKey(key),
+    category: "Business" as const,
+    requiredWhen: "Required when the lifecycle record is created or advances",
+    source: contract.systemOfRecord,
+    classification,
+    qualityRule: `${labelForLifecycleKey(key)} must reconcile to the authoritative parent and lifecycle version`,
+    readRoles: readers,
+    writeRoles: writers,
+    sampleValue:
+      key === "parent_reference"
+        ? `${contract.parent}-DEMO-001`
+        : key === "business_owner_reference"
+          ? "USR-DEMO-OWNER"
+          : `${key.toUpperCase()}-DEMO-001`,
+  }));
+  const governance = governanceKeys.map((key, index) => ({
+    id: `FLD-${objectId.slice(4)}-${String(index + 7).padStart(2, "0")}`,
+    key,
+    label: labelForLifecycleKey(key),
+    type: typeForLifecycleKey(key),
+    category: "Governance" as const,
+    requiredWhen: "Always for governed lifecycle records",
+    source: contract.systemOfRecord,
+    classification,
+    qualityRule: `${labelForLifecycleKey(key)} must be present, versioned and attributable`,
+    readRoles: readers,
+    writeRoles: writers.filter((role) =>
+      ["Configuration Admin", "Platform Admin", "HRIS Operator", "Privacy & Legal"].includes(role),
+    ),
+    sampleValue:
+      key === "stable_id"
+        ? `${objectId.replace("OBJ", "REC")}-001`
+        : key === "lifecycle_state"
+          ? contract.states[0]
+          : key === "business_version"
+            ? "1"
+            : key === "effective_time"
+              ? "2026-08-28T12:00:00Z"
+              : key === "source_system"
+                ? contract.systemOfRecord
+                : key === "owner_or_service"
+                  ? "Lifecycle operations"
+                  : key === "classification"
+                    ? classification
+                    : key === "retention_class"
+                      ? "RET-LIFECYCLE-v1"
+                      : key === "legal_hold_state"
+                        ? "Not on hold"
+                        : "sha256:lifecycle-fixture…01",
+  }));
+  return [...business, ...governance];
+}
+
+export const lifecycleObjectCatalog: ObjectContract[] =
+  lifecycleObjectContracts.map((contract, index) => {
+    const id = `OBJ-${String(coreObjectCatalog.length + index + 1).padStart(3, "0")}`;
+    const lifecycleType = lifecycleTypeForExtension(contract.name);
+    return {
+      id,
+      name: contract.name,
+      domain: contract.domain,
+      lifecycleType,
+      states: contract.states,
+      grain: contract.grain,
+      sourceOfTruth: contract.systemOfRecord,
+      owner: `${contract.domain} accountable owner`,
+      classification: contract.restricted
+        ? "Restricted lifecycle data"
+        : "Internal lifecycle data",
+      retention: "Purpose-specific lifecycle schedule with legal-hold handling",
+      dataGroups: lifecycleDataGroups[contract.domain],
+      personas: lifecycleRoles[contract.domain],
+      relationships: [
+        `Authoritative parent: ${contract.parent}`,
+        `One ${contract.name} record follows the declared grain and preserves version history`,
+      ],
+      commands: commandsFor(lifecycleType),
+      dataQuality: dataQualityFor(lifecycleType),
+      dataPoints: lifecycleObjectDataPoints(id, contract),
+    };
+  });
+
+export const objectCatalog: ObjectContract[] = [
+  ...coreObjectCatalog,
+  ...lifecycleObjectCatalog,
+];
+
+export const coreObjectCatalogSummary = {
+  families: coreObjectCatalog.length,
+  expandedConcepts: 111,
+  logicalDataGroups: new Set(coreObjectCatalog.flatMap((item) => item.dataGroups)).size,
+  minimumDataPoints: coreObjectCatalog.reduce((sum, item) => sum + item.dataPoints.length, 0),
+  businessDataPoints: coreObjectCatalog.reduce((sum, item) => sum + item.dataPoints.filter((field) => field.category === "Business").length, 0),
+  governanceDataPoints: coreObjectCatalog.reduce((sum, item) => sum + item.dataPoints.filter((field) => field.category === "Governance").length, 0),
+  lifecycleClassified: coreObjectCatalog.filter((item) => item.states.length > 0).length,
+  commandClassified: coreObjectCatalog.filter((item) => item.commands.length > 0).length,
+  relationshipClassified: coreObjectCatalog.filter((item) => item.relationships.length > 0).length,
+};
+
+export const objectDomains = [
+  ...domains.map((domain) => domain.name),
+  ...new Set(lifecycleObjectContracts.map((object) => object.domain)),
+];
 export const lifecycleTypes: LifecycleType[] = [
   "Stateful business record",
   "Versioned configuration",
@@ -1731,7 +1938,9 @@ export const lifecycleTypes: LifecycleType[] = [
 ];
 export const objectCatalogSummary = {
   families: objectCatalog.length,
-  expandedConcepts: 111,
+  coreFamilies: coreObjectCatalog.length,
+  lifecycleFamilies: lifecycleObjectCatalog.length,
+  expandedConcepts: 157,
   logicalDataGroups: new Set(objectCatalog.flatMap((item) => item.dataGroups))
     .size,
   minimumDataPoints: objectCatalog.reduce(

@@ -8,7 +8,7 @@ import traceability from "../../artifacts/v0.9/traceability.json";
 import accessibility from "../../artifacts/v0.9/content-accessibility.json";
 import { scenarioStates } from "../data/fixtures";
 import { analyticsApplications, dashboardCatalog } from "../data/analytics";
-import { objectCatalog, objectCatalogSummary } from "../data/objectCatalog";
+import { coreObjectCatalog as objectCatalog, coreObjectCatalogSummary as objectCatalogSummary } from "../data/objectCatalog";
 
 describe("v0.9 executable artifacts", () => {
   it("keeps every screen traced to scenarios, requirements, tests and accessibility", () => {
@@ -113,7 +113,7 @@ describe("v1.7 canonical scenario and reporting graph", () => {
       analyticsApplications.every(
         (row) =>
           row.id.startsWith("ANA-APP-") &&
-          row.candidate.startsWith("Synthetic candidate"),
+          row.candidate.startsWith("Synthetic subject"),
       ),
     ).toBe(true);
     expect(

@@ -1,6 +1,8 @@
 import { HashRouter, Navigate, Route, Routes } from "react-router-dom";
 import { CandidatePortal } from "./components/CandidatePortal";
 import { HrWorkspace } from "./components/HrWorkspace";
+import { NewHirePortal } from "./components/NewHirePortal";
+import { RolePortal } from "./components/RolePortals";
 import { PrototypeProvider, usePrototype } from "./prototype/PrototypeContext";
 
 function PrototypeRoutes() {
@@ -25,6 +27,19 @@ function PrototypeRoutes() {
         path="/my-applications/:id"
         element={<CandidatePortal screen="hub" />}
       />
+      <Route path="/saved-jobs" element={<CandidatePortal screen="relationship" />} />
+      <Route path="/job-alerts" element={<CandidatePortal screen="relationship" />} />
+      <Route path="/events" element={<CandidatePortal screen="relationship" />} />
+      <Route path="/events/:eventId" element={<CandidatePortal screen="relationship" />} />
+      <Route path="/my-tasks" element={<CandidatePortal screen="tasks" />} />
+      <Route path="/preboarding" element={<NewHirePortal />} />
+      <Route path="/preboarding/tasks" element={<NewHirePortal />} />
+      <Route path="/preboarding/tasks/:taskId" element={<NewHirePortal />} />
+      <Route path="/preboarding/documents" element={<NewHirePortal />} />
+      <Route path="/preboarding/profile" element={<NewHirePortal />} />
+      <Route path="/preboarding/day-one" element={<NewHirePortal />} />
+      <Route path="/preboarding/journey" element={<NewHirePortal />} />
+      <Route path="/preboarding/help" element={<NewHirePortal />} />
       <Route
         path="/hr/action-center"
         element={<HrWorkspace screen="actions" />}
@@ -106,6 +121,63 @@ function PrototypeRoutes() {
         path="/hr/governance"
         element={<HrWorkspace screen="governance" />}
       />
+      <Route
+        path="/hr/onboarding"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
+        path="/hr/onboarding/new-hires"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
+        path="/hr/onboarding/programs"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
+        path="/hr/onboarding/new-hires/:newHireId"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
+        path="/hr/onboarding/templates"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
+        path="/hr/onboarding/compliance"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
+        path="/hr/onboarding/exceptions"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
+        path="/hr/onboarding/provisioning"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
+        path="/hr/onboarding/experience"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route
+        path="/hr/onboarding/analytics"
+        element={<HrWorkspace screen="onboarding" />}
+      />
+      <Route path="/hr/talent" element={<HrWorkspace screen="talent" />} />
+      <Route path="/hr/talent/:talentView" element={<HrWorkspace screen="talent" />} />
+      <Route path="/hr/cases" element={<HrWorkspace screen="cases" />} />
+      <Route path="/hr/cases/:caseId" element={<HrWorkspace screen="cases" />} />
+      <Route path="/hr/high-volume" element={<HrWorkspace screen="high-volume" />} />
+      <Route path="/hr/locales" element={<HrWorkspace screen="high-volume" />} />
+      <Route path="/hr/recovery" element={<HrWorkspace screen="high-volume" />} />
+      <Route path="/hr/platform" element={<HrWorkspace screen="platform" />} />
+      <Route path="/hr/platform/:platformView" element={<HrWorkspace screen="platform" />} />
+      <Route path="/manager" element={<RolePortal kind="manager" />} />
+      <Route path="/manager/new-hires/:newHireId" element={<RolePortal kind="manager" />} />
+      <Route path="/it" element={<RolePortal kind="it" />} />
+      <Route path="/it/requests/:requestId" element={<RolePortal kind="it" />} />
+      <Route path="/agency" element={<RolePortal kind="agency" />} />
+      <Route path="/agency/submissions" element={<RolePortal kind="agency" />} />
+      <Route path="/agency/submissions/new" element={<RolePortal kind="agency" />} />
+      <Route path="/agency/submissions/:submissionId" element={<RolePortal kind="agency" />} />
       <Route path="*" element={<Navigate replace to="/careers" />} />
     </Routes>
   );

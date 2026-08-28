@@ -1,0 +1,54 @@
+{
+  "version": "2.2.0",
+  "releaseName": "Deep recruitment and onboarding journey wireframe",
+  "syntheticOnly": true,
+  "generatedAt": "2026-08-28T17:15:00+05:30",
+  "counts": {
+    "personas": 13,
+    "screenContracts": 32,
+    "routeDeclarations": 71,
+    "functionalDestinations": 69,
+    "redirectRoutes": 2,
+    "routedObjectFamilies": 138,
+    "routedObjectPageInstances": 552,
+    "seededObjectRecords": 1656,
+    "workspaceFieldContracts": 2208,
+    "coreAtomicConcepts": 129,
+    "lifecycleExtensionObjects": 46,
+    "combinedLogicalConcepts": 175,
+    "physicalObjectsApproved": 0
+  },
+  "deepJourneySeeds": {
+    "candidateTasks": 6,
+    "screeningCases": 32,
+    "savedJobs": 4,
+    "jobAlerts": 3,
+    "eventRegistrations": 36,
+    "referralRewards": 24,
+    "agencySubmissions": 32,
+    "highVolumeCampaigns": 8,
+    "localeVariants": 12,
+    "recoveryScenarios": 24
+  },
+  "firstClassJourneys": [
+    "candidate saved jobs, alerts and event registration/waitlist/cancellation",
+    "candidate assessment, reference, background and pre-adverse task control",
+    "internal regulated case queue, detail, human review and redress guardrail",
+    "evergreen, campus, hiring-event and seasonal high-volume coordination",
+    "country, language and worker-type content variants",
+    "expiry, duplicate, stale-version, provider, cancellation and retry recovery",
+    "relationship-scoped manager readiness portal",
+    "function-scoped IT fulfilment portal",
+    "agency-scoped assignment, duplicate, ownership, fee and submission portal"
+  ],
+  "production": {
+    "authentication": "not implemented",
+    "serverAuthorization": "not implemented",
+    "persistence": "browser memory only",
+    "integrations": "synthetic contracts only",
+    "physicalSchemaApproved": false,
+    "securityApproval": "not obtained",
+    "privacyLegalApproval": "not obtained",
+    "pilot": "blocked"
+  }
+}

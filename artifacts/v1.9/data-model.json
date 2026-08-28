@@ -1,0 +1,35 @@
+{
+  "artifact": "ART-006-v1.9-logical-data-model",
+  "version": "1.9.0",
+  "authoritativeSources": [
+    "src/data/canonicalDataModel.ts",
+    "src/data/canonicalRuntime.ts",
+    "src/data/analytics.ts",
+    "src/data/access.ts",
+    "docs/DATA-MODEL-v1.9.md",
+    "docs/MATRIX-v1.9.md",
+    "docs/AUDIT-v1.9.md"
+  ],
+  "contractIds": {
+    "concept": "CON-*",
+    "field": "AFLD-*",
+    "relationship": "REL-*",
+    "transition": "DTR-*",
+    "invariant": "INV-DM-*",
+    "quality": "DQ-*"
+  },
+  "physicalDisposition": {
+    "status": "Proposed — accountable approval required",
+    "approvedObjectCount": 0,
+    "rule": "A navigation family or atomic concept does not imply one Salesforce object. Standard, custom-object, custom-metadata, external-file, event/archive, BFF-read-model and embedded-value dispositions must be reviewed before deployment."
+  },
+  "acceptanceEvidence": [
+    "src/test/dataModel.test.ts",
+    "src/test/contracts.test.ts",
+    "src/test/readiness.test.ts",
+    "src/test/app.test.tsx",
+    "src/test/accessibility.test.tsx",
+    "tests/e2e/smoke.spec.ts",
+    "scripts/audit-artifacts.mjs"
+  ]
+}

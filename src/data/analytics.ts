@@ -1,5 +1,12 @@
+import { seededCanonicalCoreStore } from "./canonicalRuntime";
+
 export type AnalyticsApplication = {
   id: string;
+  applicationId: string;
+  sourceEventId: string;
+  aggregateVersion: number;
+  sourceObservedAt: string;
+  restatementVersion: number;
   candidate: string;
   jobId: string;
   job: string;
@@ -42,44 +49,11 @@ export type AnalyticsApplication = {
   handoffState: "Not ready" | "Ready" | "Reconciled" | "Failed";
 };
 
-const jobs = [
-  {
-    id: "JOB-DEMO-001",
-    title: "Senior Product Designer",
-    department: "Product & Research",
-    location: "Remote" as const,
-  },
-  {
-    id: "JOB-DEMO-002",
-    title: "Recruiting Operations Partner",
-    department: "People Operations",
-    location: "Hybrid" as const,
-  },
-  {
-    id: "JOB-DEMO-003",
-    title: "Staff Data Platform Engineer",
-    department: "Engineering",
-    location: "Remote" as const,
-  },
-];
-const stages: AnalyticsApplication["stage"][] = [
-  "Recruiter review",
-  "Screening",
-  "Scheduling",
-  "Interviews",
-  "Debrief",
-  "Offer",
-  "Hired",
-  "Rejected",
-  "Withdrawn",
-];
-const sources: AnalyticsApplication["source"][] = [
-  "Careers site",
-  "Referral",
-  "Agency",
-  "Sourced",
-];
-const owners = ["Alex Rivera", "Priya Nair", "Marcus Johnson", "Ops queue"];
+const ownerNames: Record<string, string> = {
+  "USR-REC-001": "Alex Rivera",
+  "USR-COO-001": "Priya Nair",
+  "USR-HM-001": "Marcus Johnson",
+};
 const slaByStage: Record<AnalyticsApplication["stage"], number> = {
   "Recruiter review": 3,
   Screening: 3,
@@ -92,121 +66,136 @@ const slaByStage: Record<AnalyticsApplication["stage"], number> = {
   Withdrawn: 7,
 };
 
-const fixtureWindows = [2, 14, 60] as const;
-
-// Complete cross-product coverage keeps every supported job × source × stage ×
-// rolling-window filter contract populated. It intentionally optimizes contract
-// testability, not production-volume realism.
-export const analyticsApplications: AnalyticsApplication[] = jobs.flatMap(
-  (job, jobIndex) =>
-    sources.flatMap((source, sourceIndex) =>
-      stages.flatMap((stage, stageIndex) =>
-        fixtureWindows.map((daysAgo, windowIndex) => {
-          const index =
-            ((jobIndex * sources.length + sourceIndex) * stages.length +
-              stageIndex) *
-              fixtureWindows.length +
-            windowIndex;
-          const stageAgeDays = (index * 3) % 11;
-          const interviewState: AnalyticsApplication["interviewState"] = [
-            "Scheduling",
-            "Interviews",
-            "Debrief",
-            "Offer",
-            "Hired",
-          ].includes(stage)
-            ? stage === "Scheduling"
-              ? "Needs scheduling"
-              : stage === "Interviews"
-                ? index % 3 === 0
-                  ? "Confirmed"
-                  : "Complete"
-                : "Complete"
-            : "Not required";
-          const offerState: AnalyticsApplication["offerState"] =
-            stage === "Offer"
-              ? index % 2 === 0
-                ? "Pending approval"
-                : "Extended"
-              : stage === "Hired"
-                ? "Accepted"
-                : stage === "Rejected" && index % 2 === 0
-                  ? "Declined"
-                  : "Not started";
-          return {
-            id: `ANA-APP-${String(index + 1).padStart(3, "0")}`,
-            candidate: `Synthetic candidate ${String(index + 1).padStart(2, "0")}`,
-            jobId: job.id,
-            job: job.title,
-            department: job.department,
-            location: job.location,
-            source,
-            stage,
-            owner: owners[index % owners.length],
-            daysAgo,
-            stageAgeDays,
-            slaDays: slaByStage[stage],
-            interviewState,
-            scorecardsSubmitted:
-              interviewState === "Complete"
-                ? index % 4 === 0
-                  ? 2
-                  : 3
-                : interviewState === "Confirmed"
-                  ? 0
-                  : 0,
-            scorecardsRequired: interviewState === "Not required" ? 0 : 3,
-            offerState,
-            experienceEligible: index % 5 !== 0,
-            experienceRating:
-              index % 5 === 0 || index % 4 === 0
-                ? null
-                : index % 9 === 0
-                  ? 2
-                  : 3 + (index % 3),
-            messageState:
-              index % 13 === 0
-                ? "Failed"
-                : index % 7 === 0
-                  ? "Queued"
-                  : index % 11 === 0
-                    ? "Suppressed"
-                    : "Delivered",
-            automationState:
-              index % 17 === 0
-                ? "Failed"
-                : index % 8 === 0
-                  ? "Suppressed"
-                  : index % 6 === 0
-                    ? "Manual"
-                    : "Succeeded",
-            privacyState:
-              index % 23 === 0
-                ? "Overdue"
-                : index % 17 === 0
-                  ? "Due soon"
-                  : index % 13 === 0
-                    ? "Open"
-                    : "None",
-            integrityState:
-              index % 19 === 0
-                ? "Review"
-                : index % 11 === 0
-                  ? "Cleared"
-                  : "None",
-            handoffState:
-              stage === "Hired"
-                ? "Reconciled"
-                : stage === "Offer" && index % 3 === 0
-                  ? "Ready"
-                  : stage === "Offer" && index % 5 === 0
-                    ? "Failed"
-                    : "Not ready",
-          };
-        }),
-      ),
-    ),
+const requisitionById = new Map(
+  seededCanonicalCoreStore.requisitions.map((requisition) => [
+    requisition.id,
+    requisition,
+  ]),
 );
+const stageEventByApplication = new Map(
+  seededCanonicalCoreStore.applicationStageEvents.map((event) => [
+    event.applicationId,
+    event,
+  ]),
+);
+
+// The 324-row contract-complete cohort is a governed projection of the same
+// canonical application aggregates used by the operational wireframe. It is
+// no longer a separately invented business population.
+export const analyticsApplications: AnalyticsApplication[] =
+  seededCanonicalCoreStore.applications
+    .filter((application) => application.analyticsCohort)
+    .map((application, index) => {
+      const requisition = requisitionById.get(application.requisitionId);
+      const stageEvent = stageEventByApplication.get(application.id);
+      if (!requisition || !stageEvent || application.analyticsWindowDays === null)
+        throw new Error(`Incomplete analytics lineage for ${application.id}`);
+      const stage = stageEvent.destinationStage as AnalyticsApplication["stage"];
+      const source = application.sourceCode as AnalyticsApplication["source"];
+      const stageAgeDays = Math.max(
+        0,
+        Math.round(
+          (new Date("2026-08-28T12:00:00.000Z").getTime() -
+            new Date(stageEvent.occurredAt).getTime()) /
+            86_400_000,
+        ),
+      );
+      const interviewState: AnalyticsApplication["interviewState"] = [
+        "Scheduling",
+        "Interviews",
+        "Debrief",
+        "Offer",
+        "Hired",
+      ].includes(stage)
+        ? stage === "Scheduling"
+          ? "Needs scheduling"
+          : stage === "Interviews"
+            ? index % 3 === 0
+              ? "Confirmed"
+              : "Complete"
+            : "Complete"
+        : "Not required";
+      const offerState: AnalyticsApplication["offerState"] =
+        stage === "Offer"
+          ? index % 2 === 0
+            ? "Pending approval"
+            : "Extended"
+          : stage === "Hired"
+            ? "Accepted"
+            : stage === "Rejected" && index % 2 === 0
+              ? "Declined"
+              : "Not started";
+      return {
+        id: `ANA-APP-${String(index + 1).padStart(3, "0")}`,
+        applicationId: application.id,
+        sourceEventId: stageEvent.id,
+        aggregateVersion: stageEvent.aggregateVersion,
+        sourceObservedAt: stageEvent.occurredAt,
+        restatementVersion: 1,
+        candidate: `Synthetic subject · ${application.candidateId}`,
+        jobId: requisition.postingId,
+        job: requisition.title,
+        department: requisition.departmentName,
+        location:
+          requisition.workplaceMode === "Hybrid" ? "Hybrid" : "Remote",
+        source,
+        stage,
+        owner: ownerNames[application.ownerId] ?? "Ops queue",
+        daysAgo: application.analyticsWindowDays,
+        stageAgeDays,
+        slaDays: slaByStage[stage],
+        interviewState,
+        scorecardsSubmitted:
+          interviewState === "Complete" ? (index % 4 === 0 ? 2 : 3) : 0,
+        scorecardsRequired: interviewState === "Not required" ? 0 : 3,
+        offerState,
+        experienceEligible: index % 5 !== 0,
+        experienceRating:
+          index % 5 === 0 || index % 4 === 0
+            ? null
+            : index % 9 === 0
+              ? 2
+              : 3 + (index % 3),
+        messageState:
+          index % 13 === 0
+            ? "Failed"
+            : index % 7 === 0
+              ? "Queued"
+              : index % 11 === 0
+                ? "Suppressed"
+                : "Delivered",
+        automationState:
+          index % 17 === 0
+            ? "Failed"
+            : index % 8 === 0
+              ? "Suppressed"
+              : index % 6 === 0
+                ? "Manual"
+                : "Succeeded",
+        privacyState:
+          index % 23 === 0
+            ? "Overdue"
+            : index % 17 === 0
+              ? "Due soon"
+              : index % 13 === 0
+                ? "Open"
+                : "None",
+        integrityState:
+          index % 19 === 0
+            ? "Review"
+            : index % 11 === 0
+              ? "Cleared"
+              : "None",
+        handoffState:
+          stage === "Hired"
+            ? "Reconciled"
+            : stage === "Offer" && index % 3 === 0
+              ? "Ready"
+              : stage === "Offer" && index % 5 === 0
+                ? "Failed"
+                : "Not ready",
+      };
+    });
 
 export type DashboardDefinition = {
   id: string;
@@ -383,11 +372,11 @@ export const dashboardCatalog: DashboardDefinition[] = [
   },
   {
     id: "data-readiness",
-    name: "Object and data contract readiness",
+    name: "Canonical data-model readiness",
     shortName: "Data contract",
     purpose: "Solution-design readiness",
     question:
-      "Does every logical object have lifecycle, business-field, relationship and command coverage?",
+      "Does every navigation family resolve to atomic concepts with complete field, relationship and transition contracts?",
     roles: ["Configuration Admin", "Platform Admin", "Privacy & Legal"],
     metricKeys: [
       "object_coverage",
@@ -507,41 +496,41 @@ export const metricDefinitions: Record<
     direction: "up",
   },
   object_coverage: {
-    label: "Object lifecycle coverage",
+    label: "Atomic decomposition coverage",
     definition:
-      "Logical object families with an assigned lifecycle classification and state set divided by all 92 families.",
-    grain: "One logical object family",
+      "Filtered navigation families resolving to at least one independently governed atomic concept divided by filtered navigation families.",
+    grain: "One navigation family",
     direction: "up",
   },
   data_group_coverage: {
-    label: "DAT-group coverage",
+    label: "Atomic concepts in scope",
     definition:
-      "Normative DAT groups mapped to at least one logical object family divided by all 48 groups.",
-    grain: "One DAT group",
+      "Canonical atomic concepts resolved from the filtered navigation families; supporting concepts remain attached to their governing family.",
+    grain: "One atomic concept",
     direction: "up",
   },
   data_point_coverage: {
-    label: "Logical field coverage",
+    label: "Atomic field-contract coverage",
     definition:
-      "Logical object families with six domain-specific business fields and ten mandatory governance/provenance fields divided by all logical families.",
-    grain: "One logical object family",
+      "Atomic concepts with all 13 governance/provenance fields and at least three object-specific business fields divided by filtered atomic concepts.",
+    grain: "One atomic concept",
     direction: "up",
   },
   quality_coverage: {
-    label: "Quality-rule coverage",
+    label: "Relationship and lifecycle coverage",
     definition:
-      "Logical object families with relationship, lifecycle and data-quality controls divided by all logical families.",
-    grain: "One logical object family",
+      "Atomic concepts with at least one structured relationship and one guarded transition contract divided by filtered atomic concepts.",
+    grain: "One atomic concept",
     direction: "up",
   },
 };
 
 export const analyticsSource = {
-  id: "SRC-ANALYTICS-FIXTURE-v1.7",
-  name: "Deterministic synthetic recruitment analytics snapshot",
+  id: "SRC-ANALYTICS-CANONICAL-v1.9",
+  name: "Canonical synthetic recruitment analytics projection",
   path: "src/data/analytics.ts → analyticsApplications",
   grain:
-    "One synthetic application attempt with current operational projections",
+    "One canonical synthetic application attempt with source-event and aggregate-version lineage",
   freshness: "Fixture snapshot · Aug 28, 2026 · 9:30 AM PT",
   exclusions:
     "No real candidates, demographic attributes, compensation details, raw message content or production events. Experience nonresponse is explicit.",

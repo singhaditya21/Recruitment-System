@@ -24,6 +24,12 @@ import {
   objectCatalogSummary,
   objectDomains,
 } from "../data/objectCatalog";
+import {
+  atomicConcepts,
+  canonicalDataModelSummary,
+  relationshipContracts,
+  transitionContracts,
+} from "../data/canonicalDataModel";
 import { ExplainPanel, Pill } from "./Common";
 
 export type MetricView = {
@@ -445,66 +451,97 @@ function DataReadinessSurface() {
       ),
     [domain, lifecycle],
   );
+  const concepts = useMemo(() => {
+    const familyIds = new Set(rows.map((object) => object.id));
+    return atomicConcepts.filter((concept) => familyIds.has(concept.familyId));
+  }, [rows]);
   const cards = useMemo(() => {
-    const denominator = rows.length;
-    const dataGroups = new Set(rows.flatMap((object) => object.dataGroups));
+    const familyDenominator = rows.length;
+    const conceptDenominator = concepts.length;
     return [
       rateView(
         "object_coverage",
-        "Lifecycle-complete families",
-        rows.filter(
-          (object) => object.lifecycleType && object.states.length >= 4,
+        "Atomic decomposition complete",
+        rows.filter((object) =>
+          concepts.some((concept) => concept.familyId === object.id),
         ).length,
-        denominator,
+        familyDenominator,
         1,
-        "filtered object families",
+        "filtered navigation families",
       ),
       {
         ...rateView(
           "data_group_coverage",
-          "DAT groups in scope",
-          dataGroups.size,
-          48,
+          "Atomic concepts in scope",
+          concepts.length,
+          canonicalDataModelSummary.atomicConcepts,
           null,
-          "normative DAT groups",
+          "canonical atomic concepts",
         ),
-        display: denominator ? String(dataGroups.size) : "N/A",
-        detail: denominator
-          ? `${dataGroups.size} of 48 groups represented by ${denominator} filtered families`
-          : "No filtered object families",
+        display: familyDenominator ? String(concepts.length) : "N/A",
+        detail: familyDenominator
+          ? `${concepts.length} concepts resolve from ${familyDenominator} filtered families`
+          : "No filtered navigation families",
       },
       rateView(
         "data_point_coverage",
-        "16-field contract complete",
-        rows.filter((object) => object.dataPoints.length === 16).length,
-        denominator,
+        "Atomic field contract complete",
+        concepts.filter(
+          (concept) =>
+            concept.fields.filter((field) => field.category === "Governance")
+              .length === 13 &&
+            concept.fields.filter((field) => field.category === "Business")
+              .length >= 3,
+        ).length,
+        conceptDenominator,
         1,
-        "filtered object families",
+        "filtered atomic concepts",
       ),
       rateView(
         "quality_coverage",
-        "Quality controls complete",
-        rows.filter(
-          (object) =>
-            object.dataQuality.length > 0 && object.relationships.length > 0,
+        "Relationship + lifecycle complete",
+        concepts.filter(
+          (concept) =>
+            relationshipContracts.some(
+              (relationship) => relationship.from === concept.name,
+            ) &&
+            transitionContracts.some(
+              (transition) => transition.concept === concept.name,
+            ),
         ).length,
-        denominator,
+        conceptDenominator,
         1,
-        "filtered object families",
+        "filtered atomic concepts",
       ),
     ];
-  }, [rows]);
+  }, [concepts, rows]);
   const breakdown = useMemo(() => {
     const counts = new Map<string, number>();
-    for (const object of rows)
-      counts.set(
-        object.lifecycleType,
-        (counts.get(object.lifecycleType) ?? 0) + 1,
-      );
+    for (const concept of concepts)
+      counts.set(concept.kind, (counts.get(concept.kind) ?? 0) + 1);
     return [...counts]
       .map(([label, value]) => ({ label, value }))
       .sort((a, b) => b.value - a.value);
-  }, [rows]);
+  }, [concepts]);
+  const fieldCounts = useMemo(
+    () => ({
+      governance: concepts.reduce(
+        (total, concept) =>
+          total +
+          concept.fields.filter((field) => field.category === "Governance")
+            .length,
+        0,
+      ),
+      business: concepts.reduce(
+        (total, concept) =>
+          total +
+          concept.fields.filter((field) => field.category === "Business")
+            .length,
+        0,
+      ),
+    }),
+    [concepts],
+  );
   return (
     <>
       <section
@@ -551,7 +588,9 @@ function DataReadinessSurface() {
           <RotateCcw size={15} /> Reset
         </button>
         <span className="analytics-result-count" role="status">
-          {rows.length} of {objectCatalog.length} object families
+          {rows.length} of {objectCatalog.length} navigation families ·{" "}
+          {concepts.length} of {canonicalDataModelSummary.atomicConcepts} atomic
+          concepts
         </span>
       </section>
       <section
@@ -574,39 +613,41 @@ function DataReadinessSurface() {
           <div className="panel-heading">
             <div>
               <BarChart3 size={18} />
-              <h2>Object families by lifecycle type</h2>
-              <span>Same filtered object population as the detail table</span>
+              <h2>Atomic concepts by model kind</h2>
+              <span>Resolved from the same filtered family population</span>
             </div>
             <Pill tone="info">Reconciled</Pill>
           </div>
           <BarBreakdown
             rows={breakdown}
-            title="Object families by lifecycle type"
+            title="Atomic concepts by model kind"
           />
         </section>
         <section className="panel analytics-chart">
           <div className="panel-heading">
             <div>
               <Database size={18} />
-              <h2>Logical field composition</h2>
+              <h2>Atomic field composition</h2>
               <span>
                 Business fields are distinct from governance/provenance fields
               </span>
             </div>
-            <Pill tone="success">1,472 total</Pill>
+            <Pill tone="success">
+              {fieldCounts.governance + fieldCounts.business} in scope
+            </Pill>
           </div>
           <BarBreakdown
             rows={[
               {
                 label: "Governance/provenance",
-                value: objectCatalogSummary.governanceDataPoints,
+                value: fieldCounts.governance,
               },
               {
                 label: "Business",
-                value: objectCatalogSummary.businessDataPoints,
+                value: fieldCounts.business,
               },
             ]}
-            title="Logical field composition"
+            title="Atomic field composition"
           />
         </section>
       </div>
@@ -614,47 +655,66 @@ function DataReadinessSurface() {
         <div className="panel-heading">
           <div>
             <Table2 size={18} />
-            <h2>Filtered object readiness detail</h2>
-            <span>Every row reconciles to the object filters above</span>
+            <h2>Filtered atomic-model readiness detail</h2>
+            <span>Every concept resolves from the family filters above</span>
           </div>
-          <Pill>{Math.min(20, rows.length)} shown</Pill>
+          <Pill>{Math.min(20, concepts.length)} shown</Pill>
         </div>
         <div
           className="data-readiness-table"
           role="table"
-          aria-label="Filtered object readiness detail"
+          aria-label="Filtered atomic model readiness detail"
         >
           <div role="row">
-            <span role="columnheader">Object</span>
+            <span role="columnheader">Atomic concept</span>
             <span role="columnheader">Domain</span>
-            <span role="columnheader">Lifecycle</span>
+            <span role="columnheader">Kind / grain</span>
             <span role="columnheader">Fields</span>
             <span role="columnheader">Relationships</span>
             <span role="columnheader">Commands</span>
           </div>
-          {rows.slice(0, 20).map((object) => (
-            <div role="row" key={object.id}>
+          {concepts.slice(0, 20).map((concept) => {
+            const family = objectCatalog.find(
+              (object) => object.id === concept.familyId,
+            );
+            return (
+            <div role="row" key={concept.id}>
               <strong role="cell">
-                {object.name}
-                <small>{object.id}</small>
+                {concept.name}
+                <small>{concept.id} · {concept.familyId}</small>
               </strong>
-              <span role="cell">{object.domain}</span>
-              <span role="cell">{object.lifecycleType}</span>
+              <span role="cell">{family?.domain ?? "Unmapped"}</span>
               <span role="cell">
-                {object.dataPoints.length}
+                {concept.kind}
+                <small>{concept.grain}</small>
+              </span>
+              <span role="cell">
+                {concept.fields.length}
                 <small>
                   {
-                    object.dataPoints.filter(
+                    concept.fields.filter(
                       (field) => field.category === "Business",
                     ).length
                   }{" "}
                   business
                 </small>
               </span>
-              <span role="cell">{object.relationships.length}</span>
-              <span role="cell">{object.commands.length}</span>
+              <span role="cell">
+                {
+                  relationshipContracts.filter(
+                    (relationship) => relationship.from === concept.name,
+                  ).length
+                }
+              </span>
+              <span role="cell">
+                {
+                  transitionContracts.filter(
+                    (transition) => transition.concept === concept.name,
+                  ).length
+                }
+              </span>
             </div>
-          ))}
+          )})}
         </div>
       </section>
       <div className="analytics-assurance-grid">
@@ -663,7 +723,7 @@ function DataReadinessSurface() {
             <div>
               <Database size={18} />
               <h2>Metric definitions</h2>
-              <span>Object population, not application rows</span>
+              <span>Atomic concepts, not application analytics rows</span>
             </div>
             <Pill tone="success">Reconciled</Pill>
           </div>
@@ -687,7 +747,7 @@ function DataReadinessSurface() {
             <div>
               <ShieldCheck size={18} />
               <h2>Source and trust contract</h2>
-              <span>SRC-OBJECT-CATALOG-v1.7</span>
+              <span>SRC-CANONICAL-DATA-MODEL-v1.9</span>
             </div>
             <Pill tone="success">Dedicated object source</Pill>
           </div>
@@ -695,16 +755,16 @@ function DataReadinessSurface() {
             <div>
               <dt>Source path</dt>
               <dd>
-                <code>src/data/objectCatalog.ts</code>
+                <code>src/data/canonicalDataModel.ts</code>
               </dd>
             </div>
             <div>
               <dt>Grain</dt>
-              <dd>One logical object family</dd>
+              <dd>One atomic logical concept resolved from one navigation family</dd>
             </div>
             <div>
               <dt>Freshness</dt>
-              <dd>Repository build snapshot · v1.7</dd>
+              <dd>Repository build snapshot · v1.9</dd>
             </div>
             <div>
               <dt>Current predicates</dt>
@@ -796,7 +856,7 @@ export function AnalyticsDashboard({
           <span>
             <strong>Ready fixture</strong>
             {dashboard.id === "data-readiness"
-              ? "Object catalog snapshot · v1.7"
+              ? "Canonical data-model snapshot · v1.9"
               : analyticsSource.freshness}
           </span>
         </div>
@@ -843,11 +903,12 @@ export function AnalyticsDashboard({
         <DataReadinessSurface />
         <ExplainPanel
           title="Reconciled data-readiness boundary"
-          source="SRC-OBJECT-CATALOG-v1.7"
+          source="SRC-CANONICAL-DATA-MODEL-v1.9"
         >
           Every card, chart and row on this view is derived from the same
-          filtered object-family population. Application date, job, source and
-          stage filters are intentionally absent.
+          filtered navigation-family population and its resolved atomic
+          concepts. Application date, job, source and stage filters are
+          intentionally absent.
         </ExplainPanel>
       </div>
     );

@@ -1,0 +1,71 @@
+{
+  "version": "2.0.0",
+  "releaseName": "Full recruitment and onboarding wireframe",
+  "syntheticOnly": true,
+  "generatedAt": "2026-08-28T15:00:00+05:30",
+  "surfaces": [
+    "Candidate careers and application",
+    "Internal talent lifecycle operations",
+    "New-hire preboarding portal"
+  ],
+  "counts": {
+    "personas": 13,
+    "screenContracts": 24,
+    "routeDeclarations": 49,
+    "functionalDestinations": 47,
+    "redirectRoutes": 2,
+    "coreNavigationFamilies": 92,
+    "coreAtomicConcepts": 129,
+    "lifecycleExtensionObjects": 46,
+    "combinedLogicalConcepts": 175,
+    "extensionKeyDataPoints": 186,
+    "extensionLifecycleStates": 238,
+    "physicalObjectsApproved": 0
+  },
+  "seededWireframe": {
+    "newHires": 36,
+    "onboardingTemplates": 8,
+    "flagshipPlanTasks": 8,
+    "onboardingExceptions": 18,
+    "provisioningRequests": 72,
+    "newHireDocuments": 6,
+    "talentProspects": 120,
+    "talentCommunities": 8,
+    "talentCampaigns": 6,
+    "jobDistributions": 24,
+    "internalOpportunities": 8
+  },
+  "implementedWireframeCapabilities": [
+    "candidate-to-pre-hire-to-pending-worker-to-employee identity lineage",
+    "versioned onboarding template, stage, plan and task previews",
+    "new-hire home, task, form, document, profile, day-one and help routes",
+    "document, form and simulated e-signature completion states",
+    "HRIS correction, safe replay and reconciliation preview",
+    "manager, IT and facilities provisioning board",
+    "onboarding exception and progress dashboards",
+    "talent CRM with consent and suppression guardrails",
+    "campaign funnel and execution guardrails",
+    "job channel delivery and reconciliation ledger",
+    "internal role, gig, project and mentorship marketplace",
+    "identity, integration, persistence and security design controls"
+  ],
+  "production": {
+    "authentication": "not implemented",
+    "serverAuthorization": "not implemented",
+    "persistence": "browser memory only",
+    "integrations": "synthetic contracts only",
+    "physicalSchemaApproved": false,
+    "securityApproval": "not obtained",
+    "privacyLegalApproval": "not obtained",
+    "pilot": "blocked"
+  },
+  "authoritativeSources": [
+    "src/data/onboarding.ts",
+    "src/data/talentGrowth.ts",
+    "src/data/lifecyclePlatform.ts",
+    "src/components/OnboardingWorkspace.tsx",
+    "src/components/NewHirePortal.tsx",
+    "src/components/TalentGrowthWorkspace.tsx",
+    "src/components/PlatformControlWorkspace.tsx"
+  ]
+}

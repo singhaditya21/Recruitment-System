@@ -7,6 +7,7 @@ import {
   type ApplicationRecord,
 } from "./fixtures";
 import type { ObjectContract, ObjectDataPoint } from "./objectCatalog";
+import type { ObjectRecord } from "./objectWorkspace";
 import type {
   AssignmentRecord,
   CandidateRecord,
@@ -372,9 +373,49 @@ export function canCreateObject(role: string, object: ObjectContract) {
   return object.dataPoints.some((field) => field.writeRoles.includes(role));
 }
 
+export function canReadObjectRecord(
+  role: string,
+  personaId: string,
+  object: ObjectContract,
+  record: ObjectRecord,
+  observedAt = "2026-08-28T12:00:00.000Z",
+) {
+  if (!canReadObject(role, object)) return false;
+  if (record.security.organizationId !== "ORG-DEMO-001") return false;
+  const observed = new Date(observedAt).getTime();
+  if (observed < new Date(record.security.validFrom).getTime()) return false;
+  if (
+    record.security.validTo &&
+    observed >= new Date(record.security.validTo).getTime()
+  )
+    return false;
+  const hasRelationship =
+    record.security.ownerUserId === personaId ||
+    record.security.assignedUserIds.includes(personaId) ||
+    record.security.assignedRoles.includes(role);
+  if (!hasRelationship) return false;
+  if (
+    record.security.restrictedEntitlements.length > 0 &&
+    ![
+      "Privacy & Legal",
+      "Application Integrity Reviewer",
+      "Offer Approver",
+      "HRIS Operator",
+      "Platform Admin",
+      "Configuration Admin",
+      "Auditor",
+    ].includes(role) &&
+    !record.security.assignedUserIds.includes(personaId)
+  )
+    return false;
+  return true;
+}
+
 export function fieldAccessForRole(role: string, field: ObjectDataPoint) {
+  const auditorWithinMinimizedScope =
+    role !== "Auditor" || field.category === "Governance";
   return {
-    read: field.readRoles.includes(role) || role === "Auditor",
+    read: field.readRoles.includes(role) && auditorWithinMinimizedScope,
     write: field.writeRoles.includes(role) && role !== "Auditor",
   };
 }
