@@ -3933,13 +3933,14 @@ Passing v1.5 provides stronger interaction and usability evidence for `WP-02`; i
 
 | Evidence | Current result |
 | --- | --- |
+| Implementation source | Commit [`dee8d951df62e187bd0046c50b1f2283f4c87709`](https://github.com/singhaditya21/Recruitment-System/commit/dee8d951df62e187bd0046c50b1f2283f4c87709) (`Build v1.5 operational recruitment wireframe`); release workflow metadata aligned in commit [`7a0252d1955617dfb285a4dd9d8db78d877b18a3`](https://github.com/singhaditya21/Recruitment-System/commit/7a0252d1955617dfb285a4dd9d8db78d877b18a3) |
 | Operational application | Seven functional application panels are backed by seeded job-specific messages, activity, documents, tasks, interviews and related-application context; record navigation and message queuing are memory-only |
 | Cross-route interaction | Shared prototype context carries candidate availability, scorecard completion/readiness and offer approval/candidate-task projection until scenario/reset/refresh |
 | Scheduling and evidence | Availability/direct-booking modes, hard/soft constraints, active-link invalidation, participant capacity, session lifecycle, interviewer briefing, feedback blinding and attributed amendment are executable synthetic states |
 | Approval and automation | Ordered offer steps, send-back/approval, immutable version comparison, candidate-safe consequence, event-condition-action rule detail, collision simulation and failed-run replay are executable without external writes |
 | Automated local checks | `pnpm verify` passes the 12-route/12-scenario artifact audit, TypeScript, 23 component/contract/axe checks and production build; `pnpm test:e2e` passes 26 desktop/mobile Chromium journeys |
 | Visual evidence | Six reviewed desktop/mobile captures are versioned under `artifacts/screenshots/v1.5`; inspected routes report zero page-level overflow and zero browser console errors |
-| Deployment | Pending exact-commit CI and GitHub Pages evidence; local success alone does not accept the public release |
+| Deployment | Verification run [`33131288950`](https://github.com/singhaditya21/Recruitment-System/actions/runs/33131288950) and Pages run [`33131288981`](https://github.com/singhaditya21/Recruitment-System/actions/runs/33131288981) succeeded for release commit `7a0252d1955617dfb285a4dd9d8db78d877b18a3`; [the public wireframe](https://singhaditya21.github.io/Recruitment-System/) returned HTTPS `200`, loaded the generated v1.5 JS/CSS assets, exposed the functional application cockpit on the deployed build, rendered HR and candidate routes at desktop and 390 px with zero page-level overflow, and produced no browser console errors |
 
 ## 23. Change log
 
