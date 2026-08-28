@@ -6,7 +6,7 @@ An end-to-end recruitment and onboarding platform wireframe for a San Franciscoâ
 
 [Open the Recruitment System wireframe](https://singhaditya21.github.io/Recruitment-System/)
 
-This working tree is the v3.0 release candidate. It should be called the deployed v3.0 release only after the exact commit, CI/security and Pages workflow are verified. [View the source repository](https://github.com/singhaditya21/Recruitment-System).
+v3.0 is deployed from application commit [`b768226`](https://github.com/singhaditya21/Recruitment-System/commit/b7682267a8b04b60f163b665cc9316a9cffd011c) through [PR #10](https://github.com/singhaditya21/Recruitment-System/pull/10). Verification, security and [Pages deployment](https://github.com/singhaditya21/Recruitment-System/actions/runs/33193262391) succeeded, and the served site passed the same 1,018-destination crawl. [View the source repository](https://github.com/singhaditya21/Recruitment-System).
 
 - Candidate careers surface: `#/careers`
 - Saved jobs, alerts and events: `#/saved-jobs`, `#/job-alerts`, `#/events`
