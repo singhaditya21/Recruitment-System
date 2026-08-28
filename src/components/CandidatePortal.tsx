@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import { ArrowLeft, ArrowRight, Bell, BriefcaseBusiness, Building2, CalendarDays, CheckCircle2, CircleHelp, Clock3, Copy, FileCheck2, FileText, Globe2, HeartHandshake, LockKeyhole, Mail, MapPin, MessageCircle, Save, Search, ShieldCheck, SlidersHorizontal, Star, UserRound } from "lucide-react";
-import { applicationMessages, candidateApplications, jobs, syntheticCandidate } from "../data/fixtures";
+import { applicationMessages, candidateApplications, syntheticCandidate } from "../data/fixtures";
 import { Freshness, Pill, PrototypeBanner, ScenarioControl, ScreenId, Stepper } from "./Common";
 import { usePrototype } from "../prototype/PrototypeContext";
 
@@ -35,11 +35,13 @@ function CandidateShell({ children }: { children: React.ReactNode }) {
 function CareersScreen() {
   const [query, setQuery] = useState("");
   const [workplace, setWorkplace] = useState("All workplaces");
-  const visibleJobs = useMemo(() => jobs.filter((job) => {
+  const { jobRecords } = usePrototype();
+  const visibleJobs = useMemo(() => jobRecords.filter((job) => {
+    if (job.status !== "Published") return false;
     const matchesQuery = `${job.title} ${job.team} ${job.location}`.toLowerCase().includes(query.toLowerCase());
     const matchesWorkplace = workplace === "All workplaces" || job.workplace === workplace;
     return matchesQuery && matchesWorkplace;
-  }), [query, workplace]);
+  }), [jobRecords, query, workplace]);
 
   return (
     <CandidateShell>
@@ -98,7 +100,9 @@ function CareersScreen() {
 
 function JobScreen() {
   const { publicId } = useParams();
-  const job = jobs.find((item) => item.publicId === publicId) ?? jobs[0];
+  const { jobRecords } = usePrototype();
+  const publishedJobs = jobRecords.filter((item) => item.status === "Published");
+  const job = publishedJobs.find((item) => item.publicId === publicId) ?? publishedJobs[0];
   const navigate = useNavigate();
   return (
     <CandidateShell>
@@ -136,7 +140,9 @@ function ApplyScreen() {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { publicId } = useParams();
-  const job = jobs.find((item) => item.publicId === publicId) ?? jobs[0];
+  const { jobRecords } = usePrototype();
+  const publishedJobs = jobRecords.filter((item) => item.status === "Published");
+  const job = publishedJobs.find((item) => item.publicId === publicId) ?? publishedJobs[0];
   const steps = ["Profile", "Experience", "Declarations", "Review"];
 
   const next = () => {

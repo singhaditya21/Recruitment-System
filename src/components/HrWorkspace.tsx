@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, type FormEvent } from "react";
 import { NavLink, useNavigate, useParams } from "react-router-dom";
 import {
   Activity,
@@ -33,7 +33,9 @@ import {
   MoreHorizontal,
   PanelBottom,
   PauseCircle,
+  Pencil,
   PlayCircle,
+  Plus,
   RefreshCcw,
   Scale,
   Search,
@@ -54,13 +56,10 @@ import {
   applicationMessages,
   applicationRecords,
   applicationTasks,
-  assignmentRecords,
   auditEvents,
   automationRuleDetails,
   automationRuns,
   demoPersonas,
-  interviewRecords,
-  jobs,
   offerApprovalSteps,
   personaOperatingModels,
   pipeline,
@@ -88,10 +87,12 @@ import { ReportWorkspace } from "./ReportWorkspace";
 import {
   displayCandidateForRole,
   roleDataScopes,
-  visibleApplicationsForRole,
-  visibleAssignmentsForRole,
-  visibleInterviewsForRole,
-  visibleJobsForRole,
+  canManageCoreRecord,
+  visibleApplications,
+  visibleAssignments,
+  visibleCandidates,
+  visibleInterviews,
+  visibleJobs,
 } from "../data/access";
 
 type HrScreen = HrScreenKey;
@@ -126,6 +127,12 @@ const hrNav = [
     label: "Jobs",
     screen: "job" as const,
     icon: BriefcaseBusiness,
+  },
+  {
+    to: "/hr/candidates",
+    label: "Candidates",
+    screen: "candidate" as const,
+    icon: UsersRound,
   },
   {
     to: "/hr/applications",
@@ -208,8 +215,17 @@ function HrShell({
   const [mobileMenu, setMobileMenu] = useState(false);
   const [query, setQuery] = useState("");
   const [topPanel, setTopPanel] = useState<string | null>(null);
-  const { personaId, persona, setPersonaId, notice, announce, clearNotice } =
-    usePrototype();
+  const {
+    personaId,
+    persona,
+    setPersonaId,
+    notice,
+    announce,
+    clearNotice,
+    jobRecords,
+    applicationRecords: liveApplications,
+    interviewRecords: liveInterviews,
+  } = usePrototype();
   const operatingModel = personaOperatingModels[persona.id];
   const allowed = operatingModel.screens.includes(screen);
   const resolvedTitle = title.startsWith("Good morning")
@@ -219,17 +235,17 @@ function HrShell({
     if (query.trim().length < 2) return [];
     const needle = query.toLowerCase();
     return [
-      ...visibleApplicationsForRole(persona.role).map((row) => ({
+      ...visibleApplications(persona.role, liveApplications).map((row) => ({
         label: displayCandidateForRole(persona.role, row),
         detail: `${row.job} · ${row.id}`,
         to: `/hr/applications/${row.id}`,
       })),
-      ...visibleJobsForRole(persona.role).map((row) => ({
+      ...visibleJobs(persona.role, jobRecords, liveApplications).map((row) => ({
         label: `${row.title} · ${row.id}`,
         detail: row.team,
         to: `/hr/jobs/${row.id}`,
       })),
-      ...visibleInterviewsForRole(persona.role).map((row) => ({
+      ...visibleInterviews(persona.role, liveInterviews, liveApplications).map((row) => ({
         label: displayCandidateForRole(persona.role, row),
         detail: `${row.type} · ${row.id}`,
         to: `/hr/interviews/${row.id}`,
@@ -239,7 +255,7 @@ function HrShell({
         `${row.label} ${row.detail}`.toLowerCase().includes(needle),
       )
       .slice(0, 6);
-  }, [persona.role, query]);
+  }, [jobRecords, liveApplications, liveInterviews, persona.role, query]);
   const toggle = (panel: string) =>
     setTopPanel((current) => (current === panel ? null : panel));
   return (
@@ -526,9 +542,20 @@ function ActionCenter() {
   const [compact, setCompact] = useState(false);
   const [savedView, setSavedView] = useState("My urgent work");
   const navigate = useNavigate();
-  const { scenario, scenarioState, persona, resetPrototype } = usePrototype();
-  const visibleApplications = visibleApplicationsForRole(persona.role);
-  const visibleInterviews = visibleInterviewsForRole(persona.role);
+  const {
+    scenario,
+    scenarioState,
+    persona,
+    resetPrototype,
+    applicationRecords: liveApplications,
+    interviewRecords: liveInterviews,
+  } = usePrototype();
+  const roleApplications = visibleApplications(persona.role, liveApplications);
+  const roleInterviews = visibleInterviews(
+    persona.role,
+    liveInterviews,
+    liveApplications,
+  );
   const byRole: Record<string, string[]> = {
     Recruiter: ["WORK-101", "WORK-102", "WORK-103", "WORK-104", "WORK-105"],
     "Recruiting Coordinator": ["WORK-102", "WORK-103"],
@@ -763,7 +790,7 @@ function ActionCenter() {
             <div>
               <h2>Recently updated applications</h2>
               <span>
-                Role-scoped list view · {visibleApplications.length} records
+                Role-scoped list view · {roleApplications.length} records
               </span>
             </div>
             <button
@@ -787,7 +814,7 @@ function ActionCenter() {
               <span role="columnheader">Owner</span>
               <span role="columnheader">Updated</span>
             </div>
-            {visibleApplications.map((item) => (
+            {roleApplications.slice(0, 20).map((item) => (
               <div className="table-row" role="row" key={item.id}>
                 <span role="cell" data-label="Application">
                   <NavLink to={`/hr/applications/${item.id}`}>
@@ -822,13 +849,13 @@ function ActionCenter() {
             <div>
               <h2>Today's interviews</h2>
               <span>
-                {visibleInterviews.length} role-visible · candidate-timezone
+                {roleInterviews.length} role-visible · candidate-timezone
                 aware
               </span>
             </div>
             <CalendarDays size={18} />
           </div>
-          {visibleInterviews.map((item) => {
+          {roleInterviews.slice(0, 12).map((item) => {
             const state =
               item.id === "INT-DEMO-001"
                 ? scenarioState.interviewState
@@ -867,23 +894,64 @@ function ActionCenter() {
 function RecordList({
   kind,
 }: {
-  kind: "jobs" | "applications" | "interviews" | "assignments" | "decisions";
+  kind:
+    | "jobs"
+    | "candidates"
+    | "applications"
+    | "interviews"
+    | "assignments"
+    | "decisions";
 }) {
-  const { scenarioState, persona } = usePrototype();
-  const scopedApplications = visibleApplicationsForRole(persona.role);
+  const {
+    scenarioState,
+    persona,
+    jobRecords,
+    candidateRecords,
+    applicationRecords: liveApplications,
+    interviewRecords: liveInterviews,
+    assignmentRecords: liveAssignments,
+  } = usePrototype();
+  const [query, setQuery] = useState("");
+  const [stateFilter, setStateFilter] = useState("All states");
+  const [page, setPage] = useState(1);
+  const scopedApplications = visibleApplications(persona.role, liveApplications);
   const config = {
     jobs: {
       title: "Jobs & openings",
       eyebrow: "Jobs list",
       screenId: "UI-HR-002",
       screen: "job" as const,
-      rows: visibleJobsForRole(persona.role).map((item) => ({
+      rows: visibleJobs(persona.role, jobRecords, liveApplications).map((item) => ({
         id: item.id,
         primary: item.title,
         secondary: item.team,
         state: item.status,
         to: `/hr/jobs/${item.id}`,
       })),
+      newPath: "/hr/jobs/new",
+      newLabel: "New job requisition",
+      canCreate: canManageCoreRecord(persona.role, "job", "create"),
+    },
+    candidates: {
+      title: "Candidates",
+      eyebrow: "Candidate identity list",
+      screenId: "UI-HR-003",
+      screen: "candidate" as const,
+      rows: visibleCandidates(persona.role, candidateRecords, liveApplications).map(
+        (item) => ({
+          id: item.id,
+          primary: displayCandidateForRole(persona.role, {
+            id: item.id,
+            candidate: item.name,
+          }),
+          secondary: `${item.source} · ${item.location}`,
+          state: item.status,
+          to: `/hr/candidates/${item.id}`,
+        }),
+      ),
+      newPath: "/hr/candidates/new",
+      newLabel: "New candidate identity",
+      canCreate: canManageCoreRecord(persona.role, "candidate", "create"),
     },
     applications: {
       title: "Applications",
@@ -900,13 +968,16 @@ function RecordList({
             : item.stage,
         to: `/hr/applications/${item.id}`,
       })),
+      newPath: "/hr/applications/new",
+      newLabel: "New application",
+      canCreate: canManageCoreRecord(persona.role, "application", "create"),
     },
     interviews: {
       title: "Interviews",
       eyebrow: "Interview list",
       screenId: "UI-HR-004",
       screen: "interview" as const,
-      rows: visibleInterviewsForRole(persona.role).map((item) => ({
+      rows: visibleInterviews(persona.role, liveInterviews, liveApplications).map((item) => ({
         id: item.id,
         primary: displayCandidateForRole(persona.role, item),
         secondary: item.type,
@@ -916,13 +987,16 @@ function RecordList({
             : item.state,
         to: `/hr/interviews/${item.id}`,
       })),
+      newPath: "",
+      newLabel: "",
+      canCreate: false,
     },
     assignments: {
       title: "Scorecards",
       eyebrow: "Assignment list",
       screenId: "UI-HR-005",
       screen: "scorecard" as const,
-      rows: visibleAssignmentsForRole(persona.role).map((item) => ({
+      rows: visibleAssignments(persona.role, liveAssignments, liveApplications).map((item) => ({
         id: item.id,
         primary: displayCandidateForRole(persona.role, item),
         secondary: item.interviewer,
@@ -932,6 +1006,9 @@ function RecordList({
             : item.state,
         to: `/hr/assignments/${item.id}`,
       })),
+      newPath: "",
+      newLabel: "",
+      canCreate: false,
     },
     decisions: {
       title: "Offers & handoff",
@@ -939,7 +1016,11 @@ function RecordList({
       screenId: "UI-HR-006",
       screen: "decision" as const,
       rows: scopedApplications
-        .filter((item) => ["APP-DEMO-001", "APP-DEMO-011"].includes(item.id))
+        .filter(
+          (item) =>
+            ["APP-DEMO-001", "APP-DEMO-011"].includes(item.id) ||
+            ["Offer", "Hired"].includes(item.stage),
+        )
         .map((item) => ({
           id: item.id,
           primary: displayCandidateForRole(persona.role, item),
@@ -950,26 +1031,100 @@ function RecordList({
               : "Offer approval",
           to: `/hr/decisions/${item.id}`,
         })),
+      newPath: "",
+      newLabel: "",
+      canCreate: false,
     },
   }[kind];
+  const states = ["All states", ...new Set(config.rows.map((row) => row.state))];
+  const filteredRows = config.rows.filter((row) => {
+    const matchesQuery = `${row.id} ${row.primary} ${row.secondary}`
+      .toLowerCase()
+      .includes(query.trim().toLowerCase());
+    const matchesState =
+      stateFilter === "All states" || row.state === stateFilter;
+    return matchesQuery && matchesState;
+  });
+  const pageSize = 20;
+  const pageCount = Math.max(1, Math.ceil(filteredRows.length / pageSize));
+  const safePage = Math.min(page, pageCount);
+  const pageRows = filteredRows.slice(
+    (safePage - 1) * pageSize,
+    safePage * pageSize,
+  );
+  const downstreamCopy =
+    kind === "interviews"
+      ? "Interview records are generated from an application scheduling request after participants, timezone and availability are validated."
+      : kind === "assignments"
+        ? "Scorecard assignments are generated from an approved interview plan; they are never created as free-floating evidence."
+        : kind === "decisions"
+          ? "Decision, offer and handoff records are generated only after governed application readiness gates are satisfied."
+          : null;
   return (
     <HrShell
       title={config.title}
       eyebrow={config.eyebrow}
       screenId={config.screenId}
       screen={config.screen}
+      actions={
+        config.canCreate ? (
+          <NavLink className="primary-button" to={config.newPath}>
+            <Plus size={16} /> {config.newLabel}
+          </NavLink>
+        ) : undefined
+      }
     >
       <ScenarioControl />
+      {downstreamCopy && (
+        <ExplainPanel
+          title="How this record is created"
+          source="Workflow creation contract · v1.8"
+        >
+          {downstreamCopy}
+        </ExplainPanel>
+      )}
       <section className="panel record-list-panel">
         <div className="panel-heading">
           <div>
             <h2>{config.title}</h2>
-            <span>{config.rows.length} synthetic route-bound records</span>
+            <span>
+              {filteredRows.length} of {config.rows.length} role-visible
+              synthetic records
+            </span>
           </div>
           <Freshness>Canonical registry · now</Freshness>
         </div>
+        <div className="collection-tools">
+          <label className="global-search">
+            <Search size={16} aria-hidden="true" />
+            <span className="sr-only">Search {kind}</span>
+            <input
+              value={query}
+              onChange={(event) => {
+                setQuery(event.target.value);
+                setPage(1);
+              }}
+              placeholder={`Search ${kind} by ID or name`}
+            />
+          </label>
+          <label>
+            <span className="sr-only">Filter {kind} by state</span>
+            <select
+              aria-label={`Filter ${kind} by state`}
+              value={stateFilter}
+              onChange={(event) => {
+                setStateFilter(event.target.value);
+                setPage(1);
+              }}
+            >
+              {states.map((state) => (
+                <option key={state}>{state}</option>
+              ))}
+            </select>
+          </label>
+        </div>
         <div className="record-list">
-          {config.rows.map((row) => (
+          {pageRows.map((row) => (
             <NavLink to={row.to} key={row.id}>
               <span className="object-icon">
                 <AppWindow size={18} />
@@ -996,18 +1151,240 @@ function RecordList({
             </NavLink>
           ))}
         </div>
+        {!pageRows.length && (
+          <div className="empty-state" role="status">
+            <Search size={28} />
+            <h3>No role-visible records match</h3>
+            <p>Clear the search or state filter; no data was changed.</p>
+            <button
+              className="secondary-button"
+              onClick={() => {
+                setQuery("");
+                setStateFilter("All states");
+              }}
+            >
+              Clear filters
+            </button>
+          </div>
+        )}
+        {filteredRows.length > pageSize && (
+          <div className="collection-pagination" aria-label={`${kind} pagination`}>
+            <button
+              className="secondary-button"
+              disabled={safePage === 1}
+              onClick={() => setPage((current) => Math.max(1, current - 1))}
+            >
+              Previous
+            </button>
+            <span>
+              Page {safePage} of {pageCount} · {pageRows.length} rows shown
+            </span>
+            <button
+              className="secondary-button"
+              disabled={safePage === pageCount}
+              onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </section>
     </HrShell>
   );
 }
 
-function JobWorkspace() {
-  const { jobId } = useParams();
+function MutationDenied({
+  kind,
+  returnTo,
+}: {
+  kind: string;
+  returnTo: string;
+}) {
+  const { persona } = usePrototype();
+  return (
+    <section className="panel access-denied" role="alert">
+      <LockKeyhole size={28} />
+      <div>
+        <h2>Mutation is not permitted</h2>
+        <p>
+          {persona.role} cannot create or edit this {kind}. The collection and
+          fields remain scoped to the selected demonstration persona.
+        </p>
+      </div>
+      <NavLink className="primary-button" to={returnTo}>
+        Return to list
+      </NavLink>
+    </section>
+  );
+}
+
+function JobForm({ mode, jobId }: { mode: "new" | "edit"; jobId?: string }) {
   const navigate = useNavigate();
-  const { scenarioState, announce, persona } = usePrototype();
+  const { persona, jobRecords, createJob, updateJob } = usePrototype();
+  const job = jobRecords.find((record) => record.id === jobId);
+  const [values, setValues] = useState(() => ({
+    title: job?.title ?? "",
+    publicId: job?.publicId ?? "",
+    team: job?.team ?? "",
+    location: job?.location ?? "",
+    workplace: job?.workplace ?? "Remote",
+    type: job?.type ?? "Full time",
+    pay: job?.pay ?? "",
+    status: job?.status ?? "Draft",
+    summary: job?.summary ?? "",
+    requirements: job?.requirements.join("\n") ?? "",
+    owner: job?.owner ?? persona.name,
+  }));
+  const [error, setError] = useState("");
+  const permitted = canManageCoreRecord(
+    persona.role,
+    "job",
+    mode === "new" ? "create" : "edit",
+  );
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    if (!values.title.trim() || !values.team.trim() || !values.location.trim()) {
+      setError("Title, team and location are required.");
+      return;
+    }
+    const duplicate = jobRecords.some(
+      (record) =>
+        record.id !== job?.id &&
+        record.title.toLowerCase() === values.title.trim().toLowerCase() &&
+        record.team.toLowerCase() === values.team.trim().toLowerCase(),
+    );
+    if (duplicate) {
+      setError("A synthetic job with this title and team already exists. Review the existing requisition first.");
+      return;
+    }
+    const publicId =
+      values.publicId.trim() ||
+      `${values.title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-memory`;
+    const input = {
+      title: values.title.trim(),
+      publicId,
+      team: values.team.trim(),
+      location: values.location.trim(),
+      workplace: values.workplace,
+      type: values.type,
+      pay: values.pay.trim() || "Compensation review pending",
+      status: mode === "new" ? "Draft" : values.status,
+      summary: values.summary.trim() || "Synthetic role summary pending structured content review.",
+      requirements: values.requirements
+        .split("\n")
+        .map((item) => item.trim())
+        .filter(Boolean),
+      owner: values.owner,
+    };
+    if (mode === "edit" && job) {
+      updateJob(job.id, input);
+      navigate(`/hr/jobs/${job.id}`);
+    } else {
+      const id = createJob(input);
+      navigate(`/hr/jobs/${id}`);
+    }
+  };
+  return (
+    <HrShell
+      title={mode === "new" ? "New job requisition" : `Edit ${job?.title ?? "job"}`}
+      eyebrow="Job object-specific form"
+      screenId="UI-HR-002"
+      screen="job"
+    >
+      {!permitted || (mode === "edit" && !job) ? (
+        <MutationDenied kind="job requisition" returnTo="/hr/jobs" />
+      ) : (
+        <form className="panel object-form" onSubmit={submit} noValidate>
+          <div className="panel-heading">
+            <div>
+              <h2>{mode === "new" ? "Create a draft requisition" : "Edit permitted job fields"}</h2>
+              <span>
+                {mode === "new"
+                  ? "New jobs always begin as Draft; approval and publication remain separate."
+                  : `${job?.id} · expected ${job?.version}`}
+              </span>
+            </div>
+            <Pill tone="warning">Memory only</Pill>
+          </div>
+          {error && (
+            <div className="error-summary" role="alert">
+              <strong>Check the job form</strong>
+              <span>{error}</span>
+            </div>
+          )}
+          <div className="object-form-grid">
+            <label>
+              <span>Job title *</span>
+              <input aria-label="Job title" value={values.title} onChange={(event) => setValues({ ...values, title: event.target.value })} />
+            </label>
+            <label>
+              <span>Team *</span>
+              <input aria-label="Team" value={values.team} onChange={(event) => setValues({ ...values, team: event.target.value })} />
+            </label>
+            <label>
+              <span>Location *</span>
+              <input aria-label="Job location" value={values.location} onChange={(event) => setValues({ ...values, location: event.target.value })} />
+            </label>
+            <label>
+              <span>Workplace</span>
+              <select aria-label="Workplace" value={values.workplace} onChange={(event) => setValues({ ...values, workplace: event.target.value })}>
+                <option>Remote</option><option>Hybrid</option><option>On-site</option>
+              </select>
+            </label>
+            <label>
+              <span>Employment type</span>
+              <select aria-label="Employment type" value={values.type} onChange={(event) => setValues({ ...values, type: event.target.value })}>
+                <option>Full time</option><option>Part time</option><option>Contract</option>
+              </select>
+            </label>
+            <label>
+              <span>Compensation range</span>
+              <input aria-label="Compensation range" value={values.pay} onChange={(event) => setValues({ ...values, pay: event.target.value })} />
+            </label>
+            <label>
+              <span>Owner</span>
+              <input aria-label="Job owner" value={values.owner} onChange={(event) => setValues({ ...values, owner: event.target.value })} />
+            </label>
+            {mode === "edit" && (
+              <label>
+                <span>Lifecycle state</span>
+                <select aria-label="Job lifecycle state" value={values.status} disabled title="Lifecycle transitions use the governed approval and publication workflow" onChange={(event) => setValues({ ...values, status: event.target.value })}>
+                  <option>Draft</option><option>Approved</option><option>Published</option><option>Paused</option><option>Closed</option>
+                </select>
+              </label>
+            )}
+            <label className="full-field">
+              <span>Public URL slug</span>
+              <input aria-label="Public URL slug" value={values.publicId} onChange={(event) => setValues({ ...values, publicId: event.target.value })} />
+            </label>
+            <label className="full-field">
+              <span>Role summary</span>
+              <textarea aria-label="Role summary" value={values.summary} onChange={(event) => setValues({ ...values, summary: event.target.value })} />
+            </label>
+            <label className="full-field">
+              <span>Structured requirements · one per line</span>
+              <textarea aria-label="Structured requirements" value={values.requirements} onChange={(event) => setValues({ ...values, requirements: event.target.value })} />
+            </label>
+          </div>
+          <div className="object-form-actions">
+            <NavLink className="secondary-button" to={job ? `/hr/jobs/${job.id}` : "/hr/jobs"}>Cancel</NavLink>
+            <button className="primary-button" type="submit"><CheckCircle2 size={16} /> {mode === "new" ? "Create draft requisition" : "Save job changes"}</button>
+          </div>
+        </form>
+      )}
+    </HrShell>
+  );
+}
+
+function JobWorkspace() {
+  const { jobId, action } = useParams();
+  const navigate = useNavigate();
+  const { scenarioState, announce, persona, jobRecords, applicationRecords: liveApplications } = usePrototype();
   if (!jobId) return <RecordList kind="jobs" />;
-  const job = jobs.find((item) => item.id === jobId) ?? jobs[0];
-  if (!visibleJobsForRole(persona.role).some((item) => item.id === job.id))
+  if (jobId === "new") return <JobForm mode="new" />;
+  if (action === "edit") return <JobForm mode="edit" jobId={jobId} />;
+  const job = jobRecords.find((item) => item.id === jobId);
+  if (!job || !visibleJobs(persona.role, jobRecords, liveApplications).some((item) => item.id === job.id))
     return (
       <HrShell
         title="Job access denied"
@@ -1030,7 +1407,13 @@ function JobWorkspace() {
         </section>
       </HrShell>
     );
-  const blocked = job.id === "JOB-DEMO-001" && scenarioState.policyBlocked;
+  const policyBlocked =
+    job.id === "JOB-DEMO-001" && scenarioState.policyBlocked;
+  const draftBlocked =
+    job.status === "Draft" ||
+    job.pay.toLowerCase().includes("pending") ||
+    job.requirements.length < 2;
+  const blocked = policyBlocked || draftBlocked;
   const reserved =
     job.id === "JOB-DEMO-001" ? scenarioState.openingReserved : 0;
   return (
@@ -1041,11 +1424,19 @@ function JobWorkspace() {
       screen="job"
       actions={
         <>
+          {canManageCoreRecord(persona.role, "job", "edit") && (
+            <NavLink className="secondary-button" to={`/hr/jobs/${job.id}/edit`}>
+              <Pencil size={16} /> Edit
+            </NavLink>
+          )}
           <button
             className="secondary-button"
+            disabled={job.status !== "Published"}
             onClick={() => navigate(`/careers/jobs/${job.publicId}`)}
           >
-            Preview public job
+            {job.status === "Published"
+              ? "Preview public job"
+              : "Public preview unavailable"}
           </button>
           <button
             className="primary-button"
@@ -1070,14 +1461,15 @@ function JobWorkspace() {
         </div>
         <div>
           <span>Owner</span>
-          <strong>
-            {job.id === "JOB-DEMO-002" ? "Priya Nair" : "Alex Rivera"}
-          </strong>
+          <strong>{job.owner}</strong>
         </div>
         <div>
           <span>Effective plan</span>
           <strong>{job.version}</strong>
         </div>
+        <Pill tone={job.status === "Published" ? "success" : "info"}>
+          {job.status}
+        </Pill>
         <Freshness>Reconciled 4 min ago</Freshness>
       </div>
       <ScenarioControl />
@@ -1085,13 +1477,18 @@ function JobWorkspace() {
         <div className="blocking-banner" role="alert">
           <ShieldAlert size={22} />
           <div>
-            <strong>Publication is blocked</strong>
+            <strong>
+              {policyBlocked
+                ? "Publication is blocked"
+                : "Draft requires governed completion"}
+            </strong>
             <span>
-              Work location and candidate residence produce an unknown policy
-              result. LEGAL-DEMO queue owns review.
+              {policyBlocked
+                ? "Work location and candidate residence produce an unknown policy result. LEGAL-DEMO queue owns review."
+                : "Complete structured content, compensation, opening approval and the publication workflow before a public projection exists."}
             </span>
           </div>
-          <Pill tone="danger">ERR-008</Pill>
+          <Pill tone="danger">{policyBlocked ? "ERR-008" : "Draft"}</Pill>
         </div>
       ) : (
         <div className="success-banner">
@@ -1112,16 +1509,16 @@ function JobWorkspace() {
               <span>Derived from authoritative facts</span>
             </div>
             <strong className={`readiness-score ${blocked ? "blocked" : ""}`}>
-              {blocked ? "71%" : "100%"}
+              {policyBlocked ? "71%" : draftBlocked ? "62%" : "100%"}
             </strong>
           </div>
           <div className="readiness-list">
             {[
-              ["Opening approved", true],
+              ["Opening approved", !draftBlocked],
               ["Hiring team covered", true],
               ["Structured plan approved", true],
-              ["Pay and content approved", true],
-              ["Jurisdiction result known", !blocked],
+              ["Pay and content approved", !draftBlocked],
+              ["Jurisdiction result known", !policyBlocked],
             ].map(([label, pass]) => (
               <div key={String(label)} className={pass ? "pass" : "fail"}>
                 {pass ? <CheckCircle2 size={18} /> : <XCircle size={18} />}
@@ -1214,8 +1611,324 @@ function JobWorkspace() {
   );
 }
 
+function CandidateForm({
+  mode,
+  candidateId,
+}: {
+  mode: "new" | "edit";
+  candidateId?: string;
+}) {
+  const navigate = useNavigate();
+  const {
+    persona,
+    candidateRecords,
+    createCandidate,
+    updateCandidate,
+  } = usePrototype();
+  const candidate = candidateRecords.find((record) => record.id === candidateId);
+  const [values, setValues] = useState(() => ({
+    name: candidate?.name ?? "",
+    email: candidate?.email ?? "",
+    phone: candidate?.phone ?? "",
+    location: candidate?.location ?? "",
+    timezone: candidate?.timezone ?? "America/Los_Angeles",
+    source: candidate?.source ?? "Referral",
+    consent: candidate?.consent ?? "Candidate notice v2 · acknowledged",
+    status: candidate?.status ?? "Active",
+    owner: candidate?.owner ?? persona.name,
+  }));
+  const [error, setError] = useState("");
+  const permitted = canManageCoreRecord(
+    persona.role,
+    "candidate",
+    mode === "new" ? "create" : "edit",
+  );
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    if (!values.name.trim() || !values.email.trim() || !values.source) {
+      setError("Name, synthetic email and source are required.");
+      return;
+    }
+    if (!values.email.toLowerCase().endsWith("@example.test")) {
+      setError("Use only a reserved @example.test address in this public prototype.");
+      return;
+    }
+    if (
+      candidateRecords.some(
+        (record) =>
+          record.id !== candidate?.id &&
+          record.email.toLowerCase() === values.email.trim().toLowerCase(),
+      )
+    ) {
+      setError("A candidate identity with this synthetic email already exists. Open that identity to avoid a duplicate.");
+      return;
+    }
+    const input = {
+      name: values.name.trim(),
+      email: values.email.trim().toLowerCase(),
+      phone: values.phone.trim(),
+      location: values.location.trim(),
+      timezone: values.timezone,
+      source: values.source,
+      consent: values.consent,
+      status: values.status,
+      owner: values.owner,
+    };
+    if (mode === "edit" && candidate) {
+      updateCandidate(candidate.id, input);
+      navigate(`/hr/candidates/${candidate.id}`);
+    } else {
+      const id = createCandidate(input);
+      navigate(`/hr/candidates/${id}`);
+    }
+  };
+  return (
+    <HrShell
+      title={mode === "new" ? "New candidate identity" : `Edit ${candidate?.name ?? "candidate"}`}
+      eyebrow="Candidate object-specific form"
+      screenId="UI-HR-003"
+      screen="candidate"
+    >
+      {!permitted || (mode === "edit" && !candidate) ? (
+        <MutationDenied kind="candidate identity" returnTo="/hr/candidates" />
+      ) : (
+        <form className="panel object-form" onSubmit={submit} noValidate>
+          <div className="panel-heading">
+            <div>
+              <h2>{mode === "new" ? "Create a candidate identity" : "Edit identity and provenance"}</h2>
+              <span>
+                A candidate is a person record. This form never creates an
+                application or submits the person to a job automatically.
+              </span>
+            </div>
+            <Pill tone="warning">Synthetic identity only</Pill>
+          </div>
+          {error && (
+            <div className="error-summary" role="alert">
+              <strong>Check the candidate form</strong>
+              <span>{error}</span>
+            </div>
+          )}
+          <div className="object-form-grid">
+            <label><span>Full name *</span><input aria-label="Candidate full name" value={values.name} onChange={(event) => setValues({ ...values, name: event.target.value })} /></label>
+            <label><span>Synthetic email *</span><input aria-label="Candidate synthetic email" type="email" value={values.email} onChange={(event) => setValues({ ...values, email: event.target.value })} /></label>
+            <label><span>Phone</span><input aria-label="Candidate phone" value={values.phone} onChange={(event) => setValues({ ...values, phone: event.target.value })} /></label>
+            <label><span>Location</span><input aria-label="Candidate location" value={values.location} onChange={(event) => setValues({ ...values, location: event.target.value })} /></label>
+            <label><span>Timezone</span><select aria-label="Candidate timezone" value={values.timezone} onChange={(event) => setValues({ ...values, timezone: event.target.value })}><option>America/Los_Angeles</option><option>America/New_York</option><option>Europe/London</option><option>Asia/Kolkata</option></select></label>
+            <label><span>Source *</span><select aria-label="Candidate source" value={values.source} onChange={(event) => setValues({ ...values, source: event.target.value })}><option>Referral</option><option>Careers site</option><option>Agency</option><option>Sourced</option><option>Manual import</option></select></label>
+            <label><span>Notice / consent evidence</span><select aria-label="Candidate consent evidence" value={values.consent} onChange={(event) => setValues({ ...values, consent: event.target.value })}><option>Candidate notice v2 · acknowledged</option><option>Referral notice · pending</option><option>Manual import notice · pending</option></select></label>
+            <label><span>Identity state</span><select aria-label="Candidate identity state" value={values.status} onChange={(event) => setValues({ ...values, status: event.target.value })}><option>Active</option><option>Restricted</option><option>Archived</option></select></label>
+            <label><span>Owner</span><input aria-label="Candidate owner" value={values.owner} onChange={(event) => setValues({ ...values, owner: event.target.value })} /></label>
+          </div>
+          <div className="object-form-actions">
+            <NavLink className="secondary-button" to={candidate ? `/hr/candidates/${candidate.id}` : "/hr/candidates"}>Cancel</NavLink>
+            <button className="primary-button" type="submit"><CheckCircle2 size={16} /> {mode === "new" ? "Create candidate identity" : "Save candidate changes"}</button>
+          </div>
+        </form>
+      )}
+    </HrShell>
+  );
+}
+
+function CandidateWorkspace() {
+  const { candidateId, action } = useParams();
+  const {
+    persona,
+    candidateRecords,
+    applicationRecords: liveApplications,
+  } = usePrototype();
+  if (!candidateId) return <RecordList kind="candidates" />;
+  if (candidateId === "new") return <CandidateForm mode="new" />;
+  if (action === "edit")
+    return <CandidateForm mode="edit" candidateId={candidateId} />;
+  const candidate = candidateRecords.find((record) => record.id === candidateId);
+  const scopedCandidates = visibleCandidates(
+    persona.role,
+    candidateRecords,
+    liveApplications,
+  );
+  if (!candidate || !scopedCandidates.some((record) => record.id === candidate.id))
+    return (
+      <HrShell title="Candidate access denied" eyebrow={candidateId} screenId="UI-HR-003" screen="candidate">
+        <section className="panel access-denied" role="alert">
+          <ShieldAlert size={28} />
+          <div><h2>Candidate row access denied safely</h2><p>{persona.role} cannot open this identity outside its authorized application population.</p></div>
+          <NavLink className="primary-button" to="/hr/candidates">Return to visible candidates</NavLink>
+        </section>
+      </HrShell>
+    );
+  const scopedApplications = visibleApplications(persona.role, liveApplications).filter(
+    (record) => record.candidateId === candidate.id,
+  );
+  const scope = roleDataScopes[persona.role];
+  return (
+    <HrShell
+      title={displayCandidateForRole(persona.role, { id: candidate.id, candidate: candidate.name })}
+      eyebrow={`Candidate identity workspace · ${candidate.id}`}
+      screenId="UI-HR-003"
+      screen="candidate"
+      actions={
+        canManageCoreRecord(persona.role, "candidate", "edit") ? (
+          <>
+            <NavLink className="secondary-button" to={`/hr/candidates/${candidate.id}/edit`}><Pencil size={16} /> Edit</NavLink>
+            <NavLink className="primary-button" to="/hr/applications/new"><Plus size={16} /> Create application</NavLink>
+          </>
+        ) : undefined
+      }
+    >
+      <div className="context-strip">
+        <div><span>Candidate ID</span><strong>{candidate.id}</strong></div>
+        <div><span>Identity state</span><strong>{candidate.status}</strong></div>
+        <div><span>Source</span><strong>{candidate.source}</strong></div>
+        <div><span>Owner</span><strong>{candidate.owner}</strong></div>
+        <Freshness>{candidate.updated}</Freshness>
+      </div>
+      <div className="job-workspace-grid">
+        <section className="panel">
+          <div className="panel-heading"><div><h2>Identity & contact</h2><span>Field-level scope: {scope?.identity} identity · {scope?.contact} contact</span></div><Pill tone="info">Role scoped</Pill></div>
+          <dl className="fact-list">
+            <div><dt>Name</dt><dd>{displayCandidateForRole(persona.role, { id: candidate.id, candidate: candidate.name })}</dd></div>
+            <div><dt>Email</dt><dd>{scope?.contact === "full" ? candidate.email : "Restricted"}</dd></div>
+            <div><dt>Phone</dt><dd>{scope?.contact === "full" ? candidate.phone : "Restricted"}</dd></div>
+            <div><dt>Location / timezone</dt><dd>{candidate.location} · {candidate.timezone}</dd></div>
+          </dl>
+        </section>
+        <section className="panel">
+          <div className="panel-heading"><div><h2>Purpose & provenance</h2><span>Separate from job consideration</span></div><Pill tone="success">{candidate.consent.includes("acknowledged") ? "Recorded" : "Pending"}</Pill></div>
+          <dl className="fact-list"><div><dt>Source</dt><dd>{candidate.source}</dd></div><div><dt>Notice evidence</dt><dd>{candidate.consent}</dd></div><div><dt>Applications</dt><dd>{scopedApplications.length} role-visible link{scopedApplications.length === 1 ? "" : "s"}</dd></div></dl>
+        </section>
+        <section className="panel wide-panel">
+          <div className="panel-heading"><div><h2>Applications</h2><span>One candidate may have multiple independent job considerations</span></div></div>
+          <div className="record-list">
+            {scopedApplications.map((record) => <NavLink to={`/hr/applications/${record.id}`} key={record.id}><span className="object-icon"><AppWindow size={18} /></span><div><strong>{record.job}</strong><span>{record.id} · {record.owner}</span></div><Pill tone={record.tone}>{record.stage}</Pill><ArrowRight size={17} /></NavLink>)}
+            {!scopedApplications.length && <div className="empty-state"><UsersRound size={28} /><h3>No role-visible applications</h3><p>Create an application explicitly when there is a valid job consideration.</p></div>}
+          </div>
+        </section>
+      </div>
+      <IntegrityNotice kind="restricted" />
+    </HrShell>
+  );
+}
+
+function ApplicationForm({
+  mode,
+  applicationId,
+}: {
+  mode: "new" | "edit";
+  applicationId?: string;
+}) {
+  const navigate = useNavigate();
+  const {
+    persona,
+    candidateRecords,
+    jobRecords,
+    applicationRecords: liveApplications,
+    createApplication,
+    updateApplication,
+  } = usePrototype();
+  const application = liveApplications.find((record) => record.id === applicationId);
+  const availableJobs = jobRecords.filter((record) => record.status !== "Closed");
+  const [values, setValues] = useState(() => ({
+    candidateId: application?.candidateId ?? candidateRecords[0]?.id ?? "",
+    jobId: application?.jobId ?? availableJobs[0]?.id ?? "",
+    stage: application?.stage ?? "Recruiter review",
+    owner: application?.owner ?? persona.name,
+    nextInternalAction:
+      application?.nextInternalAction ?? "Complete structured recruiter review",
+  }));
+  const [error, setError] = useState("");
+  const permitted = canManageCoreRecord(
+    persona.role,
+    "application",
+    mode === "new" ? "create" : "edit",
+  );
+  const submit = (event: FormEvent) => {
+    event.preventDefault();
+    if (!values.candidateId || !values.jobId || !values.owner.trim()) {
+      setError("Candidate, job and owner are required.");
+      return;
+    }
+    const duplicate = liveApplications.some(
+      (record) =>
+        record.id !== application?.id &&
+        record.candidateId === values.candidateId &&
+        record.jobId === values.jobId &&
+        !["Rejected", "Withdrawn"].includes(record.stage),
+    );
+    if (duplicate) {
+      setError("An active application already links this candidate and job. Open the existing record instead of creating a duplicate.");
+      return;
+    }
+    const input = {
+      ...values,
+      owner: values.owner.trim(),
+      nextInternalAction:
+        values.nextInternalAction.trim() || "Complete the next governed stage action",
+    };
+    if (mode === "edit" && application) {
+      updateApplication(application.id, input);
+      navigate(`/hr/applications/${application.id}`);
+    } else {
+      const id = createApplication(input);
+      navigate(`/hr/applications/${id}`);
+    }
+  };
+  return (
+    <HrShell
+      title={mode === "new" ? "New application" : `Edit ${application?.id ?? "application"}`}
+      eyebrow="Candidate-to-job junction form"
+      screenId="UI-HR-003"
+      screen="application"
+    >
+      {!permitted || (mode === "edit" && !application) ? (
+        <MutationDenied kind="application" returnTo="/hr/applications" />
+      ) : (
+        <form className="panel object-form" onSubmit={submit} noValidate>
+          <div className="panel-heading">
+            <div>
+              <h2>{mode === "new" ? "Link a candidate to a job" : "Edit application routing fields"}</h2>
+              <span>Candidate identity and job requisition stay independent; this record represents the consideration.</span>
+            </div>
+            <Pill tone="warning">Duplicate protected</Pill>
+          </div>
+          {error && <div className="error-summary" role="alert"><strong>Check the application form</strong><span>{error}</span></div>}
+          <div className="object-form-grid">
+            <label>
+              <span>Candidate *</span>
+              <select aria-label="Application candidate" value={values.candidateId} disabled={mode === "edit"} title={mode === "edit" ? "Candidate binding is immutable after application creation" : undefined} onChange={(event) => setValues({ ...values, candidateId: event.target.value })}>
+                {candidateRecords.filter((record) => record.status === "Active").map((record) => <option value={record.id} key={record.id}>{record.name} · {record.id}</option>)}
+              </select>
+            </label>
+            <label>
+              <span>Job requisition *</span>
+              <select aria-label="Application job" value={values.jobId} disabled={mode === "edit"} title={mode === "edit" ? "Job binding is immutable after application creation" : undefined} onChange={(event) => setValues({ ...values, jobId: event.target.value })}>
+                {availableJobs.map((record) => <option value={record.id} key={record.id}>{record.title} · {record.id} · {record.status}</option>)}
+              </select>
+            </label>
+            <label>
+              <span>Application stage</span>
+              <select aria-label="Application stage" value={values.stage} disabled title="Stage changes use the governed transition action" onChange={(event) => setValues({ ...values, stage: event.target.value })}>
+                {["Recruiter review", "Screening", "Scheduling", "Interviews", "Debrief", "Offer", "Hired", "Rejected", "Withdrawn"].map((stage) => <option key={stage}>{stage}</option>)}
+              </select>
+            </label>
+            <label><span>Owner *</span><input aria-label="Application owner" value={values.owner} onChange={(event) => setValues({ ...values, owner: event.target.value })} /></label>
+            <label className="full-field"><span>Next internal action</span><textarea aria-label="Application next action" value={values.nextInternalAction} onChange={(event) => setValues({ ...values, nextInternalAction: event.target.value })} /></label>
+          </div>
+          <ExplainPanel title="Creation boundary" source="Application invariant · v1.8">
+            This creates only the synthetic application junction. Interview scheduling, scorecards, decisions, offers and handoff records are generated later by their governed workflow gates.
+          </ExplainPanel>
+          <div className="object-form-actions">
+            <NavLink className="secondary-button" to={application ? `/hr/applications/${application.id}` : "/hr/applications"}>Cancel</NavLink>
+            <button className="primary-button" type="submit"><CheckCircle2 size={16} /> {mode === "new" ? "Create application" : "Save application changes"}</button>
+          </div>
+        </form>
+      )}
+    </HrShell>
+  );
+}
+
 function ApplicationWorkspace() {
-  const { applicationId } = useParams();
+  const { applicationId, action } = useParams();
   const navigate = useNavigate();
   const [tab, setTab] = useState("Summary");
   const [preview, setPreview] = useState(false);
@@ -1230,14 +1943,17 @@ function ApplicationWorkspace() {
     resolveScorecard,
     availabilitySubmitted,
     persona,
+    applicationRecords: liveApplications,
+    interviewRecords: liveInterviews,
   } = usePrototype();
   if (!applicationId) return <RecordList kind="applications" />;
+  if (applicationId === "new") return <ApplicationForm mode="new" />;
+  if (action === "edit")
+    return <ApplicationForm mode="edit" applicationId={applicationId} />;
 
-  const record =
-    applicationRecords.find((item) => item.id === applicationId) ??
-    applicationRecords[0];
-  const scopedRecords = visibleApplicationsForRole(persona.role);
-  if (!scopedRecords.some((item) => item.id === record.id))
+  const record = liveApplications.find((item) => item.id === applicationId);
+  const scopedRecords = visibleApplications(persona.role, liveApplications);
+  if (!record || !scopedRecords.some((item) => item.id === record.id))
     return (
       <HrShell
         title="Application access denied"
@@ -1312,7 +2028,7 @@ function ApplicationWorkspace() {
       ? ["Related applications"]
       : []),
   ];
-  const relatedInterviews = interviewRecords.filter(
+  const relatedInterviews = liveInterviews.filter(
     (item) => item.applicationId === record.id,
   );
   const completeTask = (id: string) =>
@@ -1348,6 +2064,14 @@ function ApplicationWorkspace() {
               Next
             </button>
           </div>
+          {canManageCoreRecord(persona.role, "application", "edit") && (
+            <NavLink
+              className="secondary-button"
+              to={`/hr/applications/${record.id}/edit`}
+            >
+              <Pencil size={16} /> Edit
+            </NavLink>
+          )}
           {tabs.includes("Messages") && (
             <button
               className="secondary-button"
@@ -1596,7 +2320,7 @@ function ApplicationWorkspace() {
             <div className="operational-cards">
               {(relatedInterviews.length
                 ? relatedInterviews
-                : interviewRecords.slice(0, 1)
+                : liveInterviews.slice(0, 1)
               ).map((interview) => (
                 <article key={interview.id}>
                   <div>
@@ -1871,7 +2595,7 @@ function ApplicationWorkspace() {
                   >
                     {application.stage}
                   </Pill>
-                  {applicationRecords.some(
+                  {liveApplications.some(
                     (item) => item.id === application.id,
                   ) ? (
                     <NavLink
@@ -2004,14 +2728,19 @@ function InterviewWorkspace() {
   const [mode, setMode] = useState("Availability request");
   const [confirmed, setConfirmed] = useState(false);
   const [linkActive, setLinkActive] = useState(true);
-  const { scenarioState, availabilitySubmitted, announce, persona } =
-    usePrototype();
+  const {
+    scenarioState,
+    availabilitySubmitted,
+    announce,
+    persona,
+    interviewRecords: liveInterviews,
+    applicationRecords: liveApplications,
+  } = usePrototype();
   if (!interviewId) return <RecordList kind="interviews" />;
-  const interview =
-    interviewRecords.find((item) => item.id === interviewId) ??
-    interviewRecords[0];
+  const interview = liveInterviews.find((item) => item.id === interviewId);
   if (
-    !visibleInterviewsForRole(persona.role).some(
+    !interview ||
+    !visibleInterviews(persona.role, liveInterviews, liveApplications).some(
       (item) => item.id === interview.id,
     )
   )
@@ -2311,8 +3040,14 @@ function InterviewWorkspace() {
 
 function ScorecardWorkspace() {
   const { assignmentId } = useParams();
-  const { resolveScorecard, scorecardResolved, announce, persona } =
-    usePrototype();
+  const {
+    resolveScorecard,
+    scorecardResolved,
+    announce,
+    persona,
+    assignmentRecords: liveAssignments,
+    applicationRecords: liveApplications,
+  } = usePrototype();
   const [saved, setSaved] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [briefingTab, setBriefingTab] = useState("Briefing");
@@ -2321,11 +3056,10 @@ function ScorecardWorkspace() {
     scorecard.map((item) => item.evidence),
   );
   if (!assignmentId) return <RecordList kind="assignments" />;
-  const assignment =
-    assignmentRecords.find((item) => item.id === assignmentId) ??
-    assignmentRecords[0];
+  const assignment = liveAssignments.find((item) => item.id === assignmentId);
   if (
-    !visibleAssignmentsForRole(persona.role).some(
+    !assignment ||
+    !visibleAssignments(persona.role, liveAssignments, liveApplications).some(
       (item) => item.id === assignment.id,
     )
   )
@@ -2600,19 +3334,25 @@ function ScorecardWorkspace() {
 
 function DecisionWorkspace() {
   const { applicationId } = useParams();
-  const { scenarioState, announce, offerApproved, approveOffer, persona } =
-    usePrototype();
+  const {
+    scenarioState,
+    announce,
+    offerApproved,
+    approveOffer,
+    persona,
+    applicationRecords: liveApplications,
+  } = usePrototype();
   const [sentBack, setSentBack] = useState(false);
   const [versionsOpen, setVersionsOpen] = useState(false);
   if (!applicationId) return <RecordList kind="decisions" />;
-  const record =
-    applicationRecords.find((item) => item.id === applicationId) ??
-    applicationRecords[0];
+  const record = liveApplications.find((item) => item.id === applicationId);
   if (
-    !visibleApplicationsForRole(persona.role).some(
+    !record ||
+    !visibleApplications(persona.role, liveApplications).some(
       (item) => item.id === record.id,
     ) ||
-    !["APP-DEMO-001", "APP-DEMO-011"].includes(record.id)
+    (!['APP-DEMO-001', 'APP-DEMO-011'].includes(record.id) &&
+      !['Offer', 'Hired'].includes(record.stage))
   )
     return (
       <HrShell
@@ -2642,7 +3382,7 @@ function DecisionWorkspace() {
   const ready = isMaya && scenarioState.decisionState === "Ready for decision";
   const accepted = isMaya && scenarioState.offerState === "Accepted";
   const approval =
-    record.id === "APP-DEMO-011" ||
+    record.id === "APP-DEMO-011" || record.stage === "Offer" ||
     scenarioState.offerState === "Pending approval";
   const approved = offerApproved && approval;
   const handoffFailed =
@@ -3609,6 +4349,7 @@ export function HrWorkspace({ screen }: { screen: HrScreen }) {
   if (screen === "reports") return <ReportsWorkspace />;
   if (screen === "objects") return <ObjectsWorkspace />;
   if (screen === "job") return <JobWorkspace />;
+  if (screen === "candidate") return <CandidateWorkspace />;
   if (screen === "application") return <ApplicationWorkspace />;
   if (screen === "interview") return <InterviewWorkspace />;
   if (screen === "scorecard") return <ScorecardWorkspace />;

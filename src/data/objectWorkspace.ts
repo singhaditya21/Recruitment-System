@@ -41,7 +41,7 @@ const owners = ["Alex Rivera", "Priya Nair", "Configuration queue"];
 
 export const seededObjectRecords: ObjectRecord[] = objectCatalog.flatMap(
   (object, objectIndex) =>
-    Array.from({ length: 3 }, (_, recordIndex) => {
+    Array.from({ length: 12 }, (_, recordIndex) => {
       const number = recordIndex + 1;
       const id = `${object.id.replace("OBJ", "REC")}-${String(number).padStart(3, "0")}`;
       const state =
@@ -77,7 +77,7 @@ export const seededObjectRecords: ObjectRecord[] = objectCatalog.flatMap(
             ? "Today · 11:45 AM"
             : number === 2
               ? "Yesterday · 4:20 PM"
-              : "Aug 26 · 9:10 AM",
+              : `${Math.min(number, 28)} days ago · generated fixture`,
         values,
         history: [
           {

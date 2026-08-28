@@ -15,6 +15,18 @@ import {
   seededObjectRecords,
   type ObjectRecord,
 } from "../data/objectWorkspace";
+import {
+  seededApplications,
+  seededAssignments,
+  seededCandidates,
+  seededInterviews,
+  seededJobs,
+  type AssignmentRecord,
+  type CandidateRecord,
+  type InterviewRecord,
+  type JobRecord,
+} from "../data/coreRecords";
+import type { ApplicationRecord } from "../data/fixtures";
 
 type Scenario = (typeof scenarioArtifact.scenarios)[number];
 
@@ -46,6 +58,37 @@ type PrototypeContextValue = {
     label: string,
     values: Record<string, string>,
   ) => void;
+  jobRecords: JobRecord[];
+  candidateRecords: CandidateRecord[];
+  applicationRecords: ApplicationRecord[];
+  interviewRecords: InterviewRecord[];
+  assignmentRecords: AssignmentRecord[];
+  createJob: (input: Omit<JobRecord, "id" | "version" | "posted">) => string;
+  updateJob: (id: string, input: Omit<JobRecord, "id" | "version" | "posted">) => void;
+  createCandidate: (
+    input: Omit<CandidateRecord, "id" | "initials" | "updated">,
+  ) => string;
+  updateCandidate: (
+    id: string,
+    input: Omit<CandidateRecord, "id" | "initials" | "updated">,
+  ) => void;
+  createApplication: (input: {
+    candidateId: string;
+    jobId: string;
+    stage: string;
+    owner: string;
+    nextInternalAction: string;
+  }) => string;
+  updateApplication: (
+    id: string,
+    input: {
+      candidateId: string;
+      jobId: string;
+      stage: string;
+      owner: string;
+      nextInternalAction: string;
+    },
+  ) => void;
   resetKey: number;
   resetPrototype: () => void;
 };
@@ -61,6 +104,11 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
   const [offerApproved, setOfferApproved] = useState(false);
   const [objectRecords, setObjectRecords] =
     useState<ObjectRecord[]>(seededObjectRecords);
+  const [jobRecords, setJobRecords] = useState<JobRecord[]>(seededJobs);
+  const [candidateRecords, setCandidateRecords] =
+    useState<CandidateRecord[]>(seededCandidates);
+  const [applicationRecords, setApplicationRecords] =
+    useState<ApplicationRecord[]>(seededApplications);
   const [resetKey, setResetKey] = useState(0);
   const scenario =
     scenarioArtifact.scenarios.find((item) => item.id === scenarioId) ??
@@ -195,6 +243,167 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
           `${recordId} updated in memory with optimistic version control.`,
         );
       },
+      jobRecords,
+      candidateRecords,
+      applicationRecords,
+      interviewRecords: seededInterviews,
+      assignmentRecords: seededAssignments,
+      createJob: (input: Omit<JobRecord, "id" | "version" | "posted">) => {
+        const sequence =
+          jobRecords.filter((record) => record.id.startsWith("JOB-MEM-")).length +
+          1;
+        const id = `JOB-MEM-${String(sequence).padStart(3, "0")}`;
+        setJobRecords((records) => [
+          {
+            ...input,
+            id,
+            version: "Posting v1 · Policy pending",
+            posted: input.status === "Published" ? "Now · in-memory fixture" : "Not public",
+          },
+          ...records,
+        ]);
+        setNotice(
+          `${id} created as an in-memory ${input.status.toLowerCase()} requisition. No public posting or Salesforce record was created.`,
+        );
+        return id;
+      },
+      updateJob: (
+        id: string,
+        input: Omit<JobRecord, "id" | "version" | "posted">,
+      ) => {
+        setJobRecords((records) =>
+          records.map((record) =>
+            record.id === id
+              ? {
+                  ...record,
+                  ...input,
+                  version: `Posting v${Number(record.version.match(/v(\d+)/)?.[1] ?? 1) + 1} · in-memory`,
+                  posted:
+                    input.status === "Published"
+                      ? record.posted === "Not public"
+                        ? "Now · in-memory fixture"
+                        : record.posted
+                      : "Not public",
+                }
+              : record,
+          ),
+        );
+        setNotice(`${id} updated in memory. Publication still requires the governed preview action.`);
+      },
+      createCandidate: (
+        input: Omit<CandidateRecord, "id" | "initials" | "updated">,
+      ) => {
+        const sequence =
+          candidateRecords.filter((record) => record.id.startsWith("PER-MEM-"))
+            .length + 1;
+        const id = `PER-MEM-${String(sequence).padStart(3, "0")}`;
+        const initials = input.name
+          .split(/\s+/)
+          .slice(0, 2)
+          .map((part) => part[0]?.toUpperCase() ?? "")
+          .join("");
+        setCandidateRecords((records) => [
+          { ...input, id, initials, updated: "Now · in-memory fixture" },
+          ...records,
+        ]);
+        setNotice(
+          `${id} candidate identity created in memory. No application was created automatically.`,
+        );
+        return id;
+      },
+      updateCandidate: (
+        id: string,
+        input: Omit<CandidateRecord, "id" | "initials" | "updated">,
+      ) => {
+        setCandidateRecords((records) =>
+          records.map((record) =>
+            record.id === id
+              ? {
+                  ...record,
+                  ...input,
+                  initials: input.name
+                    .split(/\s+/)
+                    .slice(0, 2)
+                    .map((part) => part[0]?.toUpperCase() ?? "")
+                    .join(""),
+                  updated: "Now · in-memory fixture",
+                }
+              : record,
+          ),
+        );
+        setNotice(`${id} candidate identity updated in memory with consent provenance preserved.`);
+      },
+      createApplication: (input: {
+        candidateId: string;
+        jobId: string;
+        stage: string;
+        owner: string;
+        nextInternalAction: string;
+      }) => {
+        const candidate = candidateRecords.find((record) => record.id === input.candidateId);
+        const job = jobRecords.find((record) => record.id === input.jobId);
+        if (!candidate || !job) throw new Error("Candidate and job are required.");
+        const sequence =
+          applicationRecords.filter((record) => record.id.startsWith("APP-MEM-"))
+            .length + 1;
+        const id = `APP-MEM-${String(sequence).padStart(3, "0")}`;
+        setApplicationRecords((records) => [
+          {
+            id,
+            candidateId: candidate.id,
+            candidate: candidate.name,
+            initials: candidate.initials,
+            jobId: job.id,
+            job: job.title,
+            stage: input.stage,
+            owner: input.owner,
+            stageAge: "0 hours",
+            updated: "Now",
+            tone: "info",
+            version: "v1",
+            nextInternalAction: input.nextInternalAction,
+          },
+          ...records,
+        ]);
+        setNotice(
+          `${id} linked ${candidate.id} to ${job.id} in memory. The candidate identity and requisition remain separate records.`,
+        );
+        return id;
+      },
+      updateApplication: (
+        id: string,
+        input: {
+          candidateId: string;
+          jobId: string;
+          stage: string;
+          owner: string;
+          nextInternalAction: string;
+        },
+      ) => {
+        const candidate = candidateRecords.find((record) => record.id === input.candidateId);
+        const job = jobRecords.find((record) => record.id === input.jobId);
+        if (!candidate || !job) throw new Error("Candidate and job are required.");
+        setApplicationRecords((records) =>
+          records.map((record) =>
+            record.id === id
+              ? {
+                  ...record,
+                  candidateId: candidate.id,
+                  candidate: candidate.name,
+                  initials: candidate.initials,
+                  jobId: job.id,
+                  job: job.title,
+                  stage: input.stage,
+                  owner: input.owner,
+                  nextInternalAction: input.nextInternalAction,
+                  updated: "Now",
+                  version: `v${Number(record.version.replace("v", "")) + 1}`,
+                }
+              : record,
+          ),
+        );
+        setNotice(`${id} updated in memory; stage and reference history remain synthetic.`);
+      },
       resetKey,
       resetPrototype: () => {
         setScenarioId("SCN-005");
@@ -203,6 +412,9 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
         setAvailabilitySubmitted(false);
         setOfferApproved(false);
         setObjectRecords(seededObjectRecords);
+        setJobRecords(seededJobs);
+        setCandidateRecords(seededCandidates);
+        setApplicationRecords(seededApplications);
         setNotice(
           "Prototype reset to the coherent missing-scorecard scenario.",
         );
@@ -213,6 +425,9 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
       availabilitySubmitted,
       notice,
       objectRecords,
+      jobRecords,
+      candidateRecords,
+      applicationRecords,
       offerApproved,
       persona,
       personaId,

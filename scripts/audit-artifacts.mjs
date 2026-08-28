@@ -77,6 +77,24 @@ const v17Trace = JSON.parse(
     "utf8",
   ),
 );
+const v18 = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v1.8/readiness.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v18Routes = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v1.8/routes.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v18Trace = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v1.8/traceability.json", import.meta.url),
+    "utf8",
+  ),
+);
 
 assertSeries(
   routes.routes.filter(({ id }) => id.startsWith("UI-CAN")),
@@ -206,6 +224,36 @@ assert(
   v17.formalFindings.open === 18 && v17.production.pilot === "blocked",
   "v1.7 must preserve formal finding and pilot gates",
 );
+assert(
+  v18Routes.screenFamilies.length === 14 &&
+    v18Routes.functionalPatternCount === 29 &&
+    v18Trace.rows.length === 14,
+  "v1.8 screen, route and trace counts must reconcile",
+);
+assert(
+  v18.syntheticContract.seededObjectRecords === 1104 &&
+    v18.syntheticContract.seededCoreRecords === 1360 &&
+    v18.syntheticContract.seededCorePlusGenericRecords === 2464,
+  "v1.8 dense seed counts must reconcile",
+);
+assert(
+  v18.syntheticContract.seededJobs === 48 &&
+    v18.syntheticContract.seededCandidates === 320 &&
+    v18.syntheticContract.seededApplications === 640 &&
+    v18.syntheticContract.seededInterviews === 192 &&
+    v18.syntheticContract.seededAssignments === 160,
+  "v1.8 core seed families must reconcile",
+);
+assert(
+  v18Trace.rows.every(({ screenId }) =>
+    v18Routes.screenFamilies.some(({ id }) => id === screenId),
+  ),
+  "Every v1.8 screen family requires a current trace row",
+);
+assert(
+  v18.formalFindings.open === 18 && v18.production.pilot === "blocked",
+  "v1.8 must preserve formal finding and pilot gates",
+);
 
 const sourcePaths = await sourceFiles(new URL("../src/", import.meta.url));
 const source = (
@@ -253,10 +301,17 @@ assert(
   "The v1.7 object workspace route must be present",
 );
 assert(
+  source.includes("/hr/candidates") &&
+    source.includes("createCandidate") &&
+    source.includes("createApplication") &&
+    source.includes("createJob"),
+  "The v1.8 core routes and mutation contracts must be present",
+);
+assert(
   source.includes("SRC-ANALYTICS-FIXTURE-v1.7"),
   "The v1.7 analytics source contract must be present",
 );
 
 console.log(
-  "Artifact audit passed: 12 inherited executable route artifacts, 14 current screen families, 12 scenarios, 15 transitions, 15 automations, 15 interfaces, 15 invariants, 10 error classes, 18 formally open controlled findings, and the v1.7 92-object/368-page/1,472-field/600-filter contract.",
+  "Artifact audit passed: 12 inherited executable route artifacts, 14 current screen families, 29 functional patterns, 12 scenarios, 15 transitions, 15 automations, 15 interfaces, 15 invariants, 10 error classes, 18 formally open controlled findings, 92 objects, 368 generic page instances, 2,464 core-plus-generic records, 1,472 fields and 600 populated analytics filter combinations.",
 );

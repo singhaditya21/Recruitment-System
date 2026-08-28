@@ -2,20 +2,20 @@
 
 | Field | Value |
 | --- | --- |
-| Status | Draft v1.7 — complete object-page, role/data-scope, analytics and governed-reporting wireframe contract |
+| Status | Draft v1.8 — dense synthetic data and object-specific core creation/editing wireframe contract |
 | Last updated | August 28, 2026 |
 | Product owner | Aditya Singh |
 | Initial market | San Francisco–based employer hiring in the United States |
 | Primary timezone | America/Los_Angeles |
 | Currency | USD |
-| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; v1.7 HTTPS deployment verified from commit `9c85f20` on August 28, 2026 |
+| Prototype deployment | [Public GitHub Pages wireframe](https://singhaditya21.github.io/Recruitment-System/) using synthetic data only; v1.8 is delivered through the protected `main` Pages workflow and verification evidence is recorded in section 22.12 |
 | Pilot/production candidate deployment | Approved external application host and backend-for-frontend; providers TBD |
 | Pilot/production HR deployment | Native Salesforce Lightning application |
 | Operational system of record | Salesforce custom recruitment application |
-| Implementation state | React/TypeScript/Vite synthetic prototype includes a Lightning-style internal shell, both product surfaces, 14 canonical screen families, 24 functional route patterns, 13 personas, complete reusable List/New/Detail/Edit routes for 92 logical object families (368 page instances), 276 seeded generic records, 1,472 logical field contracts (552 business plus 920 governance/provenance), row/field-aware persona projections, 11 dashboards over 324 deterministic analytics rows with all 600 supported global-filter combinations populated, and governed saved-report/builder/schedule/delivery/target/restatement previews; Salesforce metadata, approved physical fields/API names, production services/data, BFF/IdP, provider integrations and an approved pilot environment do not exist |
+| Implementation state | React/TypeScript/Vite synthetic prototype includes a Lightning-style internal shell, both product surfaces, 14 canonical screen families, 29 functional route patterns, 13 personas, domain-specific List/New/Detail/Edit journeys for jobs/candidate identities/applications, workflow-generation explanations for downstream records, complete reusable List/New/Detail/Edit routes for 92 logical object families (368 page instances), 1,104 seeded generic records, 1,360 dense core records, 1,472 logical field contracts (552 business plus 920 governance/provenance), row/field-aware persona projections, 11 dashboards over 324 separate analytics rows with all 600 supported global-filter combinations populated, and governed saved-report/builder/schedule/delivery/target/restatement previews; Salesforce metadata, approved physical fields/API names, production services/data, BFF/IdP, provider integrations and an approved pilot environment do not exist |
 | Pilot contract state | Proposed control envelope in section 7.6; employer, legal, provider, Salesforce, and named-owner decisions remain unapproved until their `OD-##` records close |
 | Full-audit state | [v1.7 remediation audit](AUDIT-v1.7.md) reconciles the current repository; all 18 controlled findings remain formally Open until accountable dated review, even where the synthetic wireframe gap is implemented, and real-candidate work remains blocked |
-| v1.7 change boundary | Public-safe object-page, access, analytics, reporting, API/event-design and assurance-scaffold release: application source, deterministic fixtures, tests, contracts, documentation, CI/security automation and Pages deployment may change; no deployable Salesforce org metadata, production backend, authentication, provider write, real candidate data, legal approval or pilot authorization is created |
+| v1.8 change boundary | Public-safe dense-fixture and core-form release: job/candidate/application browser-memory state, deterministic fixtures, route/search/filter/pagination/validation interactions, tests, contracts, documentation, CI/security automation and Pages deployment may change; no deployable Salesforce org metadata, production backend, authentication, provider write, real candidate data, legal approval or pilot authorization is created |
 
 ## 1. Executive summary
 
@@ -81,7 +81,7 @@ This brief is a review entrypoint, not a substitute for the numbered contract. A
 | What must be configurable? | Only approved versioned content, job plans, bounded stages/mappings, rubrics, queues/calendars and finite rules inside the `CFG-*` authority model | Named configuration/reviewer roles, physical catalog and release evidence |
 | How will value be judged? | Governed adoption, reduced active coordination/scheduling effort, complete evidence, candidate clarity/support, safe operation and a conservative ≥1.5× recurring benefit-to-cost with ≤24-month modeled payback | Employer baseline, finance assumptions and comparable pilot evidence; economics cannot offset failed rights/guardrails |
 | How will exposure grow? | Synthetic rehearsal → nonproduction qualification → one-job limited live cohort → measured multi-job cohort → full bounded pilot; each boundary ends in one `OUT-*` decision | Approved `ART-002/022/023`, role qualification, launch gates and prior-ramp evidence |
-| What exists now? | The v1.7 synthetic React wireframe, current PRD/matrix/contracts, local automated evidence and GitHub Pages deployment workflow | Accountable acceptance and every production Salesforce/BFF/IdP/provider layer remain unproven |
+| What exists now? | The v1.8 synthetic React wireframe, current PRD/matrix/contracts, local automated evidence and GitHub Pages deployment workflow | Accountable acceptance and every production Salesforce/BFF/IdP/provider layer remain unproven |
 | What does this PRD approval authorize? | Agreement on the product contract and recorded decisions only | It does not authorize development, procurement, real candidate data, production deployment or pilot launch without their independent gates |
 
 Executive decision requested:
@@ -139,6 +139,23 @@ v1.7 turns the earlier matrix and audit into an executable wireframe contract wh
 | Is repository governance adequate? | `main` is protected with strict `verify`/`codeql` checks, CODEOWNER review, admin enforcement, linear history, conversation resolution and force-push/deletion prevention; Dependabot, dependency review, CodeQL, secret scanning/push protection, security updates, a security policy and PR checklist are enabled | Controls must remain maintained and their alerts/upgrade PRs require accountable review |
 
 The v1.7 definition of “fixed” is deliberately layered: a synthetic product/contract defect may be implemented and tested while the corresponding production finding remains Open until the accountable reviewer accepts dated evidence from the selected org, services, providers and pilot environment.
+
+### 1.7 v1.8 dense-data and core-form brief
+
+v1.8 closes the wireframe-level ambiguity around “New job,” “New candidate” and “New application” while preserving the production and privacy boundaries. The authoritative count and creation ledger is [MATRIX-v1.8.md](MATRIX-v1.8.md).
+
+| Product question | v1.8 implemented answer | Boundary still open |
+| --- | --- | --- |
+| Is the dataset heavy enough to exercise collections? | The deterministic core registry contains 48 jobs, 320 candidates, 640 applications, 192 interviews and 160 scorecard assignments; the 92-family workspace contains 12 records per family (1,104), for 2,464 core-plus-generic records | Pilot volumes, production data distribution, seasonality, skew, migration quality and load/performance evidence remain unproved |
+| Where is New Job? | `#/hr/jobs/new` is a recruiter/hiring-manager form with title/team/location/type/pay/owner/content validation; every created job starts as Draft and publication remains a separate governed action | Requisition approval, headcount integration, policy evaluation, Salesforce transaction and public projection are not implemented |
+| Where is New Candidate? | `#/hr/candidates/new` creates a candidate identity with source, notice evidence, contact, timezone, state and owner; it rejects non-`example.test` email domains and duplicate synthetic email | Production identity proofing, consent/notice content, duplicate resolution, import authorization, retention and privacy execution remain open |
+| Does creating a candidate create an application? | No. Candidate identity is independent. The candidate detail explains the boundary and offers an explicit application action only to an authorized recruiter | Production relationship integrity, ownership and server-side authorization remain open |
+| Where is New Application? | `#/hr/applications/new` creates one explicit candidate–job junction after both references exist and rejects an active duplicate pair | Production immutable-attempt rules, transaction concurrency, candidate communication and Salesforce uniqueness enforcement remain open |
+| Why are there no standalone New Interview/Scorecard/Offer forms? | The relevant list states its creation source: interviews follow validated scheduling requests; assignments follow approved interview plans; decisions/offers/handoffs follow readiness and approval gates | Those workflows remain synthetic previews; their durable events, failures, retries, provider behavior and audit records are not implemented |
+| Can users find records in a large seed? | Core lists expose role-scoped total, search, state filter, 20-row pagination, deterministic empty recovery and route-bound detail; public careers includes Published jobs only | Server pagination/query plans, search indexing, saved list preferences, export controls and production performance remain open |
+| Do forms enforce persona rules? | Recruiter can create/edit job, candidate and application; Hiring Manager can create/edit job; Recruiting Coordinator may edit application logistics; all other mutations deny safely in the route | The persona switcher is not authentication and cannot prove IdP, sharing, FLS, Apex/BFF or integration authorization |
+
+The dense fixture is generated at runtime from compact deterministic rules. “Heavy” means enough related rows to exercise search, filtering, pagination, role populations and referential-integrity tests without shipping real or realistic personal data. It does not claim production-scale load testing.
 
 ## 2. Problem statement
 
@@ -3149,7 +3166,26 @@ The logical dictionary is 1,472 fields: six domain-specific business fields for 
 
 The 12 internal persona contracts independently define authorized population; identity and contact treatment; decision-evidence, compensation, accommodation, privacy and integrity visibility; and export scope. Page navigation cannot expand these scopes. Candidate ownership remains separately enforced at the BFF/identity boundary and is not simulated by the internal persona switcher.
 
-Acceptance requires automated coverage of 92 unique slugs, 368 page instances, 276 seeded records, 1,472 fields, the 552/920 split, field-role metadata, permission denials and representative create/detail/edit journeys. This is wireframe-contract evidence only: production authorization must be server-side and proven through selected IdP/BFF/Salesforce sharing/FLS negative tests.
+Acceptance requires automated coverage of 92 unique slugs, 368 page instances, 1,104 seeded generic records, 1,472 fields, the 552/920 split, field-role metadata, permission denials and representative create/detail/edit journeys. This is wireframe-contract evidence only: production authorization must be server-side and proven through selected IdP/BFF/Salesforce sharing/FLS negative tests.
+
+### 15.16 v1.8 core record form and collection contract
+
+The candidate, job and application objects retain their logical definitions in section 13 and generic representations in `UI-HR-010`, but they also receive object-specific high-frequency routes inside `UI-HR-002/003`. This does not add a fifteenth screen family. It raises the executable route-pattern count from 24 to 29.
+
+| Core object | List contract | New contract | Detail/Edit contract | Creation side effects prohibited in the wireframe |
+| --- | --- | --- | --- | --- |
+| Job/Requisition | Role population, search, lifecycle filter, 20-row pages, public/internal status distinction | Required title/team/location; optional structured content; create as Draft; generated `JOB-MEM-*` | Readiness/opening/plan context; permitted job fields; version increment; publication preview remains separate | No headcount request, approval, posting, email, Salesforce or job-board write |
+| Candidate identity | Role-linked population, identity masking, source/state/location search context | Required name/reserved synthetic email/source; notice evidence; duplicate-email validation; generated `PER-MEM-*` | Field-scope projection, provenance, linked role-visible applications, permitted identity edit | No application, resume/file, outreach, duplicate merge, consent conclusion or real-person processing |
+| Application | Role population, candidate/job/state context, search/filter/page | Existing active candidate + existing non-closed job; duplicate active-pair validation; generated `APP-MEM-*` | Immutable candidate/job binding and workflow-owned stage; permitted owner/next-action edit; operational tabs and transition preview | No interview, scorecard, decision, disposition, offer, message or handoff is silently generated by the form |
+
+Downstream creation is event/workflow owned:
+
+1. An interview session originates from an authorized application scheduling request after timezone, participant, availability, constraint and purpose checks.
+2. An interviewer assignment/scorecard originates from the approved interview plan and binds one evidence owner, competency/rubric version and due rule.
+3. A decision subject becomes actionable only from complete governed evidence; an offer requires a human decision and current approval subject; a handoff requires an accepted current offer plus contingency/readiness facts.
+4. A list may explain and link to its originating workflow. It must not offer a generic “New” command that bypasses the invariant.
+
+The core seed contract is exactly 48 jobs, 320 candidates, 640 applications, 192 interviews and 160 assignments. IDs are unique within family; every application references an existing candidate and job; every interview references an existing application; every assignment references an existing interview; every seeded candidate email ends in `@example.test`. These are contract tests, not a production migration or performance benchmark.
 
 ## 16. Analytics and instrumentation
 
@@ -4078,10 +4114,37 @@ Passing v1.7 does not close a production finding by itself. All 18 controlled `A
 | Formal audit | [AUDIT-v1.7.md](AUDIT-v1.7.md) distinguishes synthetic remediation from accountable production closure; `artifacts/v0.9/audit-findings.json` retains all 18 formal Open statuses until review |
 | Commit, CI, security, Pages and browser evidence | Implementation commit [`9c85f20`](https://github.com/singhaditya21/Recruitment-System/commit/9c85f2051d20072c9f1396d53f9b32c3c68a6113); [CI run 33150074344](https://github.com/singhaditya21/Recruitment-System/actions/runs/33150074344) passed artifact audit, typecheck, 40 unit/component/contract/axe checks, build and 36 desktop/mobile Chromium journeys; [security run 33150074340](https://github.com/singhaditya21/Recruitment-System/actions/runs/33150074340) passed CodeQL; [Pages run 33150074337](https://github.com/singhaditya21/Recruitment-System/actions/runs/33150074337) deployed the release, which returns HTTPS 200 and contains the v1.7 release marker |
 
+### 22.11 Definition of v1.8 dense-data and core-form acceptance
+
+v1.8 is accepted as a **synthetic interaction and data-contract release** only when:
+
+1. [MATRIX-v1.8.md](MATRIX-v1.8.md) reconciles to 13 personas, 14 screen families, 29 functional route patterns, 92/111 object counts, 368 generic object-page instances, 1,104 generic records, 1,360 core records and the 552 + 920 = 1,472 field split.
+2. Job, candidate and application collections expose role-scoped totals, search, state filter, 20-row pagination, empty recovery and route-bound detail.
+3. Recruiter can complete New/Edit journeys for job, candidate and application; job creation produces Draft only; candidate creation produces no application; application creation requires valid references and rejects an active duplicate pair.
+4. Candidate forms accept only reserved synthetic `@example.test` email data. Core fixture IDs are unique and candidate→application→job plus assignment→interview→application references reconcile.
+5. Persona create/edit permissions deny unauthorized routes and hide mutation controls without describing the switcher as authentication.
+6. Interview, scorecard and decision/offer/handoff lists explain their governed creation source and expose no invariant-bypassing standalone New form.
+7. Memory-created records persist across in-session route navigation, change no external state and reset on refresh or prototype reset.
+8. Artifact audit, TypeScript, unit/component/contract/automated-accessibility, production build and Chromium desktop/mobile journeys pass on the release commit; the Pages deployment serves the v1.8 marker.
+
+Passing v1.8 does not close any production `AUD-*` finding. Dense synthetic fixtures are not load/performance evidence, and browser-side role projections are not server authorization. No v1.8 evidence authorizes real candidate data, Salesforce/BFF/IdP/provider use or a pilot.
+
+### 22.12 v1.8 release-candidate evidence
+
+| Evidence | Current result |
+| --- | --- |
+| Count ledger | [MATRIX-v1.8.md](MATRIX-v1.8.md) records 48 jobs, 320 candidates, 640 applications, 192 interviews, 160 assignments and 1,104 generic records; the separate analytics fixture remains 324 rows |
+| Referential and safety contract | Automated checks cover unique IDs, application candidate/job references, interview application references, assignment interview references and reserved-domain candidate email values |
+| Core journeys | Object-specific job/candidate/application New/Detail/Edit routes, duplicate/reference validation, role denial, search/filter/pagination and mobile containment are automated |
+| Downstream provenance | Interview, scorecard and decision collections state the required originating workflow; forms do not manufacture downstream records |
+| Automated local evidence | `pnpm verify` passes artifact audit, TypeScript, 48 unit/component/contract/automated-axe checks and production build; `pnpm test:e2e` passes 42 desktop/mobile Chromium journeys; exact protected-branch CI, CodeQL and Pages runs remain available from the repository workflow history for the release commit |
+| Production boundary | No Salesforce metadata, BFF, IdP, provider integration, authentication, upload, external write, browser persistence, real candidate data or pilot approval is introduced |
+
 ## 23. Change log
 
 | Version | Date | Summary |
 | --- | --- | --- |
+| 1.8 | August 28, 2026 | Added dense deterministic core data (48 jobs, 320 candidates, 640 applications, 192 interviews and 160 assignments) and expanded the generic workspace to 12 records per each of 92 families (1,104); added role-scoped search/filter/20-row pagination and empty recovery; implemented object-specific Job, Candidate and Application List/New/Detail/Edit journeys with Draft-only job creation, reserved-domain/duplicate candidate validation, explicit candidate–job application linkage and mutation permission denial; documented workflow-generated interview/scorecard/decision/offer/handoff creation; reconciled 29 functional route patterns in `MATRIX-v1.8`; retained memory-only/public-safe and every production/legal/manual/pilot gate |
 | 1.7 | August 28, 2026 | Implemented the role/data/object/page/reporting remediation release: added `UI-HR-009/010` and reconciled 14 screen families/24 route patterns; instantiated accessible List/New/Detail/Edit routes for 92 logical families (368 pages) with 276 seeded records and object/row/field permission states; replaced the misleading 920-total claim with 552 business plus 920 governance/provenance = 1,472 logical fields; expanded analytics to a 324-row cross-product fixture with 0 empty results across all 600 supported global-filter combinations and N/A zero denominators; reconciled Data Readiness to one object population; added saved reports, builder, drill-through, scheduling, controlled export, delivery audit, targets and restatements; added proposed API/event/Salesforce, security/privacy/operations/pilot scaffolds and repository governance automation; retained every production/legal/manual/pilot gate |
 | 1.6 | August 28, 2026 | Added a bounded synthetic analytics and logical object/data release: implemented 11 persona-filtered dynamic dashboard views with date/job/source/stage filters, reconciled KPI/breakdown/trend/detail views, 18 displayed metric definitions and visible source/grain/freshness/exclusion evidence over 48 deterministic application rows; added an interactive catalogue for all 92 logical object families, 111 expanded concepts, 48 `DAT-*` groups and 920 minimum logical data-point definitions with lifecycle, relationship, command, role, ownership, classification, retention and quality coverage; expanded component/axe/browser/visual evidence; retained 12 canonical screen families and explicit no-auth/no-network/no-persistence/no-physical-Salesforce/no-real-data boundaries |
 | 1.5 | August 28, 2026 | Converted the semantic wireframe into an operational interaction release without adding production capability or new screen families: implemented seven functional application cockpit tabs with seeded communication, activity, document, task, interview and related-application data; added saved operational views and record navigation; added candidate profile, document, communication preference, privacy request, message-thread and experience controls; distinguished availability requests from direct booking with link/constraint/capacity/lifecycle behavior; added minimum-necessary interviewer briefing, peer-feedback blinding and attributed amendment; added ordered version-bound offer approval with candidate-safe task projection; added event-condition-action automation detail, impact collision simulation and replay recovery; expanded shared cross-route memory state, responsive styling, visual evidence, component/axe coverage and desktop/mobile browser journeys; retained synthetic/no-auth/no-network/no-persistence boundaries and every real-pilot gate |
