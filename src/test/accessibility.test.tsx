@@ -66,14 +66,12 @@ describe("automated WCAG baseline", () => {
     await expectNoAxeViolations("#/hr/reports");
   });
 
-  it("passes the dense candidate and core mutation baselines", async () => {
-    for (const hash of [
-      "#/hr/candidates",
-      "#/hr/candidates/new",
-      "#/hr/jobs/new",
-      "#/hr/applications/new",
-    ]) {
-      await expectNoAxeViolations(hash);
-    }
+  it.each([
+    "#/hr/candidates",
+    "#/hr/candidates/new",
+    "#/hr/jobs/new",
+    "#/hr/applications/new",
+  ])("passes the dense core baseline at %s", async (hash) => {
+    await expectNoAxeViolations(hash);
   });
 });

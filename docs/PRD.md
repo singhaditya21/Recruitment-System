@@ -4137,7 +4137,7 @@ Passing v1.8 does not close any production `AUD-*` finding. Dense synthetic fixt
 | Referential and safety contract | Automated checks cover unique IDs, application candidate/job references, interview application references, assignment interview references and reserved-domain candidate email values |
 | Core journeys | Object-specific job/candidate/application New/Detail/Edit routes, duplicate/reference validation, role denial, search/filter/pagination and mobile containment are automated |
 | Downstream provenance | Interview, scorecard and decision collections state the required originating workflow; forms do not manufacture downstream records |
-| Automated local evidence | `pnpm verify` passes artifact audit, TypeScript, 48 unit/component/contract/automated-axe checks and production build; `pnpm test:e2e` passes 42 desktop/mobile Chromium journeys; exact protected-branch CI, CodeQL and Pages runs remain available from the repository workflow history for the release commit |
+| Automated local evidence | `pnpm verify` passes artifact audit, TypeScript, 51 unit/component/contract/automated-axe checks and production build; `pnpm test:e2e` passes 42 desktop/mobile Chromium journeys; exact protected-branch CI, CodeQL and Pages runs remain available from the repository workflow history for the release commit |
 | Production boundary | No Salesforce metadata, BFF, IdP, provider integration, authentication, upload, external write, browser persistence, real candidate data or pilot approval is introduced |
 
 ## 23. Change log
