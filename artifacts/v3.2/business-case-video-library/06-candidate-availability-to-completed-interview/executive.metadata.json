@@ -1,0 +1,67 @@
+{
+  "id": "UC-06-EXEC",
+  "title": "Candidate availability to completed interview · executive cut",
+  "generatedAt": "2026-08-29T06:02:24.078Z",
+  "durationSeconds": 164.679,
+  "captionCues": 31,
+  "embeddedChapters": 7,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-06",
+      "title": "Candidate availability to completed interview",
+      "start": 0,
+      "end": 26.133605,
+      "durationSeconds": 26.133605
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "4 accountable processes",
+      "start": 26.133605,
+      "end": 42.966621,
+      "durationSeconds": 16.833016
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open INT-DEMO-001 in context",
+      "start": 42.966621,
+      "end": 65.474376,
+      "durationSeconds": 22.507755
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Confirm session and panel",
+      "start": 65.474376,
+      "end": 86.91714200000001,
+      "durationSeconds": 21.442766
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate interviewer conflict",
+      "start": 86.91714200000001,
+      "end": 107.00276600000001,
+      "durationSeconds": 20.085624
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Substitute eligible interviewer",
+      "start": 107.00276600000001,
+      "end": 129.578594,
+      "durationSeconds": 22.575828
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-06 complete",
+      "title": "A versioned interview session completes with an eligible panel and due scorecards.",
+      "start": 129.578594,
+      "end": 164.67927400000002,
+      "durationSeconds": 35.10068
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

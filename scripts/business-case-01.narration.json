@@ -1,0 +1,128 @@
+{
+  "id": "BC-01",
+  "title": "Hiring demand to published job",
+  "voice": "Aman (English (India))",
+  "rate": 175,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "Business Case 01",
+      "title": "Hiring demand to published job",
+      "text": "Welcome to Business Case One: hiring demand to published job. In this demonstration, a hiring manager identifies a genuine workforce need. Finance and compensation controls approve the exact requisition version. A recruiter then creates the job and individual openings, prepares candidate-facing content, and publishes an immutable posting version across controlled channels. The outcome is a public posting that can always be traced back to approved demand. This is synthetic browser-memory data; no job is actually published and no external system is changed."
+    },
+    {
+      "id": "dfd-intro",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "Five governed processes",
+      "text": "We begin with the level-two data-flow diagram. Unlike a simple journey map, every process identifies the accountable actor, the exact product route and action, the input and output data, the logical object and event, the governed store, the rule that permits the action, the denial condition, and the recovery path. As each process is explained, its box is highlighted in amber. Completed processes remain green, making the flow easy to present and verify."
+    },
+    {
+      "id": "dfd-1",
+      "chapter": "Process 1 of 5",
+      "title": "Capture governed demand",
+      "text": "Process one is governed demand capture. The hiring manager starts from the manager recruiting workspace and records the workforce plan, position, location, number of openings and target date. The action creates a versioned Requisition draft in the workforce demand ledger. The guard verifies that the manager owns the relationship and that the workforce-plan reference is current. Duplicate or unavailable headcount does not disappear; the request remains a draft and displays the conflicting plan line for correction."
+    },
+    {
+      "id": "dfd-2",
+      "chapter": "Process 2 of 5",
+      "title": "Submit the exact version",
+      "text": "Process two submits an exact requisition version. The current justification, budget evidence, job level and compensation range become approval work items. This prevents approvers from unknowingly reviewing different versions. If required evidence is incomplete or the version is stale, submission is denied with field-level repair guidance. Only failed fields need correction, and the resubmission retains the earlier decision history instead of overwriting it."
+    },
+    {
+      "id": "dfd-3",
+      "chapter": "Process 3 of 5",
+      "title": "Approve, return or deny",
+      "text": "Process three is the attributed approval decision. Finance and compensation approvers inspect the current version and applied policy. Separation of duties prevents self-approval, and every required role must respond. The output is approved or returned demand, preserved in the approval ledger. A conflict does not create a silent bypass: the work can be reassigned, or returned to the author with a reason and a complete audit trail."
+    },
+    {
+      "id": "dfd-4",
+      "chapter": "Process 4 of 5",
+      "title": "Create the job and openings",
+      "text": "Process four converts approved demand into recruiting structure. The recruiter creates one job, individual openings, a hiring plan and an interview plan. These are different business grains: the job describes the work, while each opening represents one approved seat. The opening count must reconcile to demand. A mismatch, missing locale or incomplete candidate content blocks publication without destroying the approved requisition."
+    },
+    {
+      "id": "dfd-5",
+      "chapter": "Process 5 of 5",
+      "title": "Publish and reconcile",
+      "text": "Process five publishes an immutable candidate-facing posting version. Readiness evaluates current approval, pay transparency, locale content, effective dates and channel contracts. Successful publication writes the posting version and per-channel delivery records to the distribution ledger. A failed channel can be retried without duplicating successful deliveries. Withdrawal or correction creates a new version and preserves the public history; a published version is never silently overwritten."
+    },
+    {
+      "id": "manager-route",
+      "chapter": "Actual product navigation",
+      "title": "Hiring manager recruiting workspace",
+      "text": "Now we move from the diagram into the actual product wireframe. The manager sees a purpose-built recruiting workspace, not the complete recruiter console. The top banner states that the environment is synthetic. The record header identifies the screen, work item, job and due date. Status is visible as a pill. The evidence panel shows required headcount evidence, blockers, manager-owned population and the human-decision boundary. Private support, background information, unrelated compensation and other jobs remain outside this role’s view."
+    },
+    {
+      "id": "manager-action",
+      "chapter": "Manager action",
+      "title": "Review and approve current version",
+      "text": "The manager must explicitly confirm that the current version and required independent evidence were reviewed. Only then does the primary action become available. Approve current version records an attributed in-memory decision; Send back preserves a controlled return path. This interaction demonstrates three user-experience principles: consequential actions require confirmation, disabled states explain missing prerequisites, and completion produces visible feedback rather than leaving the user uncertain about what happened."
+    },
+    {
+      "id": "requisition-workbench",
+      "chapter": "WF-P0-03",
+      "title": "Requisition and multi-step approval",
+      "text": "The connected requisition workbench brings the complete seeded business context together. Workforce plan is FY twenty-seven Product expansion. Position is Senior Product Designer. Two openings are requested. The confidential budget is a four hundred ten thousand dollar approved envelope. The compensation band is one hundred sixty-eight to one hundred ninety-six thousand dollars, and the target start is November sixteenth, twenty twenty-six. Each field displays its classification and the current persona’s access result. The action reason is also captured for the audit receipt."
+    },
+    {
+      "id": "requisition-action",
+      "chapter": "Connected state change",
+      "title": "Submit, receipt and handoff",
+      "text": "Submitting the exact requisition version changes shared state from Draft version three to Approved version four. The receipt displays previous and current state, the Requisition Approved event, acting persona, correlation key and downstream effect. The same action creates a recruiter handoff and updates the causal dashboard. Exception, recovery and cancellation remain adjacent actions: we can simulate an approval return, correct and resubmit, or withdraw pending work without pretending that an external approval service exists."
+    },
+    {
+      "id": "job-route",
+      "chapter": "Recruiter product route",
+      "title": "Job detail and publication readiness",
+      "text": "The recruiter now opens the actual job record. The Lightning-style shell provides global navigation, persona scope, record identity and action controls while remaining explicitly not a Salesforce organisation. The detail surface keeps job status, version, owner, openings, policy blockers and related recruiting work visible. This is where a recruiter understands operational context before editing or publishing. The separate manager and recruiter experiences preserve minimum-necessary access while sharing the same business lineage."
+    },
+    {
+      "id": "publication-workbench",
+      "chapter": "WF-P0-04",
+      "title": "Job, opening, posting and channel lineage",
+      "text": "The publication workbench makes every business grain explicit. Requisition REQ Demo zero zero one is approved at version four. Job JOB Demo zero zero one represents Product Designer. Openings OPN zero zero one and zero zero two remain individually open. Posting PST Demo zero zero one contains the English United States candidate content. Posting version seven is effective on August twenty-eighth. Careers, LinkedIn, Indeed and the agency channel each receive their own delivery state, so a provider result cannot become the unexamined source of truth."
+    },
+    {
+      "id": "publication-action",
+      "chapter": "Publication action",
+      "title": "Publish version seven",
+      "text": "Publishing version seven moves the workbench from Ready for publication to Published and reconciled. The state-change receipt records the Job Posting Version Published event and the candidate-facing downstream effect. The rule card explains that approved demand, pay, locale and content readiness must be current. The communication card previews publication destinations but sends nothing. The metric card connects this action to publication readiness and channel reconciliation. We can also simulate a stale channel, reconcile only the failed delivery, or withdraw the current version."
+    },
+    {
+      "id": "lineage",
+      "chapter": "Universal lineage",
+      "title": "Keep business objects distinct",
+      "text": "The lineage view prevents a common data-model mistake: treating requisition, job, opening, posting and delivery as one mutable record. Each card is a separate object and version connected to the same business context. This supports opening-level headcount truth, immutable candidate content, per-channel reconciliation and reliable audit history. The sequence can be followed visually from demand through publication without losing the identity or grain of any record."
+    },
+    {
+      "id": "controls",
+      "chapter": "Trust controls",
+      "title": "Persona, jurisdiction and recovery",
+      "text": "The controls view demonstrates operational trust. The persona inspector applies allowed, purpose-bound, masked and denied states at the field level, not only in navigation. The jurisdiction selector compares California, India, the United Kingdom and Germany with different notice, worker-type and approval states. The recovery laboratory offers happy, empty, validation, stale, duplicate, denied, provider failure, cancellation and retry scenarios. Every denial preserves a safe state and explains how the operator can recover."
+    },
+    {
+      "id": "compare",
+      "chapter": "Happy path versus exception",
+      "title": "Compare outcomes side by side",
+      "text": "The comparison view puts the successful and exception paths side by side. On the happy path, the current posting version is published, its event is recorded and the candidate receives the reconciled public projection. On the exception path, a stale channel version is detected, unsupported downstream action stops, and the operator retries only the failed channel with the same correlation key. This makes recovery a first-class part of the product story rather than an afterthought."
+    },
+    {
+      "id": "control-center",
+      "chapter": "Causal analytics",
+      "title": "Actions reconcile to dashboards",
+      "text": "The control center proves that dashboards are not disconnected decoration. Substantive readiness, blocked workbenches, domain events, open handoffs and restatements are derived from the same browser-memory ledger. The drill-through row shows the previous and current states, the last event and the exact workbench. Empty denominators render N A, never a misleading zero percent. The audit timeline correlates the UI action, event, downstream effect and any recovery restatement."
+    },
+    {
+      "id": "handoff",
+      "chapter": "Cross-persona handoff",
+      "title": "The next actor receives exact work",
+      "text": "The handoff inbox closes the business loop. The recruiter receives the approved demand with the minimum context required to continue, while the publication action creates the candidate-facing projection. Every card shows source actor, destination actor, record, correlation context, creation time and acknowledgement state. Acknowledgement is itself visible but does not fabricate an email or workflow-provider delivery. This is the same record moving across personas, not a facilitator verbally pretending that a handoff occurred."
+    },
+    {
+      "id": "closing",
+      "chapter": "Business Case 01 complete",
+      "title": "Approved demand to reconciled posting",
+      "text": "Business Case One is complete. We started with controlled workforce demand, approved an exact requisition version, created the job and two individual openings, published immutable posting version seven, reconciled channel delivery, and verified the downstream dashboard and handoff evidence. The wireframe demonstrates the complete business logic with synthetic data and browser-memory actions. Production identity, Salesforce metadata, APIs, persistence and real job-board publication remain separate implementation gates."
+    }
+  ]
+}

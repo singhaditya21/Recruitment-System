@@ -1,0 +1,77 @@
+{
+  "version": "3.2.0",
+  "releaseName": "Connected use-case, action-level DFD and trust-control wireframe",
+  "syntheticOnly": true,
+  "generatedAt": "2026-08-29T00:15:00+05:30",
+  "counts": {
+    "actorPersonas": 13,
+    "internalRoles": 12,
+    "screenContracts": 72,
+    "routeDeclarations": 166,
+    "functionalDestinations": 164,
+    "redirectRoutes": 2,
+    "businessUseCases": 12,
+    "levelTwoDfdProcesses": 52,
+    "p0Requirements": 15,
+    "p1Requirements": 12,
+    "p2Requirements": 8,
+    "totalImplementedUpdates": 35,
+    "connectedP0Workbenches": 13,
+    "seededWorkbenchFields": 78,
+    "countryVariants": 4,
+    "preparedErrorRecoveryStates": 9,
+    "demoRunbooks": 3,
+    "routedObjectFamilies": 138,
+    "routedObjectPageInstances": 552,
+    "combinedLogicalConcepts": 175,
+    "physicalObjectsApproved": 0
+  },
+  "stateContract": {
+    "persistence": "shared React browser memory until deterministic reset",
+    "mutationEvidence": [
+      "versioned previous/current state",
+      "actor and reason",
+      "domain event and receipt",
+      "business and correlation keys",
+      "downstream handoff",
+      "metric consequence"
+    ],
+    "crossRouteProjection": [
+      "feature workbench",
+      "causal control center",
+      "handoff inbox",
+      "audit timeline",
+      "governed report previews",
+      "selected inherited product projections"
+    ]
+  },
+  "validation": {
+    "sourceFilesScanned": 20,
+    "buttons": 313,
+    "links": 319,
+    "routeDeclarations": 166,
+    "staticInteractionDefects": 0,
+    "unitComponentContractAndAxeTestsPassed": 130,
+    "v32ContractTestsPassed": 7,
+    "v32AccessibilityBaselinesPassed": 7,
+    "desktopAndMobileE2eTestsPassed": 73,
+    "e2eTestsIntentionallySkipped": 1,
+    "liveDestinationsCrawled": 1103,
+    "liveRouteDefects": 0,
+    "browserErrors": 0,
+    "desktopOverflowPixels": 0,
+    "mobileOverflowPixels": 0,
+    "fullVerification": "passed locally on August 29, 2026"
+  },
+  "production": {
+    "authentication": "not implemented",
+    "serverAuthorization": "not implemented",
+    "persistence": "browser memory only",
+    "integrations": "synthetic previews only",
+    "physicalSchemaApproved": false,
+    "manualAssistiveTechnology": "evidence hooks implemented; accountable execution not claimed",
+    "securityApproval": "not obtained",
+    "privacyLegalApproval": "not obtained",
+    "pilot": "blocked"
+  }
+}

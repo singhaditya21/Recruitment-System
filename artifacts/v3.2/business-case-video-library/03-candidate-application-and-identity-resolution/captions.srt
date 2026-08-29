@@ -1,0 +1,180 @@
+1
+00:00:00,000 --> 00:00:07,667
+Business Case 03 begins when a candidate starts a version-bound job
+application.
+
+2
+00:00:07,667 --> 00:00:15,973
+A valid application is linked to the correct candidate identity with
+governed provenance.
+
+3
+00:00:15,973 --> 00:00:19,168
+The governed record is APP-DEMO-001.
+
+4
+00:00:19,168 --> 00:00:25,558
+The accountable actors are Candidate, Recruiter, Candidate Support,
+Privacy Reviewer.
+
+5
+00:00:25,558 --> 00:00:35,142
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+6
+00:00:35,142 --> 00:00:39,739
+The action-level data-flow diagram defines 4 processes before product
+navigation.
+
+7
+00:00:39,739 --> 00:00:48,015
+Every process identifies the actor, screen, action, input, output,
+business object, event, governed store, rule, denial and recovery.
+
+8
+00:00:48,015 --> 00:00:52,613
+The highlighted path keeps each business grain and version distinct.
+
+9
+00:00:52,613 --> 00:00:55,469
+Process 1, Candidate: Create recoverable draft.
+
+10
+00:00:55,469 --> 00:01:02,132
+The action save profile and consent produces versioned application draft
+in the Application ledger.
+
+11
+00:01:02,132 --> 00:01:05,464
+Process 2, Identity Reviewer: Resolve possible duplicate.
+
+12
+00:01:05,464 --> 00:01:14,508
+The action compare provenance and propose match produces safe match, new
+identity or review case in the Identity ledger.
+
+13
+00:01:14,508 --> 00:01:17,364
+Process 3, Candidate: Submit exact versions.
+
+14
+00:01:17,364 --> 00:01:23,551
+The action validate and submit produces immutable application attempt in
+the Application ledger.
+
+15
+00:01:23,551 --> 00:01:26,883
+Process 4, Candidate Support: Correct or withdraw.
+
+16
+00:01:26,883 --> 00:01:34,023
+The action request governed change produces correction or withdrawal
+work item in the Case ledger.
+
+17
+00:01:34,023 --> 00:01:36,882
+The actual product route is /hr/candidates/PER-DEMO-001.
+
+18
+00:01:36,882 --> 00:01:44,030
+It presents candidate duplicate resolution and governed correction in
+the surrounding recruitment or onboarding workspace.
+
+19
+00:01:44,030 --> 00:01:55,944
+The screen remains a wireframe, but its identifiers, current state,
+navigation, data relationships and action boundaries match the business
+contract used by the connected workbench.
+
+20
+00:01:55,944 --> 00:01:58,993
+The seeded workbench follows record DUP-DEMO-001.
+
+21
+00:01:58,993 --> 00:02:06,615
+Its governed fields are Identity A, PER-DEMO-001 , Jordan Lee; Identity
+B, PER-DUP-004 , J.
+
+22
+00:02:06,615 --> 00:02:18,811
+Lee; Match signals, Verified email, phone suffix; Applications, 3
+retained separately; Consent sources, Direct and event registration;
+Proposed resolution, Link aliases; preserve source records.
+
+23
+00:02:18,811 --> 00:02:28,466
+Field classifications remain visible so the presenter can distinguish
+public, internal, confidential and restricted projections for the active
+persona.
+
+24
+00:02:28,466 --> 00:02:32,468
+With Recruiter selected, we perform approve safe field-level match.
+
+25
+00:02:32,468 --> 00:02:37,359
+The guard requires minimum-necessary signals agree and restricted
+evidence stays separated.
+
+26
+00:02:37,359 --> 00:02:48,920
+The state changes from Review required to Matched with provenance,
+records DuplicateResolved, writes to the Identity ledger, and creates
+the handoff: Recruiter receives corrected identity projection.
+
+27
+00:02:48,920 --> 00:02:53,532
+We now exercise the controlled exception: Simulate ambiguous match.
+
+28
+00:02:53,532 --> 00:02:59,682
+The prepared failure is Email matches but name and source ownership
+conflict.
+
+29
+00:02:59,682 --> 00:03:10,444
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+30
+00:03:10,444 --> 00:03:13,893
+The owned recovery is Resolve with authoritative source.
+
+31
+00:03:13,893 --> 00:03:18,205
+It reuses the governed business context without duplicating completed
+effects.
+
+32
+00:03:18,205 --> 00:03:23,810
+The new receipt preserves previous state, current state, actor, event
+and correlation key.
+
+33
+00:03:23,810 --> 00:03:32,864
+The control center and handoff inbox then expose the same recovery
+through duplicate-review accuracy and correction turnaround and
+minimum-context next-actor work.
+
+34
+00:03:32,864 --> 00:03:34,995
+Business Case 03 is complete.
+
+35
+00:03:34,995 --> 00:03:47,355
+We demonstrated the level-two process contract, the actual product
+route, governed field projections, the primary state transition, a
+controlled exception, targeted recovery, causal dashboard evidence and
+the next-actor handoff.
+
+36
+00:03:47,355 --> 00:03:52,896
+A valid application is linked to the correct candidate identity with
+governed provenance.
+
+37
+00:03:52,896 --> 00:03:57,584
+Production identity, persistence, integrations and external delivery
+remain separate implementation gates.

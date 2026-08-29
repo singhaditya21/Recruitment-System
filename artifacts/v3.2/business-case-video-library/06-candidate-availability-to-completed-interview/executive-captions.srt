@@ -1,0 +1,153 @@
+1
+00:00:00,000 --> 00:00:05,702
+Business Case 06 begins when an application reaches an authorized
+interview-scheduling milestone.
+
+2
+00:00:05,702 --> 00:00:11,404
+A versioned interview session completes with an eligible panel and due
+scorecards.
+
+3
+00:00:11,404 --> 00:00:13,780
+The governed record is INT-DEMO-001.
+
+4
+00:00:13,780 --> 00:00:19,006
+The accountable actors are Candidate, Coordinator, Interviewer, Hiring
+Manager, Candidate Support.
+
+5
+00:00:19,006 --> 00:00:26,134
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+6
+00:00:26,134 --> 00:00:26,134
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+7
+00:00:26,134 --> 00:00:30,563
+The action-level data-flow diagram defines 4 processes before product
+navigation.
+
+8
+00:00:30,563 --> 00:00:38,537
+Every process identifies the actor, screen, action, input, output,
+business object, event, governed store, rule, denial and recovery.
+
+9
+00:00:38,537 --> 00:00:42,967
+The highlighted path keeps each business grain and version distinct.
+
+10
+00:00:42,967 --> 00:00:42,967
+The action open minimum-necessary brief produces completed session and
+due scorecard in the Evidence ledger.
+
+11
+00:00:42,967 --> 00:00:45,902
+The actual product route is /hr/interviews/INT-DEMO-001.
+
+12
+00:00:45,902 --> 00:00:53,242
+It presents visual interview scheduling and panel capacity in the
+surrounding recruitment or onboarding workspace.
+
+13
+00:00:53,242 --> 00:01:05,474
+The screen remains a wireframe, but its identifiers, current state,
+navigation, data relationships and action boundaries match the business
+contract used by the connected workbench.
+
+14
+00:01:05,474 --> 00:01:05,474
+The seeded workbench follows record INT-DEMO-001.
+
+15
+00:01:05,474 --> 00:01:09,670
+With Recruiter selected, we perform confirm session and panel.
+
+16
+00:01:09,670 --> 00:01:14,331
+The guard requires timezone, availability, workload, conflicts and
+accommodations reconcile.
+
+17
+00:01:14,331 --> 00:01:26,917
+The state changes from Draft v2 to Confirmed v3, records
+InterviewScheduled, writes to the Scheduling ledger, and creates the
+handoff: Candidate and panel receive current invitation preview.
+
+18
+00:01:26,917 --> 00:01:26,917
+We now exercise the controlled exception: Simulate interviewer conflict.
+
+19
+00:01:26,917 --> 00:01:31,221
+We now exercise the controlled exception: Simulate interviewer conflict.
+
+20
+00:01:31,221 --> 00:01:36,960
+The prepared failure is Primary interviewer becomes unavailable on day
+of session.
+
+21
+00:01:36,960 --> 00:01:47,003
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+22
+00:01:47,003 --> 00:01:47,003
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+23
+00:01:47,003 --> 00:01:50,101
+The owned recovery is Substitute eligible interviewer.
+
+24
+00:01:50,101 --> 00:01:54,528
+It reuses the governed business context without duplicating completed
+effects.
+
+25
+00:01:54,528 --> 00:02:00,283
+The new receipt preserves previous state, current state, actor, event
+and correlation key.
+
+26
+00:02:00,283 --> 00:02:09,579
+The control center and handoff inbox then expose the same recovery
+through time-to-schedule, reschedules and panel capacity and
+minimum-context next-actor work.
+
+27
+00:02:09,579 --> 00:02:09,579
+The control center and handoff inbox then expose the same recovery
+through time-to-schedule, reschedules and panel capacity and
+minimum-context next-actor work.
+
+28
+00:02:09,579 --> 00:02:12,658
+Business Case 06 is complete.
+
+29
+00:02:12,658 --> 00:02:30,516
+We demonstrated the level-two process contract, the actual product
+route, governed field projections, the primary state transition, a
+controlled exception, targeted recovery, causal dashboard evidence and
+the next-actor handoff.
+
+30
+00:02:30,516 --> 00:02:37,906
+A versioned interview session completes with an eligible panel and due
+scorecards.
+
+31
+00:02:37,906 --> 00:02:44,679
+Production identity, persistence, integrations and external delivery
+remain separate implementation gates.

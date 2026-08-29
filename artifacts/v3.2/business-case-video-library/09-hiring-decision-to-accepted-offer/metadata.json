@@ -1,0 +1,79 @@
+{
+  "id": "UC-09",
+  "title": "Hiring decision to accepted offer",
+  "generatedAt": "2026-08-29T06:16:58.089Z",
+  "recordId": "OFF-DEMO-001",
+  "featureId": "WF-P0-12",
+  "videos": {
+    "client": "client-demo.mp4",
+    "executive": "executive-cut.mp4",
+    "evidence": "evidence-master.mp4"
+  },
+  "captions": "captions.srt",
+  "transcript": "transcript.md",
+  "thumbnail": "thumbnail.png",
+  "qaContactSheet": "qa-contact-sheet.png",
+  "durationSeconds": 228.43,
+  "resolution": "1920x1080",
+  "frameRate": 30,
+  "audioSampleRate": 48000,
+  "captionCues": 36,
+  "embeddedChapters": 9,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-09",
+      "title": "Hiring decision to accepted offer",
+      "durationSeconds": 24.361
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "4 accountable processes",
+      "durationSeconds": 19.311
+    },
+    {
+      "id": "dfd-processes",
+      "chapter": "Process walkthrough",
+      "title": "Actor, action, evidence and downstream state",
+      "durationSeconds": 34.316
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open OFF-DEMO-001 in context",
+      "durationSeconds": 22.508
+    },
+    {
+      "id": "workbench-data",
+      "chapter": "Governed data",
+      "title": "Inspect fields, scope and business grains",
+      "durationSeconds": 29.765
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Approve and release offer v4",
+      "durationSeconds": 28.495
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate compensation return",
+      "durationSeconds": 18.016
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Revise and reapprove v5",
+      "durationSeconds": 22.224
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-09 complete",
+      "title": "A version-bound candidate response reserves an opening and creates an eligible pre-hire handoff.",
+      "durationSeconds": 29.435
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

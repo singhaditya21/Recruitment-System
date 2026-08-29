@@ -1,0 +1,79 @@
+{
+  "id": "UC-07",
+  "title": "Structured evidence to human hiring decision",
+  "generatedAt": "2026-08-29T06:07:02.930Z",
+  "recordId": "APP-DEMO-001",
+  "featureId": "WF-P0-10",
+  "videos": {
+    "client": "client-demo.mp4",
+    "executive": "executive-cut.mp4",
+    "evidence": "evidence-master.mp4"
+  },
+  "captions": "captions.srt",
+  "transcript": "transcript.md",
+  "thumbnail": "thumbnail.png",
+  "qaContactSheet": "qa-contact-sheet.png",
+  "durationSeconds": 217.276,
+  "resolution": "1920x1080",
+  "frameRate": 30,
+  "audioSampleRate": 48000,
+  "captionCues": 36,
+  "embeddedChapters": 9,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-07",
+      "title": "Structured evidence to human hiring decision",
+      "durationSeconds": 26.745
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "4 accountable processes",
+      "durationSeconds": 17.473
+    },
+    {
+      "id": "dfd-processes",
+      "chapter": "Process walkthrough",
+      "title": "Actor, action, evidence and downstream state",
+      "durationSeconds": 38.46
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open DEB-DEMO-001 in context",
+      "durationSeconds": 21.19
+    },
+    {
+      "id": "workbench-data",
+      "chapter": "Governed data",
+      "title": "Inspect fields, scope and business grains",
+      "durationSeconds": 27.285
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Record attributed human decision",
+      "durationSeconds": 22.048
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate missing evidence",
+      "durationSeconds": 18.406
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Collect amendment and reconvene",
+      "durationSeconds": 22.437
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-07 complete",
+      "title": "An authorized human records an attributed decision using independent, versioned evidence.",
+      "durationSeconds": 23.232
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

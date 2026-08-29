@@ -1,0 +1,67 @@
+{
+  "id": "UC-05-EXEC",
+  "title": "High-volume or campus campaign to managed cohort · executive cut",
+  "generatedAt": "2026-08-29T05:57:30.089Z",
+  "durationSeconds": 158.552,
+  "captionCues": 31,
+  "embeddedChapters": 7,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-05",
+      "title": "High-volume or campus campaign to managed cohort",
+      "start": 0,
+      "end": 26.378957,
+      "durationSeconds": 26.378957
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "5 accountable processes",
+      "start": 26.378957,
+      "end": 47.07864,
+      "durationSeconds": 20.699683
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open BAT-DEMO-001 in context",
+      "start": 47.07864,
+      "end": 70.497597,
+      "durationSeconds": 23.418957
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Confirm bounded batch of 96",
+      "start": 70.497597,
+      "end": 91.815193,
+      "durationSeconds": 21.317596
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate 7 delivery failures",
+      "start": 91.815193,
+      "end": 110.03129299999999,
+      "durationSeconds": 18.2161
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Retry failed rows idempotently",
+      "start": 110.03129299999999,
+      "end": 133.14898,
+      "durationSeconds": 23.117687
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-05 complete",
+      "title": "A capacity-controlled cohort has explained membership, owned exceptions and reconciled evidence.",
+      "start": 133.14898,
+      "end": 158.552109,
+      "durationSeconds": 25.403129
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

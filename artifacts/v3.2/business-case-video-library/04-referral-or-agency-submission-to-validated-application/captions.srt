@@ -1,0 +1,176 @@
+1
+00:00:00,000 --> 00:00:07,547
+Business Case 04 begins when an employee or assigned agency proposes a
+candidate for a job.
+
+2
+00:00:07,547 --> 00:00:13,208
+A permission-bound source relationship converts into a separate
+application only after validation.
+
+3
+00:00:13,208 --> 00:00:15,567
+The governed record is SUB-DEMO-001.
+
+4
+00:00:15,567 --> 00:00:21,227
+The accountable actors are Employee Referrer, Agency User, Candidate,
+Recruiter, Partner Administrator.
+
+5
+00:00:21,227 --> 00:00:28,303
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+6
+00:00:28,303 --> 00:00:32,901
+The action-level data-flow diagram defines 4 processes before product
+navigation.
+
+7
+00:00:32,901 --> 00:00:41,176
+Every process identifies the actor, screen, action, input, output,
+business object, event, governed store, rule, denial and recovery.
+
+8
+00:00:41,176 --> 00:00:45,774
+The highlighted path keeps each business grain and version distinct.
+
+9
+00:00:45,774 --> 00:00:49,261
+Process 1, Partner: Capture authority and assignment.
+
+10
+00:00:49,261 --> 00:00:55,237
+The action prepare submission produces submission in validation in the
+Partner ledger.
+
+11
+00:00:55,237 --> 00:00:58,724
+Process 2, Recruiter: Validate duplicate and ownership.
+
+12
+00:00:58,724 --> 00:01:06,195
+The action run privacy-safe validation produces accepted, returned or
+disputed relationship in the Ownership ledger.
+
+13
+00:01:06,195 --> 00:01:09,183
+Process 3, Recruiter: Convert to application.
+
+14
+00:01:09,183 --> 00:01:16,654
+The action create controlled application produces separate application
+with source lineage in the Application ledger.
+
+15
+00:01:16,654 --> 00:01:21,137
+Process 4, Partner Administrator: Track fee or reward milestone.
+
+16
+00:01:21,137 --> 00:01:29,106
+The action review eligibility and dispute produces approved, pending or
+disputed reward in the Reward ledger.
+
+17
+00:01:29,106 --> 00:01:31,340
+The actual product route is /hr/agency-assignments/AGA-DEMO-001.
+
+18
+00:01:31,340 --> 00:01:36,927
+It presents referral and agency validation and conversion in the
+surrounding recruitment or onboarding workspace.
+
+19
+00:01:36,927 --> 00:01:46,238
+The screen remains a wireframe, but its identifiers, current state,
+navigation, data relationships and action boundaries match the business
+contract used by the connected workbench.
+
+20
+00:01:46,238 --> 00:01:49,157
+The seeded workbench follows record SUB-DEMO-001.
+
+21
+00:01:49,157 --> 00:02:06,187
+Its governed fields are Assignment, AGA-DEMO-001 , Active; Job scope,
+JOB-DEMO-001; Candidate permission, Recorded , expires Sep 12; Ownership
+window, 90 days; Duplicate result, Possible match , owner hidden; Fee
+policy, 18% on eligible start.
+
+22
+00:02:06,187 --> 00:02:15,432
+Field classifications remain visible so the presenter can distinguish
+public, internal, confidential and restricted projections for the active
+persona.
+
+23
+00:02:15,432 --> 00:02:19,589
+With Recruiter selected, we perform validate and convert submission.
+
+24
+00:02:19,589 --> 00:02:24,670
+The guard requires assignment, candidate authority, duplicate and
+ownership windows pass.
+
+25
+00:02:24,670 --> 00:02:35,294
+The state changes from In validation to Application created, records
+PartnerSubmissionConverted, writes to the Partner ledger, and creates
+the handoff: Recruiter receives APP-PARTNER-001.
+
+26
+00:02:35,294 --> 00:02:39,479
+We now exercise the controlled exception: Simulate ownership dispute.
+
+27
+00:02:39,479 --> 00:02:44,595
+The prepared failure is Existing ownership claim is privacy-protected
+and disputed.
+
+28
+00:02:44,595 --> 00:02:54,361
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+29
+00:02:54,361 --> 00:02:57,689
+The owned recovery is Resolve scope and convert.
+
+30
+00:02:57,689 --> 00:03:01,848
+It reuses the governed business context without duplicating completed
+effects.
+
+31
+00:03:01,848 --> 00:03:07,256
+The new receipt preserves previous state, current state, actor, event
+and correlation key.
+
+32
+00:03:07,256 --> 00:03:16,408
+The control center and handoff inbox then expose the same recovery
+through partner conversion, returns and dispute age and minimum-context
+next-actor work.
+
+33
+00:03:16,408 --> 00:03:18,599
+Business Case 04 is complete.
+
+34
+00:03:18,599 --> 00:03:31,308
+We demonstrated the level-two process contract, the actual product
+route, governed field projections, the primary state transition, a
+controlled exception, targeted recovery, causal dashboard evidence and
+the next-actor handoff.
+
+35
+00:03:31,308 --> 00:03:36,567
+A permission-bound source relationship converts into a separate
+application only after validation.
+
+36
+00:03:36,567 --> 00:03:41,388
+Production identity, persistence, integrations and external delivery
+remain separate implementation gates.

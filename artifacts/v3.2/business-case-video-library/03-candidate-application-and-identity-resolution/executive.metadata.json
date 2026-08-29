@@ -1,0 +1,67 @@
+{
+  "id": "UC-03-EXEC",
+  "title": "Candidate application and identity resolution · executive cut",
+  "generatedAt": "2026-08-29T05:47:57.313Z",
+  "durationSeconds": 163.652,
+  "captionCues": 30,
+  "embeddedChapters": 7,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-03",
+      "title": "Candidate application and identity resolution",
+      "start": 0,
+      "end": 35.141587,
+      "durationSeconds": 35.141587
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "4 accountable processes",
+      "start": 35.141587,
+      "end": 52.612925000000004,
+      "durationSeconds": 17.471338
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open DUP-DEMO-001 in context",
+      "start": 52.612925000000004,
+      "end": 74.534059,
+      "durationSeconds": 21.921134
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Approve safe field-level match",
+      "start": 74.534059,
+      "end": 94.987664,
+      "durationSeconds": 20.453605
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate ambiguous match",
+      "start": 94.987664,
+      "end": 116.51183599999999,
+      "durationSeconds": 21.524172
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Resolve with authoritative source",
+      "start": 116.51183599999999,
+      "end": 138.932153,
+      "durationSeconds": 22.420317
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-03 complete",
+      "title": "A valid application is linked to the correct candidate identity with governed provenance.",
+      "start": 138.932153,
+      "end": 163.652425,
+      "durationSeconds": 24.720272
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

@@ -1,0 +1,172 @@
+1
+00:00:00,000 --> 00:00:06,152
+Business Case One follows one controlled hiring need from manager-owned
+demand to a candidate-visible job.
+
+2
+00:00:06,152 --> 00:00:13,124
+Requisition R E Q Demo zero zero one creates two approved openings for a
+Senior Product Designer.
+
+3
+00:00:13,124 --> 00:00:16,405
+Finance and Compensation independently approve the exact version.
+
+4
+00:00:16,405 --> 00:00:27,888
+Recruiting configures job J O B Demo zero zero one, publishes posting
+version seven, reconciles four delivery channels and proves the result
+in analytics and the handoff inbox.
+
+5
+00:00:27,888 --> 00:00:33,220
+Every person and action is synthetic, browser-memory only, and creates
+no external effect.
+
+6
+00:00:33,220 --> 00:00:38,390
+The level-two data-flow diagram establishes the contract before we touch
+the interface.
+
+7
+00:00:38,390 --> 00:00:47,007
+Each highlighted process names its actor, product route, action, input,
+output, business object, event, governed store, rule, denial and
+recovery.
+
+8
+00:00:47,007 --> 00:00:55,193
+The moving token shows the record progressing without collapsing
+requisition, job, opening, posting and delivery into one mutable object.
+
+9
+00:00:55,193 --> 00:00:58,441
+We begin on the actual manager recruiting route.
+
+10
+00:00:58,441 --> 00:01:05,746
+The record identity is R E Q Demo zero zero one and its state is Draft
+version three.
+
+11
+00:01:05,746 --> 00:01:17,517
+The manager can see the FY twenty-seven workforce plan, Senior Product
+Designer position, California remote location, two named openings,
+November sixteenth target start, current headcount reference and
+business justification.
+
+12
+00:01:17,517 --> 00:01:24,822
+The boundary panel makes the control explicit: this actor submits demand
+but cannot self-approve Finance or Compensation evidence.
+
+13
+00:01:24,822 --> 00:01:24,823
+Before release, every channel is prepared but has no delivery receipt.
+
+14
+00:01:24,823 --> 00:01:26,820
+The recruiter publishes version seven.
+
+15
+00:01:26,820 --> 00:01:34,406
+The workbench becomes Published and reconciled, the Job Posting Version
+Published event is recorded, and four delivery receipts appear.
+
+16
+00:01:34,406 --> 00:01:41,593
+The actual job record now changes from Approved to Published, with two
+openings and posting version seven preserved.
+
+17
+00:01:41,593 --> 00:01:43,988
+No external job board is contacted.
+
+18
+00:01:43,988 --> 00:01:43,989
+No external job board is contacted.
+
+19
+00:01:43,989 --> 00:01:48,625
+We follow the public-preview action into the employer-branded careers
+experience.
+
+20
+00:01:48,625 --> 00:01:58,362
+Candidates see Senior Product Designer, the correct location, employment
+type, team, compensation range, structured requirements, process
+expectations and private support route.
+
+21
+00:01:58,362 --> 00:02:02,535
+Internal approvals, budget evidence and channel operations remain
+absent.
+
+22
+00:02:02,535 --> 00:02:07,170
+This is the candidate-safe projection of the same published record.
+
+23
+00:02:07,170 --> 00:02:07,171
+This is the candidate-safe projection of the same published record.
+
+24
+00:02:07,171 --> 00:02:11,499
+Back in the publication workbench, we simulate a channel mismatch.
+
+25
+00:02:11,499 --> 00:02:18,423
+Careers, Indeed and Agency retain successful version-seven receipts,
+while LinkedIn is isolated at stale version six.
+
+26
+00:02:18,423 --> 00:02:28,375
+The state becomes blocked for reconciliation, an owned failure receipt
+is created, and unsupported downstream action stops without withdrawing
+the valid public page.
+
+27
+00:02:28,375 --> 00:02:28,376
+The state becomes blocked for reconciliation, an owned failure receipt
+is created, and unsupported downstream action stops without withdrawing
+the valid public page.
+
+28
+00:02:28,376 --> 00:02:31,418
+The recruiter reconciles only the failed channel.
+
+29
+00:02:31,418 --> 00:02:39,238
+LinkedIn advances from version six to version seven using the existing
+business context; successful destinations are not duplicated.
+
+30
+00:02:39,238 --> 00:02:47,056
+A recovery event and restatement receipt retain the failure history
+while returning the publication to a reconciled state.
+
+31
+00:02:47,056 --> 00:02:47,058
+We acknowledge the current recruiter handoff, producing a visible
+completed state without fabricating email or workflow-provider delivery.
+
+32
+00:02:47,058 --> 00:02:49,478
+Business Case One is complete.
+
+33
+00:02:49,478 --> 00:02:55,771
+One manager-owned requisition became approved version four through
+independent Finance and Compensation decisions.
+
+34
+00:02:55,771 --> 00:03:10,292
+Recruiting configured one Senior Product Designer job and two openings,
+published immutable posting version seven, proved the candidate-facing
+page, recovered one stale channel, reconciled analytics and acknowledged
+the next-actor handoff.
+
+35
+00:03:10,292 --> 00:03:15,615
+Production identity, persistence, APIs and real delivery remain separate
+implementation gates.

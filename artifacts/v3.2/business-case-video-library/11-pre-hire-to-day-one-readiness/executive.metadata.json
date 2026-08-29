@@ -1,0 +1,67 @@
+{
+  "id": "UC-11-EXEC",
+  "title": "Pre-hire to day-one readiness · executive cut",
+  "generatedAt": "2026-08-29T06:29:07.166Z",
+  "durationSeconds": 182.791,
+  "captionCues": 31,
+  "embeddedChapters": 7,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-11",
+      "title": "Pre-hire to day-one readiness",
+      "start": 0,
+      "end": 25.850431,
+      "durationSeconds": 25.850431
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "5 accountable processes",
+      "start": 25.850431,
+      "end": 43.658549,
+      "durationSeconds": 17.808118
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open RDY-DEMO-001 in context",
+      "start": 43.658549,
+      "end": 63.187438,
+      "durationSeconds": 19.528889
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Recalculate day-one readiness",
+      "start": 63.187438,
+      "end": 86.205987,
+      "durationSeconds": 23.018549
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate IT fulfilment failure",
+      "start": 86.205987,
+      "end": 105.32090799999999,
+      "durationSeconds": 19.114921
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Retry fulfilment and reconcile",
+      "start": 105.32090799999999,
+      "end": 156.946622,
+      "durationSeconds": 51.625714
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-11 complete",
+      "title": "Day-one readiness is derived from reconciled new-hire, manager, IT and facilities evidence.",
+      "start": 156.946622,
+      "end": 182.790885,
+      "durationSeconds": 25.844263
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

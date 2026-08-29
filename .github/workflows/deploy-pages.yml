@@ -1,4 +1,4 @@
-name: Deploy v3.0 full-system recruitment and onboarding wireframe to Pages
+name: Deploy v3.2 connected-use-case recruitment and onboarding wireframe to Pages
 
 on:
   workflow_dispatch:

@@ -1,0 +1,67 @@
+{
+  "id": "UC-10-EXEC",
+  "title": "Accepted candidate to validated pending worker · executive cut",
+  "generatedAt": "2026-08-29T06:23:44.814Z",
+  "durationSeconds": 152.925,
+  "captionCues": 32,
+  "embeddedChapters": 7,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-10",
+      "title": "Accepted candidate to validated pending worker",
+      "start": 0,
+      "end": 25.699683,
+      "durationSeconds": 25.699683
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "4 accountable processes",
+      "start": 25.699683,
+      "end": 43.171020999999996,
+      "durationSeconds": 17.471338
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open PWH-DEMO-001 in context",
+      "start": 43.171020999999996,
+      "end": 66.431021,
+      "durationSeconds": 23.26
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Stage and reconcile worker",
+      "start": 66.431021,
+      "end": 87.929479,
+      "durationSeconds": 21.498458
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate location-code rejection",
+      "start": 87.929479,
+      "end": 105.732291,
+      "durationSeconds": 17.802812
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Correct mapping and replay",
+      "start": 105.732291,
+      "end": 128.31796,
+      "durationSeconds": 22.585669
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-10 complete",
+      "title": "Candidate, application, PreHire and PendingWorker remain linked, correctable and reconciled.",
+      "start": 128.31796,
+      "end": 152.924944,
+      "durationSeconds": 24.606984
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

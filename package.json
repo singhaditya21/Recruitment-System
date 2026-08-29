@@ -1,7 +1,7 @@
 {
   "name": "recruitment-system-wireframe",
   "private": true,
-  "version": "3.0.0",
+  "version": "3.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite --host 127.0.0.1",
@@ -13,6 +13,12 @@
     "test:e2e": "playwright test",
     "audit:artifacts": "node scripts/audit-artifacts.mjs",
     "audit:interactions": "node scripts/audit-interactions.mjs",
+    "record:business-case-01": "node scripts/record-business-case-01.mjs",
+    "record:business-case-01:v2": "node scripts/record-business-case-01.mjs",
+    "package:business-case-01:v2": "node scripts/package-business-case-01-cuts.mjs",
+    "record:business-case-library": "node scripts/record-business-case-library.mjs",
+    "validate:business-case-library": "node scripts/record-business-case-library.mjs --validate-only",
+    "validate:business-case-media": "node scripts/validate-business-case-library.mjs --full-decode",
     "verify": "pnpm audit:artifacts && pnpm audit:interactions && pnpm typecheck && pnpm test && pnpm build"
   },
   "dependencies": {

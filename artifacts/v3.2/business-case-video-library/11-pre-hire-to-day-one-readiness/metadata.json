@@ -1,0 +1,79 @@
+{
+  "id": "UC-11",
+  "title": "Pre-hire to day-one readiness",
+  "generatedAt": "2026-08-29T06:28:53.600Z",
+  "recordId": "NHR-DEMO-001",
+  "featureId": "WF-P0-14",
+  "videos": {
+    "client": "client-demo.mp4",
+    "executive": "executive-cut.mp4",
+    "evidence": "evidence-master.mp4"
+  },
+  "captions": "captions.srt",
+  "transcript": "transcript.md",
+  "thumbnail": "thumbnail.png",
+  "qaContactSheet": "qa-contact-sheet.png",
+  "durationSeconds": 256.829,
+  "resolution": "1920x1080",
+  "frameRate": 30,
+  "audioSampleRate": 48000,
+  "captionCues": 38,
+  "embeddedChapters": 9,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-11",
+      "title": "Pre-hire to day-one readiness",
+      "durationSeconds": 25.85
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "5 accountable processes",
+      "durationSeconds": 17.808
+    },
+    {
+      "id": "dfd-processes",
+      "chapter": "Process walkthrough",
+      "title": "Actor, action, evidence and downstream state",
+      "durationSeconds": 48.375
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open RDY-DEMO-001 in context",
+      "durationSeconds": 19.529
+    },
+    {
+      "id": "workbench-data",
+      "chapter": "Governed data",
+      "title": "Inspect fields, scope and business grains",
+      "durationSeconds": 25.663
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Recalculate day-one readiness",
+      "durationSeconds": 23.019
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate IT fulfilment failure",
+      "durationSeconds": 19.115
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Retry fulfilment and reconcile",
+      "durationSeconds": 51.626
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-11 complete",
+      "title": "Day-one readiness is derived from reconciled new-hire, manager, IT and facilities evidence.",
+      "durationSeconds": 25.844
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

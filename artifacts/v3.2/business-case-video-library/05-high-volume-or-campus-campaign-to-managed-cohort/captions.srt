@@ -1,0 +1,185 @@
+1
+00:00:00,000 --> 00:00:05,862
+Business Case 05 begins when a bounded high-volume recruiting program is
+approved.
+
+2
+00:00:05,862 --> 00:00:11,235
+A capacity-controlled cohort has explained membership, owned exceptions
+and reconciled evidence.
+
+3
+00:00:11,235 --> 00:00:13,678
+The governed record is HVC-001.
+
+4
+00:00:13,678 --> 00:00:19,051
+The accountable actors are Volume Recruiter, Coordinator, Event Staff,
+Candidate, Interviewer.
+
+5
+00:00:19,051 --> 00:00:26,379
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+6
+00:00:26,379 --> 00:00:31,826
+The action-level data-flow diagram defines 5 processes before product
+navigation.
+
+7
+00:00:31,826 --> 00:00:41,631
+Every process identifies the actor, screen, action, input, output,
+business object, event, governed store, rule, denial and recovery.
+
+8
+00:00:41,631 --> 00:00:47,079
+The highlighted path keeps each business grain and version distinct.
+
+9
+00:00:47,079 --> 00:00:50,307
+Process 1, Volume Recruiter: Version the program.
+
+10
+00:00:50,307 --> 00:00:56,302
+The action define population and owners produces program version in the
+Program ledger.
+
+11
+00:00:56,302 --> 00:00:59,069
+Process 2, Coordinator: Plan human capacity.
+
+12
+00:00:59,069 --> 00:01:04,603
+The action simulate capacity produces cohort capacity plan in the
+Planning ledger.
+
+13
+00:01:04,603 --> 00:01:07,370
+Process 3, Coordinator: Preview bounded batch.
+
+14
+00:01:07,370 --> 00:01:14,749
+The action explain selection and suppression produces selected,
+suppressed and exception rows in the Cohort ledger.
+
+15
+00:01:14,749 --> 00:01:17,977
+Process 4, Coordinator: Confirm, cancel or retry.
+
+16
+00:01:17,977 --> 00:01:25,356
+The action create bounded work produces invitations or tasks plus
+per-row receipts in the Execution ledger.
+
+17
+00:01:25,356 --> 00:01:28,585
+Process 5, Volume Recruiter: Reconcile cohort outcome.
+
+18
+00:01:28,585 --> 00:01:35,502
+The action inspect conversion and exceptions produces denominator-bound
+metrics and drill-through in the Analytics store.
+
+19
+00:01:35,502 --> 00:01:38,492
+The actual product route is
+/hr/high-volume/HVC-001/cohorts/COH-DEMO-001.
+
+20
+00:01:38,492 --> 00:01:46,464
+It presents high-volume batch preview, undo and partial-failure board in
+the surrounding recruitment or onboarding workspace.
+
+21
+00:01:46,464 --> 00:01:58,921
+The screen remains a wireframe, but its identifiers, current state,
+navigation, data relationships and action boundaries match the business
+contract used by the connected workbench.
+
+22
+00:01:58,921 --> 00:02:02,267
+The seeded workbench follows record BAT-DEMO-001.
+
+23
+00:02:02,267 --> 00:02:17,323
+Its governed fields are Program, HVC-001 , Fall campus; Population
+snapshot, 110 candidates; Selected, 96; Suppressed, 14 , explained;
+Capacity, 12 sessions × 8; Idempotency key, BAT-HVC001-V05.
+
+24
+00:02:17,323 --> 00:02:27,918
+Field classifications remain visible so the presenter can distinguish
+public, internal, confidential and restricted projections for the active
+persona.
+
+25
+00:02:27,918 --> 00:02:32,017
+With Recruiter selected, we perform confirm bounded batch of 96.
+
+26
+00:02:32,017 --> 00:02:37,757
+The guard requires every selected and suppressed row is explained; no
+ranking or disposition.
+
+27
+00:02:37,757 --> 00:02:49,236
+The state changes from Previewed to 89 delivered · 7 recoverable,
+records BatchExecuted, writes to the Execution ledger, and creates the
+handoff: Event staff receives owned check-in work.
+
+28
+00:02:49,236 --> 00:02:53,573
+We now exercise the controlled exception: Simulate 7 delivery failures.
+
+29
+00:02:53,573 --> 00:02:58,344
+The prepared failure is Seven provider failures after 89 successful
+deliveries.
+
+30
+00:02:58,344 --> 00:03:07,452
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+31
+00:03:07,452 --> 00:03:10,876
+The owned recovery is Retry failed rows idempotently.
+
+32
+00:03:10,876 --> 00:03:15,158
+It reuses the governed business context without duplicating completed
+effects.
+
+33
+00:03:15,158 --> 00:03:20,723
+The new receipt preserves previous state, current state, actor, event
+and correlation key.
+
+34
+00:03:20,723 --> 00:03:30,569
+The control center and handoff inbox then expose the same recovery
+through batch success, suppression, cancellation and duplicate
+prevention and minimum-context next-actor work.
+
+35
+00:03:30,569 --> 00:03:32,837
+Business Case 05 is complete.
+
+36
+00:03:32,837 --> 00:03:45,993
+We demonstrated the level-two process contract, the actual product
+route, governed field projections, the primary state transition, a
+controlled exception, targeted recovery, causal dashboard evidence and
+the next-actor handoff.
+
+37
+00:03:45,993 --> 00:03:50,983
+A capacity-controlled cohort has explained membership, owned exceptions
+and reconciled evidence.
+
+38
+00:03:50,983 --> 00:03:55,972
+Production identity, persistence, integrations and external delivery
+remain separate implementation gates.

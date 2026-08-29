@@ -1,0 +1,67 @@
+{
+  "id": "UC-02-EXEC",
+  "title": "Talent campaign or event to consented applicant · executive cut",
+  "generatedAt": "2026-08-29T05:42:24.970Z",
+  "durationSeconds": 146.523,
+  "captionCues": 30,
+  "embeddedChapters": 7,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-02",
+      "title": "Talent campaign or event to consented applicant",
+      "start": 0,
+      "end": 24.693333,
+      "durationSeconds": 24.693333
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "4 accountable processes",
+      "start": 24.693333,
+      "end": 41.352335,
+      "durationSeconds": 16.659002
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open AUD-DEMO-001 in context",
+      "start": 41.352335,
+      "end": 62.70067999999999,
+      "durationSeconds": 21.348345
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Activate eligible audience snapshot",
+      "start": 62.70067999999999,
+      "end": 81.03791399999999,
+      "durationSeconds": 18.337234
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Expire consent for selected rows",
+      "start": 81.03791399999999,
+      "end": 100.20331099999999,
+      "durationSeconds": 19.165397
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Re-evaluate suppression",
+      "start": 100.20331099999999,
+      "end": 122.27741499999999,
+      "durationSeconds": 22.074104
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-02 complete",
+      "title": "A consented application retains its campaign, event and source-touch lineage.",
+      "start": 122.27741499999999,
+      "end": 146.52254,
+      "durationSeconds": 24.245125
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

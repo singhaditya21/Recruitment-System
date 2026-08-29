@@ -1,0 +1,79 @@
+{
+  "id": "UC-06",
+  "title": "Candidate availability to completed interview",
+  "generatedAt": "2026-08-29T06:02:11.732Z",
+  "recordId": "INT-DEMO-001",
+  "featureId": "WF-P0-09",
+  "videos": {
+    "client": "client-demo.mp4",
+    "executive": "executive-cut.mp4",
+    "evidence": "evidence-master.mp4"
+  },
+  "captions": "captions.srt",
+  "transcript": "transcript.md",
+  "thumbnail": "thumbnail.png",
+  "qaContactSheet": "qa-contact-sheet.png",
+  "durationSeconds": 231.693,
+  "resolution": "1920x1080",
+  "frameRate": 30,
+  "audioSampleRate": 48000,
+  "captionCues": 36,
+  "embeddedChapters": 9,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-06",
+      "title": "Candidate availability to completed interview",
+      "durationSeconds": 26.134
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "4 accountable processes",
+      "durationSeconds": 16.833
+    },
+    {
+      "id": "dfd-processes",
+      "chapter": "Process walkthrough",
+      "title": "Actor, action, evidence and downstream state",
+      "durationSeconds": 36.988
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open INT-DEMO-001 in context",
+      "durationSeconds": 22.508
+    },
+    {
+      "id": "workbench-data",
+      "chapter": "Governed data",
+      "title": "Inspect fields, scope and business grains",
+      "durationSeconds": 30.026
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Confirm session and panel",
+      "durationSeconds": 21.443
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate interviewer conflict",
+      "durationSeconds": 20.086
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Substitute eligible interviewer",
+      "durationSeconds": 22.576
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-06 complete",
+      "title": "A versioned interview session completes with an eligible panel and due scorecards.",
+      "durationSeconds": 35.101
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

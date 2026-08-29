@@ -1,0 +1,175 @@
+1
+00:00:00,000 --> 00:00:05,460
+Business Case 09 begins when an authorized human decision selects the
+offer path.
+
+2
+00:00:05,460 --> 00:00:10,920
+A version-bound candidate response reserves an opening and creates an
+eligible pre-hire handoff.
+
+3
+00:00:10,920 --> 00:00:13,020
+The governed record is OFF-DEMO-001.
+
+4
+00:00:13,020 --> 00:00:18,061
+The accountable actors are Recruiter, Hiring Manager, Offer Approver,
+Candidate, People Operations.
+
+5
+00:00:18,061 --> 00:00:24,361
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+6
+00:00:24,361 --> 00:00:29,443
+The action-level data-flow diagram defines 4 processes before product
+navigation.
+
+7
+00:00:29,443 --> 00:00:38,590
+Every process identifies the actor, screen, action, input, output,
+business object, event, governed store, rule, denial and recovery.
+
+8
+00:00:38,590 --> 00:00:43,672
+The highlighted path keeps each business grain and version distinct.
+
+9
+00:00:43,672 --> 00:00:46,095
+Process 1, Recruiter: Compose versioned offer.
+
+10
+00:00:46,095 --> 00:00:51,747
+The action build terms and contingencies produces validated offer draft
+in the Offer ledger.
+
+11
+00:00:51,747 --> 00:00:54,573
+Process 2, Offer Approver: Approve exact version.
+
+12
+00:00:54,573 --> 00:00:59,821
+The action approve, return or deny produces approval timeline in the
+Approval ledger.
+
+13
+00:00:59,821 --> 00:01:02,647
+Process 3, Candidate: Respond to exact version.
+
+14
+00:01:02,647 --> 00:01:08,299
+The action accept, decline or ask question produces version-bound
+response in the Offer ledger.
+
+15
+00:01:08,299 --> 00:01:11,529
+Process 4, People Operations: Reserve and hand off.
+
+16
+00:01:11,529 --> 00:01:17,988
+The action validate contingencies and create prehire produces opening
+reservation and prehire in the Handoff ledger.
+
+17
+00:01:17,988 --> 00:01:20,861
+The actual product route is /hr/decisions/APP-DEMO-001.
+
+18
+00:01:20,861 --> 00:01:28,524
+It presents offer composer, version comparison and contingency board in
+the surrounding recruitment or onboarding workspace.
+
+19
+00:01:28,524 --> 00:01:40,496
+The screen remains a wireframe, but its identifiers, current state,
+navigation, data relationships and action boundaries match the business
+contract used by the connected workbench.
+
+20
+00:01:40,496 --> 00:01:43,472
+The seeded workbench follows record OFF-DEMO-001.
+
+21
+00:01:43,472 --> 00:02:00,835
+Its governed fields are Base salary, $182,000 USD; Equity, 8,500 RSUs ,
+returned scenario 9,200; Start date, November 16, 2026; Offer version,
+v4 , 2 approvers; Opening, OPN-001 , reservable; Contingencies,
+Background review , pending.
+
+22
+00:02:00,835 --> 00:02:10,261
+Field classifications remain visible so the presenter can distinguish
+public, internal, confidential and restricted projections for the active
+persona.
+
+23
+00:02:10,261 --> 00:02:16,323
+With Recruiter selected, we perform approve and release offer v4.
+
+24
+00:02:16,323 --> 00:02:23,598
+The guard requires decision, pay policy, approvals, opening and
+contingencies are current.
+
+25
+00:02:23,598 --> 00:02:38,755
+The state changes from Draft v4 to Released v4, records OfferReleased,
+writes to the Offer ledger, and creates the handoff: Candidate receives
+exact-version response task.
+
+26
+00:02:38,755 --> 00:02:42,913
+We now exercise the controlled exception: Simulate compensation return.
+
+27
+00:02:42,913 --> 00:02:47,070
+The prepared failure is Compensation approver returns equity term.
+
+28
+00:02:47,070 --> 00:02:56,771
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+29
+00:02:56,771 --> 00:03:00,064
+The owned recovery is Revise and reapprove v5.
+
+30
+00:03:00,064 --> 00:03:04,179
+It reuses the governed business context without duplicating completed
+effects.
+
+31
+00:03:04,179 --> 00:03:09,529
+The new receipt preserves previous state, current state, actor, event
+and correlation key.
+
+32
+00:03:09,529 --> 00:03:18,995
+The control center and handoff inbox then expose the same recovery
+through offer approval time, version churn and acceptance and
+minimum-context next-actor work.
+
+33
+00:03:18,995 --> 00:03:21,533
+Business Case 09 is complete.
+
+34
+00:03:21,533 --> 00:03:36,250
+We demonstrated the level-two process contract, the actual product
+route, governed field projections, the primary state transition, a
+controlled exception, targeted recovery, causal dashboard evidence and
+the next-actor handoff.
+
+35
+00:03:36,250 --> 00:03:42,848
+A version-bound candidate response reserves an opening and creates an
+eligible pre-hire handoff.
+
+36
+00:03:42,848 --> 00:03:48,430
+Production identity, persistence, integrations and external delivery
+remain separate implementation gates.

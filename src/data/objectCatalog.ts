@@ -911,7 +911,7 @@ const domainBusinessFields: Record<string, FieldTemplate[]> = {
       "Integer",
       "Approval",
       "Must be positive and reconcile to openings",
-      "1",
+      "2",
     ],
     [
       "work_location",
@@ -927,7 +927,7 @@ const domainBusinessFields: Record<string, FieldTemplate[]> = {
       "Currency range",
       "Approval",
       "Minimum cannot exceed maximum",
-      "$148,000–$176,000 USD",
+      "$168,000–$196,000 USD",
     ],
     [
       "target_start_date",

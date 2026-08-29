@@ -136,6 +136,21 @@ const caseKinds: ScreeningCase["kind"][] = ["Assessment", "Reference", "Backgrou
 const caseStates: ScreeningCase["state"][] = ["Invited", "In progress", "Review", "Clear", "Blocked", "Pre-adverse notice", "Dispute", "Closed"];
 
 export const screeningCases: ScreeningCase[] = Array.from({ length: 32 }, (_, index) => {
+  if (index === 31) return {
+    id: "CASE-DEMO-001",
+    kind: "Adverse action",
+    candidate: "Restricted candidate",
+    application: "APP-DEMO-009",
+    job: "Senior Product Designer",
+    state: "Dispute",
+    owner: "Screening Ops West",
+    due: "Sep 12",
+    jurisdiction: "US-CA",
+    consent: "Version-bound notice required",
+    version: "BG-US-CA-v5",
+    nextAction: "Pause decision and review identity correction",
+    restricted: true,
+  };
   const kind = caseKinds[index % caseKinds.length];
   const state = caseStates[index % caseStates.length];
   return {

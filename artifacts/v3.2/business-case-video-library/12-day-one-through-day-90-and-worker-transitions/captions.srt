@@ -1,0 +1,187 @@
+1
+00:00:00,000 --> 00:00:07,853
+Business Case 12 begins when the worker starts or an effective
+relationship change is proposed.
+
+2
+00:00:07,853 --> 00:00:12,565
+Milestones and transition effects remain effective-dated, reversible and
+reconciled.
+
+3
+00:00:12,565 --> 00:00:15,182
+The governed record is TRN-DEMO-001.
+
+4
+00:00:15,182 --> 00:00:21,465
+The accountable actors are Employee, Manager, Buddy, People Operations,
+HRIS, IT, Facilities.
+
+5
+00:00:21,465 --> 00:00:29,318
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+6
+00:00:29,318 --> 00:00:35,121
+The action-level data-flow diagram defines 5 processes before product
+navigation.
+
+7
+00:00:35,121 --> 00:00:45,568
+Every process identifies the actor, screen, action, input, output,
+business object, event, governed store, rule, denial and recovery.
+
+8
+00:00:45,568 --> 00:00:51,371
+The highlighted path keeps each business grain and version distinct.
+
+9
+00:00:51,371 --> 00:00:54,843
+Process 1, Employee: Complete day-one and 30/60/90 milestones.
+
+10
+00:00:54,843 --> 00:01:00,918
+The action record progress and support needs produces milestone evidence
+in the Journey ledger.
+
+11
+00:01:00,918 --> 00:01:03,956
+Process 2, People Operations: Propose effective-dated transition.
+
+12
+00:01:03,956 --> 00:01:09,597
+The action select transition and reason produces transition draft in the
+Lifecycle ledger.
+
+13
+00:01:09,597 --> 00:01:12,635
+Process 3, Approvers: Preview impact and approve.
+
+14
+00:01:12,635 --> 00:01:18,710
+The action compare before and after produces approved execution plan in
+the Lifecycle ledger.
+
+15
+00:01:18,710 --> 00:01:21,748
+Process 4, System Owners: Execute or compensate.
+
+16
+00:01:21,748 --> 00:01:27,823
+The action create downstream work produces per-destination effects and
+receipts in the Effect ledger.
+
+17
+00:01:27,823 --> 00:01:30,861
+Process 5, People Operations: Reconcile final state.
+
+18
+00:01:30,861 --> 00:01:37,804
+The action compare expected and observed produces closed, blocked or
+restated outcome in the Analytics store.
+
+19
+00:01:37,804 --> 00:01:40,227
+The actual product route is /hr/transitions/TRN-DEMO-001/impact.
+
+20
+00:01:40,227 --> 00:01:45,880
+It presents worker-transition execution and compensating-work graph in
+the surrounding recruitment or onboarding workspace.
+
+21
+00:01:45,880 --> 00:01:55,974
+The screen remains a wireframe, but its identifiers, current state,
+navigation, data relationships and action boundaries match the business
+contract used by the connected workbench.
+
+22
+00:01:55,974 --> 00:01:58,910
+The seeded workbench follows record TRN-DEMO-001.
+
+23
+00:01:58,910 --> 00:02:17,997
+Its governed fields are Transition, Crossboard to Product Design;
+Effective date, December 1, 2026; Before, Recruiting Ops , SF; After,
+Product Design , Remote CA; Downstream effects, HRIS, IGA, benefits,
+facilities; Partial state, HRIS success , 3 effects pending.
+
+24
+00:02:17,997 --> 00:02:27,296
+Field classifications remain visible so the presenter can distinguish
+public, internal, confidential and restricted projections for the active
+persona.
+
+25
+00:02:27,296 --> 00:02:30,610
+With People Operations selected, we perform approve and execute
+transition.
+
+26
+00:02:30,610 --> 00:02:34,919
+The guard requires impact owners, approvals, effective date and safe
+execution order pass.
+
+27
+00:02:34,919 --> 00:02:45,194
+The state changes from Impact preview to Reconciled with compensation,
+records WorkerTransitionReconciled, writes to the Lifecycle effect
+ledger, and creates the handoff: HRIS, IT, facilities and benefits
+owners receive ordered work.
+
+28
+00:02:45,194 --> 00:02:49,722
+We now exercise the controlled exception: Simulate partial downstream
+success.
+
+29
+00:02:49,722 --> 00:02:54,702
+The prepared failure is HRIS succeeded but access and benefits failed.
+
+30
+00:02:54,702 --> 00:03:04,210
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+31
+00:03:04,210 --> 00:03:07,007
+The owned recovery is Run compensating work.
+
+32
+00:03:07,007 --> 00:03:11,003
+It reuses the governed business context without duplicating completed
+effects.
+
+33
+00:03:11,003 --> 00:03:16,198
+The new receipt preserves previous state, current state, actor, event
+and correlation key.
+
+34
+00:03:16,198 --> 00:03:25,389
+The control center and handoff inbox then expose the same recovery
+through transition completion, partial failures and compensation age and
+minimum-context next-actor work.
+
+35
+00:03:25,389 --> 00:03:27,797
+Business Case 12 is complete.
+
+36
+00:03:27,797 --> 00:03:41,763
+We demonstrated the level-two process contract, the actual product
+route, governed field projections, the primary state transition, a
+controlled exception, targeted recovery, causal dashboard evidence and
+the next-actor handoff.
+
+37
+00:03:41,763 --> 00:03:46,098
+Milestones and transition effects remain effective-dated, reversible and
+reconciled.
+
+38
+00:03:46,098 --> 00:03:51,395
+Production identity, persistence, integrations and external delivery
+remain separate implementation gates.

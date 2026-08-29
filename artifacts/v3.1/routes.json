@@ -1,0 +1,34 @@
+{
+  "version": "3.1.0",
+  "routeDeclarationCount": 160,
+  "functionalDestinationCount": 158,
+  "redirectCount": 2,
+  "inheritedScreenContracts": 62,
+  "totalScreenContracts": 66,
+  "addedScreenContracts": [
+    {
+      "id": "UI-DEMO-001",
+      "surface": "Demo",
+      "name": "Demo Journey Command Center",
+      "route": "/demo"
+    },
+    {
+      "id": "UI-DEMO-002",
+      "surface": "Demo",
+      "name": "84-Journey Coverage Catalogue",
+      "route": "/demo/catalog"
+    },
+    {
+      "id": "UI-DEMO-003",
+      "surface": "Demo",
+      "name": "Business Use-Case Data-Flow Detail",
+      "route": "/demo/flows/:useCaseId"
+    },
+    {
+      "id": "UI-DEMO-004",
+      "surface": "Demo",
+      "name": "Demo Session Evidence Ledger",
+      "route": "/demo/evidence"
+    }
+  ]
+}

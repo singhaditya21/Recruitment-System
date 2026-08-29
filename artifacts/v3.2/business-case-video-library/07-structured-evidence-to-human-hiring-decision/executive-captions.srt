@@ -1,0 +1,153 @@
+1
+00:00:00,000 --> 00:00:06,808
+Business Case 07 begins when required interview sessions complete and
+scorecard work becomes due.
+
+2
+00:00:06,808 --> 00:00:12,157
+An authorized human records an attributed decision using independent,
+versioned evidence.
+
+3
+00:00:12,157 --> 00:00:14,588
+The governed record is APP-DEMO-001.
+
+4
+00:00:14,588 --> 00:00:19,451
+The accountable actors are Interviewer, Recruiter, Hiring Manager,
+Decision Owner.
+
+5
+00:00:19,451 --> 00:00:26,745
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+6
+00:00:26,745 --> 00:00:26,745
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+7
+00:00:26,745 --> 00:00:31,343
+The action-level data-flow diagram defines 4 processes before product
+navigation.
+
+8
+00:00:31,343 --> 00:00:39,620
+Every process identifies the actor, screen, action, input, output,
+business object, event, governed store, rule, denial and recovery.
+
+9
+00:00:39,620 --> 00:00:44,218
+The highlighted path keeps each business grain and version distinct.
+
+10
+00:00:44,218 --> 00:00:44,218
+Process 1, Interviewer: Submit independent scorecard.
+
+11
+00:00:44,218 --> 00:00:47,043
+The actual product route is /hr/decisions/APP-DEMO-001.
+
+12
+00:00:47,043 --> 00:00:53,636
+It presents evidence coverage and structured debrief in the surrounding
+recruitment or onboarding workspace.
+
+13
+00:00:53,636 --> 00:01:05,408
+The screen remains a wireframe, but its identifiers, current state,
+navigation, data relationships and action boundaries match the business
+contract used by the connected workbench.
+
+14
+00:01:05,408 --> 00:01:05,409
+The seeded workbench follows record DEB-DEMO-001.
+
+15
+00:01:05,409 --> 00:01:10,002
+With Hiring Manager selected, we perform record attributed human
+decision.
+
+16
+00:01:10,002 --> 00:01:15,054
+The guard requires independent scorecards, competency coverage and
+authority are complete.
+
+17
+00:01:15,054 --> 00:01:27,457
+The state changes from Ready for debrief to Human decision recorded,
+records HiringDecisionRecorded, writes to the Decision ledger, and
+creates the handoff: Offer owner receives authorized decision.
+
+18
+00:01:27,457 --> 00:01:27,457
+The state changes from Ready for debrief to Human decision recorded,
+records HiringDecisionRecorded, writes to the Decision ledger, and
+creates the handoff: Offer owner receives authorized decision.
+
+19
+00:01:27,457 --> 00:01:31,497
+We now exercise the controlled exception: Simulate missing evidence.
+
+20
+00:01:31,497 --> 00:01:36,435
+The prepared failure is System-design evidence missing; one scorecard
+amended late.
+
+21
+00:01:36,435 --> 00:01:45,862
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+22
+00:01:45,862 --> 00:01:45,862
+The owned recovery is Collect amendment and reconvene.
+
+23
+00:01:45,862 --> 00:01:49,186
+The owned recovery is Collect amendment and reconvene.
+
+24
+00:01:49,186 --> 00:01:53,341
+It reuses the governed business context without duplicating completed
+effects.
+
+25
+00:01:53,341 --> 00:01:58,742
+The new receipt preserves previous state, current state, actor, event
+and correlation key.
+
+26
+00:01:58,742 --> 00:02:08,299
+The control center and handoff inbox then expose the same recovery
+through evidence completeness, debrief age and amendment rate and
+minimum-context next-actor work.
+
+27
+00:02:08,299 --> 00:02:08,299
+The control center and handoff inbox then expose the same recovery
+through evidence completeness, debrief age and amendment rate and
+minimum-context next-actor work.
+
+28
+00:02:08,299 --> 00:02:10,373
+Business Case 07 is complete.
+
+29
+00:02:10,373 --> 00:02:22,404
+We demonstrated the level-two process contract, the actual product
+route, governed field projections, the primary state transition, a
+controlled exception, targeted recovery, causal dashboard evidence and
+the next-actor handoff.
+
+30
+00:02:22,404 --> 00:02:26,968
+An authorized human records an attributed decision using independent,
+versioned evidence.
+
+31
+00:02:26,968 --> 00:02:31,531
+Production identity, persistence, integrations and external delivery
+remain separate implementation gates.

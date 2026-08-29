@@ -1,0 +1,177 @@
+1
+00:00:00,000 --> 00:00:08,347
+Business Case 08 begins when a versioned assessment or screening task is
+assigned at an authorized stage.
+
+2
+00:00:08,347 --> 00:00:13,256
+A correctable, human-reviewed outcome preserves notice, response windows
+and redress.
+
+3
+00:00:13,256 --> 00:00:15,711
+The governed record is CTK-004.
+
+4
+00:00:15,711 --> 00:00:20,621
+The accountable actors are Candidate, Recruiter, Screening Reviewer,
+Candidate Support.
+
+5
+00:00:20,621 --> 00:00:27,985
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+6
+00:00:27,985 --> 00:00:32,583
+The action-level data-flow diagram defines 4 processes before product
+navigation.
+
+7
+00:00:32,583 --> 00:00:40,859
+Every process identifies the actor, screen, action, input, output,
+business object, event, governed store, rule, denial and recovery.
+
+8
+00:00:40,859 --> 00:00:45,457
+The highlighted path keeps each business grain and version distinct.
+
+9
+00:00:45,457 --> 00:00:48,419
+Process 1, Candidate: Review notice and consent.
+
+10
+00:00:48,419 --> 00:00:54,765
+The action acknowledge current notice produces notice and consent
+receipt in the Regulated case ledger.
+
+11
+00:00:54,765 --> 00:00:57,727
+Process 2, Screening Coordinator: Prepare provider request.
+
+12
+00:00:57,727 --> 00:01:05,343
+The action validate minimum data and send preview produces prepared
+request and correlation key in the Integration ledger.
+
+13
+00:01:05,343 --> 00:01:07,882
+Process 3, Candidate: Correct or dispute.
+
+14
+00:01:07,882 --> 00:01:14,229
+The action submit protected response produces dispute and decision pause
+in the Regulated case ledger.
+
+15
+00:01:14,229 --> 00:01:17,191
+Process 4, Screening Reviewer: Record governed outcome.
+
+16
+00:01:17,191 --> 00:01:23,538
+The action review separated evidence produces human outcome and
+candidate-safe status in the Outcome ledger.
+
+17
+00:01:23,538 --> 00:01:26,470
+The actual product route is /hr/cases/CASE-DEMO-001.
+
+18
+00:01:26,470 --> 00:01:33,311
+It presents regulated screening and adverse-action timeline in the
+surrounding recruitment or onboarding workspace.
+
+19
+00:01:33,311 --> 00:01:45,528
+The screen remains a wireframe, but its identifiers, current state,
+navigation, data relationships and action boundaries match the business
+contract used by the connected workbench.
+
+20
+00:01:45,528 --> 00:01:48,449
+The seeded workbench follows record CASE-DEMO-001.
+
+21
+00:01:48,449 --> 00:02:05,002
+Its governed fields are Notice version, BG-US-CA-v5 , acknowledged;
+Provider status, Report returned , review required; Response clock, 3
+business days remaining; Dispute, Identity mismatch , open; Decision
+effect, Paused; Reviewer, Screening Ops West.
+
+22
+00:02:05,002 --> 00:02:14,252
+Field classifications remain visible so the presenter can distinguish
+public, internal, confidential and restricted projections for the active
+persona.
+
+23
+00:02:14,252 --> 00:02:18,309
+With Screening Reviewer selected, we perform record governed human
+outcome.
+
+24
+00:02:18,309 --> 00:02:23,582
+The guard requires notice, consent, response clock, dispute and evidence
+separation all pass.
+
+25
+00:02:23,582 --> 00:02:35,346
+The state changes from Decision paused to Cleared after human review,
+records ScreeningOutcomeRecorded, writes to the Regulated case ledger,
+and creates the handoff: Decision owner receives minimum outcome only.
+
+26
+00:02:35,346 --> 00:02:39,408
+We now exercise the controlled exception: Open candidate dispute.
+
+27
+00:02:39,408 --> 00:02:44,823
+The prepared failure is Candidate disputes an identity mismatch during
+protected window.
+
+28
+00:02:44,823 --> 00:02:54,301
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+29
+00:02:54,301 --> 00:02:57,733
+The owned recovery is Resolve dispute and resume.
+
+30
+00:02:57,733 --> 00:03:02,024
+It reuses the governed business context without duplicating completed
+effects.
+
+31
+00:03:02,024 --> 00:03:07,601
+The new receipt preserves previous state, current state, actor, event
+and correlation key.
+
+32
+00:03:07,601 --> 00:03:16,611
+The control center and handoff inbox then expose the same recovery
+through response-window compliance and correction turnaround and
+minimum-context next-actor work.
+
+33
+00:03:16,611 --> 00:03:19,214
+Business Case 08 is complete.
+
+34
+00:03:19,214 --> 00:03:34,313
+We demonstrated the level-two process contract, the actual product
+route, governed field projections, the primary state transition, a
+controlled exception, targeted recovery, causal dashboard evidence and
+the next-actor handoff.
+
+35
+00:03:34,313 --> 00:03:39,519
+A correctable, human-reviewed outcome preserves notice, response windows
+and redress.
+
+36
+00:03:39,519 --> 00:03:45,246
+Production identity, persistence, integrations and external delivery
+remain separate implementation gates.
