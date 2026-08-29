@@ -1,0 +1,155 @@
+1
+00:00:00,000 --> 00:00:05,862
+Business Case 05 begins when a bounded high-volume recruiting program is
+approved.
+
+2
+00:00:05,862 --> 00:00:11,235
+A capacity-controlled cohort has explained membership, owned exceptions
+and reconciled evidence.
+
+3
+00:00:11,235 --> 00:00:13,678
+The governed record is HVC-001.
+
+4
+00:00:13,678 --> 00:00:19,051
+The accountable actors are Volume Recruiter, Coordinator, Event Staff,
+Candidate, Interviewer.
+
+5
+00:00:19,051 --> 00:00:26,379
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+6
+00:00:26,379 --> 00:00:26,379
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+7
+00:00:26,379 --> 00:00:31,826
+The action-level data-flow diagram defines 5 processes before product
+navigation.
+
+8
+00:00:31,826 --> 00:00:41,631
+Every process identifies the actor, screen, action, input, output,
+business object, event, governed store, rule, denial and recovery.
+
+9
+00:00:41,631 --> 00:00:47,079
+The highlighted path keeps each business grain and version distinct.
+
+10
+00:00:47,079 --> 00:00:50,068
+The actual product route is
+/hr/high-volume/HVC-001/cohorts/COH-DEMO-001.
+
+11
+00:00:50,068 --> 00:00:58,040
+It presents high-volume batch preview, undo and partial-failure board in
+the surrounding recruitment or onboarding workspace.
+
+12
+00:00:58,040 --> 00:01:10,497
+The screen remains a wireframe, but its identifiers, current state,
+navigation, data relationships and action boundaries match the business
+contract used by the connected workbench.
+
+13
+00:01:10,497 --> 00:01:10,498
+The seeded workbench follows record BAT-DEMO-001.
+
+14
+00:01:10,498 --> 00:01:10,498
+Field classifications remain visible so the presenter can distinguish
+public, internal, confidential and restricted projections for the active
+persona.
+
+15
+00:01:10,498 --> 00:01:14,597
+With Recruiter selected, we perform confirm bounded batch of 96.
+
+16
+00:01:14,597 --> 00:01:20,337
+The guard requires every selected and suppressed row is explained; no
+ranking or disposition.
+
+17
+00:01:20,337 --> 00:01:31,815
+The state changes from Previewed to 89 delivered · 7 recoverable,
+records BatchExecuted, writes to the Execution ledger, and creates the
+handoff: Event staff receives owned check-in work.
+
+18
+00:01:31,815 --> 00:01:31,816
+The state changes from Previewed to 89 delivered · 7 recoverable,
+records BatchExecuted, writes to the Execution ledger, and creates the
+handoff: Event staff receives owned check-in work.
+
+19
+00:01:31,816 --> 00:01:36,153
+We now exercise the controlled exception: Simulate 7 delivery failures.
+
+20
+00:01:36,153 --> 00:01:40,924
+The prepared failure is Seven provider failures after 89 successful
+deliveries.
+
+21
+00:01:40,924 --> 00:01:50,031
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+22
+00:01:50,031 --> 00:01:50,032
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+23
+00:01:50,032 --> 00:01:53,456
+The owned recovery is Retry failed rows idempotently.
+
+24
+00:01:53,456 --> 00:01:57,738
+It reuses the governed business context without duplicating completed
+effects.
+
+25
+00:01:57,738 --> 00:02:03,303
+The new receipt preserves previous state, current state, actor, event
+and correlation key.
+
+26
+00:02:03,303 --> 00:02:13,149
+The control center and handoff inbox then expose the same recovery
+through batch success, suppression, cancellation and duplicate
+prevention and minimum-context next-actor work.
+
+27
+00:02:13,149 --> 00:02:13,149
+Business Case 05 is complete.
+
+28
+00:02:13,149 --> 00:02:15,417
+Business Case 05 is complete.
+
+29
+00:02:15,417 --> 00:02:28,573
+We demonstrated the level-two process contract, the actual product
+route, governed field projections, the primary state transition, a
+controlled exception, targeted recovery, causal dashboard evidence and
+the next-actor handoff.
+
+30
+00:02:28,573 --> 00:02:33,563
+A capacity-controlled cohort has explained membership, owned exceptions
+and reconciled evidence.
+
+31
+00:02:33,563 --> 00:02:38,552
+Production identity, persistence, integrations and external delivery
+remain separate implementation gates.

@@ -1,0 +1,59 @@
+{
+  "version": "3.1.0",
+  "releaseName": "Demo-journey and business data-flow wireframe",
+  "syntheticOnly": true,
+  "generatedAt": "2026-08-28T23:30:00+05:30",
+  "counts": {
+    "actorPersonas": 13,
+    "internalRoles": 12,
+    "screenContracts": 66,
+    "routeDeclarations": 160,
+    "functionalDestinations": 158,
+    "redirectRoutes": 2,
+    "businessUseCaseDiagrams": 12,
+    "journeyUnits": 84,
+    "guidedHandoffSteps": 61,
+    "demoPacks": 8,
+    "routedObjectFamilies": 138,
+    "routedObjectPageInstances": 552,
+    "combinedLogicalConcepts": 175,
+    "physicalObjectsApproved": 0
+  },
+  "demoCapabilities": [
+    "deterministic use-case launch and restart",
+    "happy-path and exception-recovery variants",
+    "persistent presenter rail across product routes",
+    "actor and internal-persona handoff",
+    "business input, output, process, store and outcome diagrams",
+    "mapped 84-journey coverage catalogue",
+    "synthetic communication preview inventory",
+    "browser-memory action receipt ledger",
+    "selected shared scorecard, offer, availability, onboarding, provisioning and HRIS state effects"
+  ],
+  "validation": {
+    "sourceFilesScanned": 19,
+    "buttons": 294,
+    "links": 303,
+    "routeDeclarations": 160,
+    "staticInteractionDefects": 0,
+    "unitComponentContractAndAxeTestsPassed": 116,
+    "demoJourneyContractTests": 4,
+    "demoAccessibilityBaselines": 4,
+    "desktopAndMobileE2eTestsPassed": 67,
+    "e2eTestsIntentionallySkipped": 1,
+    "liveDestinationsCrawled": 1056,
+    "liveRouteDefects": 0,
+    "browserErrors": 0
+  },
+  "production": {
+    "authentication": "not implemented",
+    "serverAuthorization": "not implemented",
+    "persistence": "browser memory only",
+    "integrations": "synthetic previews only",
+    "physicalSchemaApproved": false,
+    "manualAssistiveTechnology": "not run",
+    "securityApproval": "not obtained",
+    "privacyLegalApproval": "not obtained",
+    "pilot": "blocked"
+  }
+}

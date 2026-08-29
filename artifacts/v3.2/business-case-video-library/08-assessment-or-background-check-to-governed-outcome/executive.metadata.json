@@ -1,0 +1,67 @@
+{
+  "id": "UC-08-EXEC",
+  "title": "Assessment or background check to governed outcome · executive cut",
+  "generatedAt": "2026-08-29T06:46:51.852Z",
+  "durationSeconds": 158.441,
+  "captionCues": 31,
+  "embeddedChapters": 7,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-08",
+      "title": "Assessment or background check to governed outcome",
+      "start": 0,
+      "end": 27.985351,
+      "durationSeconds": 27.985351
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "4 accountable processes",
+      "start": 27.985351,
+      "end": 45.456689,
+      "durationSeconds": 17.471338
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open CASE-DEMO-001 in context",
+      "start": 45.456689,
+      "end": 67.44712,
+      "durationSeconds": 21.990431
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Record governed human outcome",
+      "start": 67.44712,
+      "end": 88.54068,
+      "durationSeconds": 21.09356
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Open candidate dispute",
+      "start": 88.54068,
+      "end": 107.495601,
+      "durationSeconds": 18.954921
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Resolve dispute and resume",
+      "start": 107.495601,
+      "end": 129.805714,
+      "durationSeconds": 22.310113
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-08 complete",
+      "title": "A correctable, human-reviewed outcome preserves notice, response windows and redress.",
+      "start": 129.805714,
+      "end": 158.44068,
+      "durationSeconds": 28.634966
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

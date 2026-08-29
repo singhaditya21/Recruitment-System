@@ -104,4 +104,25 @@ describe("automated WCAG baseline", () => {
   ])("passes the v3.0 full-system baseline at %s", async (hash) => {
     await expectNoAxeViolations(hash);
   });
+
+  it.each([
+    "#/demo",
+    "#/demo/catalog",
+    "#/demo/flows/candidate-attraction",
+    "#/demo/evidence",
+  ])("passes the v3.1 demo-journey baseline at %s", async (hash) => {
+    await expectNoAxeViolations(hash);
+  });
+
+  it.each([
+    "#/demo/workbench",
+    "#/demo/workbench/uc-01",
+    "#/demo/workbench/uc-10?tab=controls",
+    "#/demo/control-center",
+    "#/demo/handoffs",
+    "#/demo/reports",
+    "#/demo/scenarios",
+  ])("passes the v3.2 connected-use-case baseline at %s", async (hash) => {
+    await expectNoAxeViolations(hash);
+  });
 });

@@ -36,7 +36,7 @@ export function PrototypeBanner() {
         <span>
           No real jobs, people, authentication, uploads or external writes.
         </span>
-        <span className="banner-release">v3.0 full-system wireframe</span>
+        <span className="banner-release">v3.2 connected-use-case wireframe</span>
       </div>
     </>
   );

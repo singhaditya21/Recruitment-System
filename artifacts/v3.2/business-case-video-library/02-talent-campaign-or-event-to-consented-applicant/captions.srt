@@ -1,0 +1,176 @@
+1
+00:00:00,000 --> 00:00:05,945
+Business Case 02 begins when talent marketing defines an audience or
+recruiting event.
+
+2
+00:00:05,945 --> 00:00:10,518
+A consented application retains its campaign, event and source-touch
+lineage.
+
+3
+00:00:10,518 --> 00:00:12,804
+The governed record is CAM-DEMO-001.
+
+4
+00:00:12,804 --> 00:00:17,834
+The accountable actors are Talent Marketer, Campus Recruiter, Candidate,
+Recruiting Coordinator.
+
+5
+00:00:17,834 --> 00:00:24,693
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+6
+00:00:24,693 --> 00:00:29,077
+The action-level data-flow diagram defines 4 processes before product
+navigation.
+
+7
+00:00:29,077 --> 00:00:36,968
+Every process identifies the actor, screen, action, input, output,
+business object, event, governed store, rule, denial and recovery.
+
+8
+00:00:36,968 --> 00:00:41,352
+The highlighted path keeps each business grain and version distinct.
+
+9
+00:00:41,352 --> 00:00:44,422
+Process 1, Talent Marketer: Build eligible audience.
+
+10
+00:00:44,422 --> 00:00:50,999
+The action apply segment rules produces eligible and suppressed
+population snapshot in the Recruiting CRM.
+
+11
+00:00:50,999 --> 00:00:54,507
+Process 2, Campus Recruiter: Configure event and campaign.
+
+12
+00:00:54,507 --> 00:01:00,646
+The action bind event to campaign produces versioned event invitation in
+the Campaign ledger.
+
+13
+00:01:00,646 --> 00:01:03,277
+Process 3, Candidate: Register with consent.
+
+14
+00:01:03,277 --> 00:01:09,855
+The action register or join waitlist produces registration or waitlist
+position in the Relationship ledger.
+
+15
+00:01:09,855 --> 00:01:12,486
+Process 4, Candidate: Start attributed application.
+
+16
+00:01:12,486 --> 00:01:19,940
+The action follow source-bound job link produces draft application with
+immutable source touch in the Application ledger.
+
+17
+00:01:19,940 --> 00:01:22,787
+The actual product route is /hr/talent/campaigns.
+
+18
+00:01:22,787 --> 00:01:29,428
+It presents audience, consent and source-attribution builder in the
+surrounding recruitment or onboarding workspace.
+
+19
+00:01:29,428 --> 00:01:41,289
+The screen remains a wireframe, but its identifiers, current state,
+navigation, data relationships and action boundaries match the business
+contract used by the connected workbench.
+
+20
+00:01:41,289 --> 00:01:44,595
+The seeded workbench follows record AUD-DEMO-001.
+
+21
+00:01:44,595 --> 00:01:57,820
+Its governed fields are Community, Design leaders — Bay Area;
+Population, 215 prospects; Eligible, 184; Suppressed, 27 ,
+consent/retention; Event, EVT-DEMO-001; Source token,
+SRC-CAM-2026-08-PD.
+
+22
+00:01:57,820 --> 00:02:08,290
+Field classifications remain visible so the presenter can distinguish
+public, internal, confidential and restricted projections for the active
+persona.
+
+23
+00:02:08,290 --> 00:02:11,729
+With Recruiter selected, we perform activate eligible audience snapshot.
+
+24
+00:02:11,729 --> 00:02:16,313
+The guard requires purpose, consent, suppression and effective-date
+rules pass per row.
+
+25
+00:02:16,313 --> 00:02:26,628
+The state changes from Draft population to Activated · 184 eligible,
+records AudienceActivated, writes to the Recruiting CRM, and creates the
+handoff: Event team receives consented audience.
+
+26
+00:02:26,628 --> 00:02:31,530
+We now exercise the controlled exception: Expire consent for selected
+rows.
+
+27
+00:02:31,530 --> 00:02:36,433
+The prepared failure is 27 records suppressed; 4 have expired authority.
+
+28
+00:02:36,433 --> 00:02:45,793
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+29
+00:02:45,793 --> 00:02:48,390
+The owned recovery is Re-evaluate suppression.
+
+30
+00:02:48,390 --> 00:02:52,718
+It reuses the governed business context without duplicating completed
+effects.
+
+31
+00:02:52,718 --> 00:02:58,345
+The new receipt preserves previous state, current state, actor, event
+and correlation key.
+
+32
+00:02:58,345 --> 00:03:07,867
+The control center and handoff inbox then expose the same recovery
+through eligible, suppressed and attributed conversion rates and
+minimum-context next-actor work.
+
+33
+00:03:07,867 --> 00:03:10,071
+Business Case 02 is complete.
+
+34
+00:03:10,071 --> 00:03:22,855
+We demonstrated the level-two process contract, the actual product
+route, governed field projections, the primary state transition, a
+controlled exception, targeted recovery, causal dashboard evidence and
+the next-actor handoff.
+
+35
+00:03:22,855 --> 00:03:27,263
+A consented application retains its campaign, event and source-touch
+lineage.
+
+36
+00:03:27,263 --> 00:03:32,112
+Production identity, persistence, integrations and external delivery
+remain separate implementation gates.

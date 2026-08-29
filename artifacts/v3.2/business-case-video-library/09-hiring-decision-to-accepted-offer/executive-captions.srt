@@ -1,0 +1,149 @@
+1
+00:00:00,000 --> 00:00:05,460
+Business Case 09 begins when an authorized human decision selects the
+offer path.
+
+2
+00:00:05,460 --> 00:00:10,920
+A version-bound candidate response reserves an opening and creates an
+eligible pre-hire handoff.
+
+3
+00:00:10,920 --> 00:00:13,020
+The governed record is OFF-DEMO-001.
+
+4
+00:00:13,020 --> 00:00:18,061
+The accountable actors are Recruiter, Hiring Manager, Offer Approver,
+Candidate, People Operations.
+
+5
+00:00:18,061 --> 00:00:24,361
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+6
+00:00:24,361 --> 00:00:24,361
+This demonstration uses synthetic browser-memory data and creates no
+database, provider, message or external-system effect.
+
+7
+00:00:24,361 --> 00:00:29,443
+The action-level data-flow diagram defines 4 processes before product
+navigation.
+
+8
+00:00:29,443 --> 00:00:38,590
+Every process identifies the actor, screen, action, input, output,
+business object, event, governed store, rule, denial and recovery.
+
+9
+00:00:38,590 --> 00:00:43,672
+The highlighted path keeps each business grain and version distinct.
+
+10
+00:00:43,672 --> 00:00:43,672
+Process 1, Recruiter: Compose versioned offer.
+
+11
+00:00:43,672 --> 00:00:46,545
+The actual product route is /hr/decisions/APP-DEMO-001.
+
+12
+00:00:46,545 --> 00:00:54,208
+It presents offer composer, version comparison and contingency board in
+the surrounding recruitment or onboarding workspace.
+
+13
+00:00:54,208 --> 00:01:06,180
+The screen remains a wireframe, but its identifiers, current state,
+navigation, data relationships and action boundaries match the business
+contract used by the connected workbench.
+
+14
+00:01:06,180 --> 00:01:06,180
+Field classifications remain visible so the presenter can distinguish
+public, internal, confidential and restricted projections for the active
+persona.
+
+15
+00:01:06,180 --> 00:01:12,242
+With Recruiter selected, we perform approve and release offer v4.
+
+16
+00:01:12,242 --> 00:01:19,517
+The guard requires decision, pay policy, approvals, opening and
+contingencies are current.
+
+17
+00:01:19,517 --> 00:01:34,674
+The state changes from Draft v4 to Released v4, records OfferReleased,
+writes to the Offer ledger, and creates the handoff: Candidate receives
+exact-version response task.
+
+18
+00:01:34,674 --> 00:01:34,674
+We now exercise the controlled exception: Simulate compensation return.
+
+19
+00:01:34,674 --> 00:01:38,832
+We now exercise the controlled exception: Simulate compensation return.
+
+20
+00:01:38,832 --> 00:01:42,989
+The prepared failure is Compensation approver returns equity term.
+
+21
+00:01:42,989 --> 00:01:52,690
+Unsupported downstream work stops, successful prior evidence remains
+intact, and the state-change receipt assigns explicit recovery without
+hiding the failed attempt.
+
+22
+00:01:52,690 --> 00:01:52,690
+The owned recovery is Revise and reapprove v5.
+
+23
+00:01:52,690 --> 00:01:55,983
+The owned recovery is Revise and reapprove v5.
+
+24
+00:01:55,983 --> 00:02:00,098
+It reuses the governed business context without duplicating completed
+effects.
+
+25
+00:02:00,098 --> 00:02:05,448
+The new receipt preserves previous state, current state, actor, event
+and correlation key.
+
+26
+00:02:05,448 --> 00:02:14,914
+The control center and handoff inbox then expose the same recovery
+through offer approval time, version churn and acceptance and
+minimum-context next-actor work.
+
+27
+00:02:14,914 --> 00:02:14,915
+Business Case 09 is complete.
+
+28
+00:02:14,915 --> 00:02:17,452
+Business Case 09 is complete.
+
+29
+00:02:17,452 --> 00:02:32,169
+We demonstrated the level-two process contract, the actual product
+route, governed field projections, the primary state transition, a
+controlled exception, targeted recovery, causal dashboard evidence and
+the next-actor handoff.
+
+30
+00:02:32,169 --> 00:02:38,767
+A version-bound candidate response reserves an opening and creates an
+eligible pre-hire handoff.
+
+31
+00:02:38,767 --> 00:02:44,349
+Production identity, persistence, integrations and external delivery
+remain separate implementation gates.

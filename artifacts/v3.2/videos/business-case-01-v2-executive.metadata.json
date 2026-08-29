@@ -1,0 +1,80 @@
+{
+  "id": "BC-01-V2-EXEC",
+  "title": "Hiring demand to published job · executive cut",
+  "generatedAt": "2026-08-29T05:22:29.759Z",
+  "source": "business-case-01-v2-client-demo.mp4",
+  "video": "artifacts/v3.2/videos/business-case-01-v2-executive-cut.mp4",
+  "subtitles": "artifacts/v3.2/videos/business-case-01-v2-executive-captions.srt",
+  "transcript": "artifacts/v3.2/videos/business-case-01-v2-executive-transcript.md",
+  "thumbnail": "artifacts/v3.2/videos/business-case-01-v2-executive-thumbnail.png",
+  "durationSeconds": 195.615,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "Business Case 01",
+      "title": "Hiring demand to published job",
+      "durationSeconds": 33.22,
+      "start": 0,
+      "end": 33.22
+    },
+    {
+      "id": "dfd-intro",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "One governed record across five processes",
+      "durationSeconds": 21.973,
+      "start": 33.22,
+      "end": 55.193
+    },
+    {
+      "id": "manager-demand",
+      "chapter": "Hiring Manager",
+      "title": "Create controlled workforce demand",
+      "durationSeconds": 29.629,
+      "start": 55.193,
+      "end": 84.82199999999999
+    },
+    {
+      "id": "publication",
+      "chapter": "Publication action",
+      "title": "Publish posting version seven",
+      "durationSeconds": 19.166,
+      "start": 84.82199999999999,
+      "end": 103.98799999999999
+    },
+    {
+      "id": "candidate-outcome",
+      "chapter": "Candidate-facing outcome",
+      "title": "Verify the public projection",
+      "durationSeconds": 23.182,
+      "start": 103.98799999999999,
+      "end": 127.17
+    },
+    {
+      "id": "channel-failure",
+      "chapter": "Controlled exception",
+      "title": "Detect a stale LinkedIn delivery",
+      "durationSeconds": 21.205,
+      "start": 127.17,
+      "end": 148.375
+    },
+    {
+      "id": "channel-recovery",
+      "chapter": "Targeted recovery",
+      "title": "Retry only the failed destination",
+      "durationSeconds": 18.681,
+      "start": 148.375,
+      "end": 167.05599999999998
+    },
+    {
+      "id": "closing",
+      "chapter": "Business Case 01 complete",
+      "title": "Approved demand to reconciled public job",
+      "durationSeconds": 28.559,
+      "start": 167.05599999999998,
+      "end": 195.615
+    }
+  ],
+  "captionCues": 35,
+  "embeddedChapters": 8,
+  "productionBoundary": "Synthetic browser-memory wireframe; no external job publication or production effect."
+}

@@ -1,0 +1,67 @@
+{
+  "id": "UC-09-EXEC",
+  "title": "Hiring decision to accepted offer · executive cut",
+  "generatedAt": "2026-08-29T06:17:11.710Z",
+  "durationSeconds": 164.35,
+  "captionCues": 31,
+  "embeddedChapters": 7,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-09",
+      "title": "Hiring decision to accepted offer",
+      "start": 0,
+      "end": 24.360907,
+      "durationSeconds": 24.360907
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "4 accountable processes",
+      "start": 24.360907,
+      "end": 43.672245000000004,
+      "durationSeconds": 19.311338
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open OFF-DEMO-001 in context",
+      "start": 43.672245000000004,
+      "end": 66.17990900000001,
+      "durationSeconds": 22.507664
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Approve and release offer v4",
+      "start": 66.17990900000001,
+      "end": 94.67442100000001,
+      "durationSeconds": 28.494512
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate compensation return",
+      "start": 94.67442100000001,
+      "end": 112.690385,
+      "durationSeconds": 18.015964
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Revise and reapprove v5",
+      "start": 112.690385,
+      "end": 134.914739,
+      "durationSeconds": 22.224354
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-09 complete",
+      "title": "A version-bound candidate response reserves an opening and creates an eligible pre-hire handoff.",
+      "start": 134.914739,
+      "end": 164.349705,
+      "durationSeconds": 29.434966
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

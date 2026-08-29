@@ -6,6 +6,8 @@ const routeSamples = [
   "/hr/events", "/hr/events/REV-DEMO-001", "/hr/high-volume/HVC-001", "/hr/high-volume/HVC-001/planning", "/hr/high-volume/HVC-001/analytics", "/hr/high-volume/HVC-001/cohorts/COH-DEMO-001", "/hr/locales/LOC-001", "/hr/recovery/RCV-DEMO-001", "/hr/agency-assignments", "/hr/agency-assignments/AGA-DEMO-001", "/hr/transitions", "/hr/transitions/TRN-DEMO-001/impact",
   "/referrer", "/facilities", "/manager/recruiting", "/interviewer", "/buddy", "/mobility", "/agency/assignments",
   "/admin", "/admin/users", "/admin/notifications", "/admin/content", "/admin/integrations", "/admin/imports", "/admin/identity", "/admin/privacy-requests",
+  "/demo", "/demo/catalog", "/demo/evidence", "/demo/flows/candidate-attraction",
+  "/demo/workbench", "/demo/workbench/uc-01", "/demo/control-center", "/demo/handoffs", "/demo/reports", "/demo/scenarios",
 ];
 
 async function setPersona(page: Page, id: string) {
@@ -13,7 +15,7 @@ async function setPersona(page: Page, id: string) {
   if (await selector.isVisible()) await selector.selectOption(id);
 }
 
-test("v3.0 route families render without redirect or browser error", async ({ page }) => {
+test("v3.1 route families render without redirect or browser error", async ({ page }) => {
   const browserErrors: string[] = [];
   page.on("pageerror", (error) => browserErrors.push(error.message));
   page.on("console", (message) => { if (message.type() === "error") browserErrors.push(message.text()); });
@@ -94,13 +96,72 @@ test("representative v3 surfaces reflow without horizontal page overflow", async
   }
 });
 
+test("guided business data flow preserves state across persona handoffs", async ({ page }) => {
+  await page.goto("/#/demo/flows/interview-offer");
+  await expect(page.getByRole("heading", { name: "Interviews, decisions, offers and hire handoff" })).toBeVisible();
+  await expect(page.locator(".dfd-flow-row")).toHaveCount(6);
+  await page.getByRole("button", { name: "Start happy path" }).click();
+  await expect(page).toHaveURL(/#\/my-applications\/APP-DEMO-001$/);
+  await expect(page.getByRole("complementary", { name: "Guided demo presenter" })).toBeVisible();
+  await page.getByRole("button", { name: "Record & hand off" }).click();
+  await expect(page).toHaveURL(/#\/hr\/interviews\/INT-DEMO-001$/);
+  await expect(page.getByText(/Step 2 of 6/)).toBeVisible();
+  await page.getByRole("link", { name: "DFD" }).click();
+  await expect(page.locator(".dfd-flow-row.active")).toContainText("Create interview version");
+});
+
+test("v3.2 workbench actions persist across receipts, handoffs and causal analytics", async ({ page }) => {
+  await page.goto("/#/demo/workbench/uc-01");
+  await expect(page.getByRole("heading", { name: "Hiring demand to published job" })).toBeVisible();
+  await page.getByRole("button", { name: /Submit exact requisition version/ }).click();
+  await expect(page.getByText("RCT-V32-0001", { exact: true })).toBeVisible();
+  await page.getByLabel("Active persona").selectOption("Finance Approver");
+  await page.getByRole("button", { name: /Record Finance approval/ }).click();
+  await page.getByLabel("Active persona").selectOption("Compensation Approver");
+  await page.getByRole("button", { name: /Record Compensation approval/ }).click();
+  await expect(page.getByText("RCT-V32-0003", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Control center" }).click();
+  await expect(page.getByRole("table", { name: "Feature readiness drill-through" })).toContainText("Approved v4");
+  await expect(page.getByText("EVT-V32-0003", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: "Handoffs", exact: true }).click();
+  await expect(page.getByText("Recruiter receives approved demand")).toBeVisible();
+  await page.locator(".v32-handoff-grid article").filter({ hasText: "Recruiter receives approved demand" }).getByRole("button", { name: "Acknowledge" }).click();
+  await expect(page.getByText("Acknowledged")).toBeVisible();
+});
+
+test("v3.2 level-two DFD and controlled exception recovery remain executable", async ({ page }) => {
+  await page.goto("/#/demo/workbench/uc-08?tab=dfd");
+  await expect(page.getByRole("heading", { name: /Actor.*screen\/action.*object\/event\/store.*downstream state/ })).toBeVisible();
+  await expect(page.locator(".v32-dfd-canvas article")).toHaveCount(4);
+  await expect(page.getByText("ScreeningConsentRecorded", { exact: true })).toBeVisible();
+  await page.getByRole("link", { name: /Open WF-P0-11 workbench/ }).click();
+  await page.getByRole("button", { name: /Open candidate dispute/ }).click();
+  await expect(page.getByText("blocked", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: /Resolve dispute and resume/ }).click();
+  await expect(page.getByText("recovered", { exact: true })).toBeVisible();
+});
+
+test("v3.2 reports, runbooks and persona data controls are interactive", async ({ page }) => {
+  await page.goto("/#/demo/workbench/uc-10?tab=controls");
+  await page.getByLabel("Inspect as persona").selectOption("New Hire");
+  await expect(page.getByText("Denied").first()).toBeVisible();
+  await page.getByLabel("Jurisdiction pack").selectOption("de");
+  await expect(page.getByText("Blocked pending synthetic approval")).toBeVisible();
+  await page.goto("/#/demo/reports");
+  await page.getByRole("button", { name: "Schedule preview" }).click();
+  await expect(page.getByText("Scheduled preview", { exact: false }).last()).toBeVisible();
+  await page.goto("/#/demo/scenarios");
+  await page.getByLabel("Demo format").selectOption("60");
+  await expect(page.locator(".v32-runbook-list li")).toHaveCount(12);
+});
+
 test("all rendered internal link destinations resolve without silent fallback", async ({ page }, testInfo) => {
   test.skip(testInfo.project.name !== "desktop-chromium", "Exhaustive crawl runs once on desktop Chromium.");
   const roots = [
     "/careers", "/saved-jobs", "/job-alerts", "/events", "/my-applications", "/my-tasks", "/support", "/privacy-requests", "/preboarding",
     "/hr/action-center", "/hr/cases", "/hr/high-volume", "/hr/events", "/hr/locales", "/hr/recovery", "/hr/agency-assignments", "/hr/transitions",
     "/manager", "/manager/recruiting", "/it", "/facilities", "/agency", "/referrer", "/interviewer", "/buddy", "/mobility",
-    "/admin", "/admin/users", "/admin/access-requests", "/admin/notifications", "/admin/content", "/admin/integrations", "/admin/imports", "/admin/identity", "/admin/privacy-requests",
+    "/admin", "/admin/users", "/admin/access-requests", "/admin/notifications", "/admin/content", "/admin/integrations", "/admin/imports", "/admin/identity", "/admin/privacy-requests", "/demo", "/demo/workbench", "/demo/control-center", "/demo/handoffs", "/demo/reports", "/demo/scenarios",
   ];
   const queue = [...roots];
   const queued = new Set(queue);

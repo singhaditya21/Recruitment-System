@@ -98,13 +98,13 @@ export const facilitiesRequests: FacilitiesRequest[] = Array.from({ length: 24 }
 
 export type ManagerRecruitingItem = { id: string; job: string; type: "Requisition" | "Pipeline" | "Interview plan" | "Debrief" | "Decision"; candidate: string; due: string; status: JourneyStatus; blockers: string; evidence: string };
 export const managerRecruitingItems: ManagerRecruitingItem[] = Array.from({ length: 20 }, (_, index) => ({
-  id: `MGR-REC-${String(index + 1).padStart(3, "0")}`,
+  id: index === 0 ? "REQ-DEMO-001" : `MGR-REC-${String(index + 1).padStart(3, "0")}`,
   job: ["Senior Product Designer", "Staff Data Platform Engineer", "Recruiting Operations Partner"][index % 3],
   type: (["Requisition", "Pipeline", "Interview plan", "Debrief", "Decision"] as const)[index % 5],
   candidate: index % 5 < 2 ? "Not applicable" : ["Maya Chen", "Noah Williams", "Sofia Rodriguez"][index % 3],
   due: ["Today", "Tomorrow", "Sep 3", "Sep 5"][index % 4],
   status: (["Draft", "Ready", "Active", "Blocked", "Complete"] as JourneyStatus[])[index % 5],
-  blockers: index % 4 === 0 ? "Missing scorecard or approval" : "None",
+  blockers: index === 0 ? "None" : index % 4 === 0 ? "Missing scorecard or approval" : "None",
   evidence: ["Headcount and outcomes", "Stage aging and capacity", "Competency coverage", "Independent scorecards", "Decision rationale"][index % 5],
 }));
 

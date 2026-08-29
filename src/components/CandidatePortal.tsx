@@ -6,6 +6,7 @@ import { candidateTasks, jobAlerts, savedJobs } from "../data/lifecycleDepth";
 import { careerEvents } from "../data/talentGrowth";
 import { Freshness, Pill, PrototypeBanner, ScenarioControl, ScreenId, Stepper } from "./Common";
 import { usePrototype } from "../prototype/PrototypeContext";
+import { useWireframe } from "../prototype/WireframeContext";
 
 type CandidateScreen = "careers" | "job" | "apply" | "hub" | "relationship" | "tasks";
 
@@ -106,10 +107,18 @@ function CareersScreen() {
 function JobScreen() {
   const { publicId } = useParams();
   const { jobRecords } = usePrototype();
+  const { featureStates } = useWireframe();
   const publishedJobs = jobRecords.filter((item) => item.status === "Published");
   const job = publishedJobs.find((item) => item.publicId === publicId);
   const navigate = useNavigate();
   const [saved, setSaved] = useState(false);
+  const publicationState = featureStates["WF-P0-04"];
+  const isPublishedBusinessCaseOne = job?.id === "JOB-DEMO-001" && (
+    publicationState?.status === "complete" ||
+    publicationState?.status === "blocked" ||
+    publicationState?.status === "recovered"
+  );
+  const effectiveVersion = isPublishedBusinessCaseOne ? "Posting v7 · Policy v2" : job?.version;
   if (!job) return <CandidateShell><section className="candidate-page empty-state"><BriefcaseBusiness size={28} /><h1>Job unavailable</h1><p>This job link may be stale, unpublished or outside the current synthetic fixture.</p><NavLink className="primary-button" to="/careers">View current roles</NavLink></section></CandidateShell>;
   return (
     <CandidateShell>
@@ -118,7 +127,7 @@ function JobScreen() {
         <div className="job-detail-grid">
           <article className="job-detail">
             <ScreenId>UI-CAN-002</ScreenId>
-            <div className="job-detail-heading"><Pill tone="success">Open · fictional role</Pill><Freshness>{job.version}</Freshness></div>
+            <div className="job-detail-heading"><Pill tone="success">Open · fictional role</Pill><Freshness>{effectiveVersion}</Freshness></div>
             <h1>{job.title}</h1>
             <p className="job-detail-lede">{job.summary}</p>
             <div className="job-facts"><span><MapPin size={17} />{job.location}</span><span><BriefcaseBusiness size={17} />{job.type}</span><span><Building2 size={17} />{job.team}</span></div>

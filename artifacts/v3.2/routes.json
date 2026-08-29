@@ -1,0 +1,46 @@
+{
+  "version": "3.2.0",
+  "routeDeclarationCount": 166,
+  "functionalDestinationCount": 164,
+  "redirectCount": 2,
+  "inheritedScreenContracts": 66,
+  "totalScreenContracts": 72,
+  "addedScreenContracts": [
+    {
+      "id": "UI-V32-001",
+      "surface": "Demo",
+      "name": "Connected Use-Case Portfolio",
+      "route": "/demo/workbench"
+    },
+    {
+      "id": "UI-V32-002",
+      "surface": "Demo",
+      "name": "Use-Case Workbench and Level-Two DFD",
+      "route": "/demo/workbench/:useCaseId"
+    },
+    {
+      "id": "UI-V32-003",
+      "surface": "Demo",
+      "name": "Causal Analytics and Audit Control Center",
+      "route": "/demo/control-center"
+    },
+    {
+      "id": "UI-V32-004",
+      "surface": "Demo",
+      "name": "Cross-Persona Handoff Inbox",
+      "route": "/demo/handoffs"
+    },
+    {
+      "id": "UI-V32-005",
+      "surface": "Demo",
+      "name": "Governed Report and Delivery Center",
+      "route": "/demo/reports"
+    },
+    {
+      "id": "UI-V32-006",
+      "surface": "Demo",
+      "name": "Scenario, Runbook and Rehearsal Laboratory",
+      "route": "/demo/scenarios"
+    }
+  ]
+}

@@ -1,0 +1,67 @@
+{
+  "id": "UC-04-EXEC",
+  "title": "Referral or agency submission to validated application · executive cut",
+  "generatedAt": "2026-08-29T05:52:33.561Z",
+  "durationSeconds": 148.862,
+  "captionCues": 32,
+  "embeddedChapters": 7,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-04",
+      "title": "Referral or agency submission to validated application",
+      "start": 0,
+      "end": 28.302857,
+      "durationSeconds": 28.302857
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "4 accountable processes",
+      "start": 28.302857,
+      "end": 45.774195,
+      "durationSeconds": 17.471338
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open SUB-DEMO-001 in context",
+      "start": 45.774195,
+      "end": 62.905896,
+      "durationSeconds": 17.131701
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Validate and convert submission",
+      "start": 62.905896,
+      "end": 82.767982,
+      "durationSeconds": 19.862086
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate ownership dispute",
+      "start": 82.767982,
+      "end": 101.83492100000001,
+      "durationSeconds": 19.066939
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Resolve scope and convert",
+      "start": 101.83492100000001,
+      "end": 123.881769,
+      "durationSeconds": 22.046848
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-04 complete",
+      "title": "A permission-bound source relationship converts into a separate application only after validation.",
+      "start": 123.881769,
+      "end": 148.862449,
+      "durationSeconds": 24.98068
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

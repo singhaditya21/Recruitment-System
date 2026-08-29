@@ -81,6 +81,7 @@ import {
   ScreenId,
 } from "./Common";
 import { usePrototype } from "../prototype/PrototypeContext";
+import { useWireframe } from "../prototype/WireframeContext";
 import { AnalyticsDashboard } from "./AnalyticsDashboard";
 import { ObjectDataStudio } from "./ObjectDataStudio";
 import { ObjectWorkspace } from "./ObjectWorkspace";
@@ -396,6 +397,7 @@ export function HrShell({
             {topPanel === "launcher" ? (
               <>
                 <strong>Talent lifecycle applications</strong>
+                <NavLink to="/demo">Demo Journey Studio</NavLink>
                 <NavLink to="/hr/action-center">
                   Talent Operations Console
                 </NavLink>
@@ -1264,7 +1266,10 @@ function MutationDenied({
 function JobForm({ mode, jobId }: { mode: "new" | "edit"; jobId?: string }) {
   const navigate = useNavigate();
   const { persona, jobRecords, createJob, updateJob } = usePrototype();
+  const { featureStates } = useWireframe();
   const job = jobRecords.find((record) => record.id === jobId);
+  const isBusinessCaseOne = job?.id === "JOB-DEMO-001";
+  const publicationState = featureStates["WF-P0-04"];
   const [values, setValues] = useState(() => ({
     title: job?.title ?? "",
     publicId: job?.publicId ?? "",
@@ -1273,7 +1278,10 @@ function JobForm({ mode, jobId }: { mode: "new" | "edit"; jobId?: string }) {
     workplace: job?.workplace ?? "Remote",
     type: job?.type ?? "Full time",
     pay: job?.pay ?? "",
-    status: job?.status ?? "Draft",
+    status:
+      isBusinessCaseOne && publicationState.status === "ready"
+        ? "Approved"
+        : job?.status ?? "Draft",
     summary: job?.summary ?? "",
     requirements: job?.requirements.join("\n") ?? "",
     owner: job?.owner ?? persona.name,
@@ -1344,7 +1352,9 @@ function JobForm({ mode, jobId }: { mode: "new" | "edit"; jobId?: string }) {
               <span>
                 {mode === "new"
                   ? "New jobs always begin as Draft; approval and publication remain separate."
-                  : `${job?.id} · expected ${job?.version}`}
+                  : isBusinessCaseOne
+                    ? `${job?.id} · next Posting v7 · Policy v2`
+                    : `${job?.id} · expected ${job?.version}`}
               </span>
             </div>
             <Pill tone="warning">Memory only</Pill>
@@ -1388,6 +1398,12 @@ function JobForm({ mode, jobId }: { mode: "new" | "edit"; jobId?: string }) {
               <span>Owner</span>
               <input aria-label="Job owner" value={values.owner} onChange={(event) => setValues({ ...values, owner: event.target.value })} />
             </label>
+            {isBusinessCaseOne && (
+              <label>
+                <span>Approved openings</span>
+                <input aria-label="Approved openings" readOnly value="2 · OPN-001 and OPN-002" />
+              </label>
+            )}
             {mode === "edit" && (
               <label>
                 <span>Lifecycle state</span>
@@ -1423,6 +1439,7 @@ function JobWorkspace() {
   const { jobId, action } = useParams();
   const navigate = useNavigate();
   const { scenarioState, announce, persona, jobRecords, applicationRecords: liveApplications } = usePrototype();
+  const { featureStates } = useWireframe();
   if (!jobId) return <RecordList kind="jobs" />;
   if (jobId === "new") return <JobForm mode="new" />;
   if (action === "edit") return <JobForm mode="edit" jobId={jobId} />;
@@ -1452,11 +1469,25 @@ function JobWorkspace() {
     );
   const policyBlocked =
     job.id === "JOB-DEMO-001" && scenarioState.policyBlocked;
+  const publicationState = featureStates["WF-P0-04"];
+  const isBusinessCaseOne = job.id === "JOB-DEMO-001";
+  const publicationBlocked =
+    isBusinessCaseOne && publicationState.status === "blocked";
+  const effectiveStatus = isBusinessCaseOne
+    ? ["complete", "recovered", "blocked"].includes(publicationState.status)
+      ? "Published"
+      : "Approved"
+    : job.status;
+  const effectiveVersion = isBusinessCaseOne
+    ? effectiveStatus === "Published"
+      ? "Posting v7 · Policy v2"
+      : "Posting draft v7 · Policy v2"
+    : job.version;
   const draftBlocked =
     job.status === "Draft" ||
     job.pay.toLowerCase().includes("pending") ||
     job.requirements.length < 2;
-  const blocked = policyBlocked || draftBlocked;
+  const blocked = policyBlocked || draftBlocked || publicationBlocked;
   const reserved =
     job.id === "JOB-DEMO-001" ? scenarioState.openingReserved : 0;
   return (
@@ -1474,10 +1505,10 @@ function JobWorkspace() {
           )}
           <button
             className="secondary-button"
-            disabled={job.status !== "Published"}
+            disabled={effectiveStatus !== "Published"}
             onClick={() => navigate(`/careers/jobs/${job.publicId}`)}
           >
-            {job.status === "Published"
+            {effectiveStatus === "Published"
               ? "Preview public job"
               : "Public preview unavailable"}
           </button>
@@ -1500,7 +1531,7 @@ function JobWorkspace() {
         </div>
         <div>
           <span>Openings</span>
-          <strong>1 approved · {scenarioState.openingFilled} filled</strong>
+          <strong>{isBusinessCaseOne ? 2 : 1} approved · {scenarioState.openingFilled} filled</strong>
         </div>
         <div>
           <span>Owner</span>
@@ -1508,10 +1539,10 @@ function JobWorkspace() {
         </div>
         <div>
           <span>Effective plan</span>
-          <strong>{job.version}</strong>
+          <strong>{effectiveVersion}</strong>
         </div>
-        <Pill tone={job.status === "Published" ? "success" : "info"}>
-          {job.status}
+        <Pill tone={effectiveStatus === "Published" ? "success" : "info"}>
+          {effectiveStatus}
         </Pill>
         <Freshness>Reconciled 4 min ago</Freshness>
       </div>
@@ -1521,17 +1552,21 @@ function JobWorkspace() {
           <ShieldAlert size={22} />
           <div>
             <strong>
-              {policyBlocked
+              {publicationBlocked
+                ? "Channel delivery requires reconciliation"
+                : policyBlocked
                 ? "Publication is blocked"
                 : "Draft requires governed completion"}
             </strong>
             <span>
-              {policyBlocked
+              {publicationBlocked
+                ? "LinkedIn retained posting v6. Careers, Indeed and Agency remain delivered at v7 while a targeted retry is owned."
+                : policyBlocked
                 ? "Work location and candidate residence produce an unknown policy result. LEGAL-DEMO queue owns review."
                 : "Complete structured content, compensation, opening approval and the publication workflow before a public projection exists."}
             </span>
           </div>
-          <Pill tone="danger">{policyBlocked ? "ERR-008" : "Draft"}</Pill>
+          <Pill tone="danger">{publicationBlocked ? "CHN-STALE" : policyBlocked ? "ERR-008" : "Draft"}</Pill>
         </div>
       ) : (
         <div className="success-banner">
@@ -1552,7 +1587,7 @@ function JobWorkspace() {
               <span>Derived from authoritative facts</span>
             </div>
             <strong className={`readiness-score ${blocked ? "blocked" : ""}`}>
-              {policyBlocked ? "71%" : draftBlocked ? "62%" : "100%"}
+              {publicationBlocked ? "92%" : policyBlocked ? "71%" : draftBlocked ? "62%" : "100%"}
             </strong>
           </div>
           <div className="readiness-list">
@@ -1579,13 +1614,13 @@ function JobWorkspace() {
           <div className="panel-heading">
             <div>
               <h2>Opening reconciliation</h2>
-              <span>One approved opening</span>
+              <span>{isBusinessCaseOne ? "Two approved openings" : "One approved opening"}</span>
             </div>
             <Pill tone="success">Balanced</Pill>
           </div>
           <div className="opening-visual">
             <div>
-              <strong>1</strong>
+              <strong>{isBusinessCaseOne ? 2 : 1}</strong>
               <span>Approved</span>
             </div>
             <ArrowRight size={20} />
@@ -3496,7 +3531,7 @@ function DecisionWorkspace() {
   const compensationScope =
     roleDataScopes[persona.role]?.compensation ?? "none";
   const salary = isMaya ? "$164,000 USD" : "$204,000 USD";
-  const salaryBand = isMaya ? "$148,000–$176,000 USD" : "$184,000–$224,000 USD";
+  const salaryBand = isMaya ? "$168,000–$196,000 USD" : "$184,000–$224,000 USD";
   const compensationValue =
     compensationScope === "full"
       ? `${salary} · inside band`

@@ -9,6 +9,10 @@ import { AdditionalPortalsV3 } from "./components/AdditionalPortalsV3";
 import { LifecycleV3 } from "./components/LifecycleV3";
 import { AdminOperationsV3 } from "./components/AdminOperationsV3";
 import { PrototypeProvider, usePrototype } from "./prototype/PrototypeContext";
+import { DemoDock, DemoWorkspace } from "./components/DemoWorkspace";
+import { DemoProvider } from "./prototype/DemoContext";
+import { WireframeV32 } from "./components/WireframeV32";
+import { WireframeProvider } from "./prototype/WireframeContext";
 
 function PrototypeRoutes() {
   const { resetKey } = usePrototype();
@@ -268,6 +272,16 @@ function PrototypeRoutes() {
       <Route path="/admin/identity" element={<AdminOperationsV3 />} />
       <Route path="/admin/privacy-requests" element={<AdminOperationsV3 />} />
       <Route path="/admin/privacy-requests/:requestId" element={<AdminOperationsV3 />} />
+      <Route path="/demo" element={<DemoWorkspace />} />
+      <Route path="/demo/catalog" element={<DemoWorkspace />} />
+      <Route path="/demo/evidence" element={<DemoWorkspace />} />
+      <Route path="/demo/flows/:useCaseId" element={<DemoWorkspace />} />
+      <Route path="/demo/workbench" element={<WireframeV32 />} />
+      <Route path="/demo/workbench/:useCaseId" element={<WireframeV32 />} />
+      <Route path="/demo/control-center" element={<WireframeV32 />} />
+      <Route path="/demo/handoffs" element={<WireframeV32 />} />
+      <Route path="/demo/reports" element={<WireframeV32 />} />
+      <Route path="/demo/scenarios" element={<WireframeV32 />} />
       <Route path="*" element={<Navigate replace to="/careers" />} />
     </Routes>
   );
@@ -277,7 +291,12 @@ export default function App() {
   return (
     <HashRouter>
       <PrototypeProvider>
-        <PrototypeRoutes />
+        <WireframeProvider>
+          <DemoProvider>
+            <PrototypeRoutes />
+            <DemoDock />
+          </DemoProvider>
+        </WireframeProvider>
       </PrototypeProvider>
     </HashRouter>
   );

@@ -1,0 +1,135 @@
+{
+  "id": "BC-01",
+  "title": "Hiring demand to published job",
+  "generatedAt": "2026-08-28T19:10:58.796Z",
+  "video": "artifacts/v3.2/videos/business-case-01-hiring-demand-to-published-job.mp4",
+  "subtitles": "artifacts/v3.2/videos/business-case-01-hiring-demand-to-published-job.srt",
+  "thumbnail": "artifacts/v3.2/videos/business-case-01-hiring-demand-to-published-job-thumbnail.png",
+  "voice": "Aman (English (India))",
+  "narrationRate": 175,
+  "durationSeconds": 595.201,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "Business Case 01",
+      "title": "Hiring demand to published job",
+      "durationSeconds": 31.953
+    },
+    {
+      "id": "dfd-intro",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "Five governed processes",
+      "durationSeconds": 25.638
+    },
+    {
+      "id": "dfd-1",
+      "chapter": "Process 1 of 5",
+      "title": "Capture governed demand",
+      "durationSeconds": 28.872
+    },
+    {
+      "id": "dfd-2",
+      "chapter": "Process 2 of 5",
+      "title": "Submit the exact version",
+      "durationSeconds": 27.621
+    },
+    {
+      "id": "dfd-3",
+      "chapter": "Process 3 of 5",
+      "title": "Approve, return or deny",
+      "durationSeconds": 25.633
+    },
+    {
+      "id": "dfd-4",
+      "chapter": "Process 4 of 5",
+      "title": "Create the job and openings",
+      "durationSeconds": 25.505
+    },
+    {
+      "id": "dfd-5",
+      "chapter": "Process 5 of 5",
+      "title": "Publish and reconcile",
+      "durationSeconds": 28.225
+    },
+    {
+      "id": "manager-route",
+      "chapter": "Actual product navigation",
+      "title": "Hiring manager recruiting workspace",
+      "durationSeconds": 31.77
+    },
+    {
+      "id": "manager-action",
+      "chapter": "Manager action",
+      "title": "Review and approve current version",
+      "durationSeconds": 30.159
+    },
+    {
+      "id": "requisition-workbench",
+      "chapter": "WF-P0-03",
+      "title": "Requisition and multi-step approval",
+      "durationSeconds": 33.14
+    },
+    {
+      "id": "requisition-action",
+      "chapter": "Connected state change",
+      "title": "Submit, receipt and handoff",
+      "durationSeconds": 30.683
+    },
+    {
+      "id": "job-route",
+      "chapter": "Recruiter product route",
+      "title": "Job detail and publication readiness",
+      "durationSeconds": 32.855
+    },
+    {
+      "id": "publication-workbench",
+      "chapter": "WF-P0-04",
+      "title": "Job, opening, posting and channel lineage",
+      "durationSeconds": 33.291
+    },
+    {
+      "id": "publication-action",
+      "chapter": "Publication action",
+      "title": "Publish version seven",
+      "durationSeconds": 33.761
+    },
+    {
+      "id": "lineage",
+      "chapter": "Universal lineage",
+      "title": "Keep business objects distinct",
+      "durationSeconds": 26.03
+    },
+    {
+      "id": "controls",
+      "chapter": "Trust controls",
+      "title": "Persona, jurisdiction and recovery",
+      "durationSeconds": 32.246
+    },
+    {
+      "id": "compare",
+      "chapter": "Happy path versus exception",
+      "title": "Compare outcomes side by side",
+      "durationSeconds": 28.101
+    },
+    {
+      "id": "control-center",
+      "chapter": "Causal analytics",
+      "title": "Actions reconcile to dashboards",
+      "durationSeconds": 28.024
+    },
+    {
+      "id": "handoff",
+      "chapter": "Cross-persona handoff",
+      "title": "The next actor receives exact work",
+      "durationSeconds": 31.302
+    },
+    {
+      "id": "closing",
+      "chapter": "Business Case 01 complete",
+      "title": "Approved demand to reconciled posting",
+      "durationSeconds": 30.39
+    }
+  ],
+  "resolution": "1440x900",
+  "productionBoundary": "Synthetic browser-memory wireframe; no external job publication or production effect."
+}

@@ -1,4 +1,4 @@
-name: v3.0 full-system recruitment and onboarding verification
+name: v3.2 connected-use-case recruitment and onboarding verification
 
 on:
   push:
@@ -30,7 +30,7 @@ jobs:
       - uses: actions/upload-artifact@v7
         if: always()
         with:
-          name: v3.0-wireframe-verification-output
+          name: v3.2-wireframe-verification-output
           path: |
             dist
             playwright-report

@@ -1,0 +1,79 @@
+1
+00:00:00,000 --> 00:00:31,953
+Business Case 01: Hiring demand to published job
+
+2
+00:00:31,953 --> 00:00:57,591
+Dynamic data-flow diagram: Five governed processes
+
+3
+00:00:57,591 --> 00:01:26,463
+Process 1 of 5: Capture governed demand
+
+4
+00:01:26,463 --> 00:01:54,084
+Process 2 of 5: Submit the exact version
+
+5
+00:01:54,084 --> 00:02:19,717
+Process 3 of 5: Approve, return or deny
+
+6
+00:02:19,717 --> 00:02:45,222
+Process 4 of 5: Create the job and openings
+
+7
+00:02:45,222 --> 00:03:13,447
+Process 5 of 5: Publish and reconcile
+
+8
+00:03:13,447 --> 00:03:45,218
+Actual product navigation: Hiring manager recruiting workspace
+
+9
+00:03:45,218 --> 00:04:15,377
+Manager action: Review and approve current version
+
+10
+00:04:15,377 --> 00:04:48,517
+WF-P0-03: Requisition and multi-step approval
+
+11
+00:04:48,517 --> 00:05:19,200
+Connected state change: Submit, receipt and handoff
+
+12
+00:05:19,200 --> 00:05:52,055
+Recruiter product route: Job detail and publication readiness
+
+13
+00:05:52,055 --> 00:06:25,347
+WF-P0-04: Job, opening, posting and channel lineage
+
+14
+00:06:25,347 --> 00:06:59,108
+Publication action: Publish version seven
+
+15
+00:06:59,108 --> 00:07:25,138
+Universal lineage: Keep business objects distinct
+
+16
+00:07:25,138 --> 00:07:57,384
+Trust controls: Persona, jurisdiction and recovery
+
+17
+00:07:57,384 --> 00:08:25,486
+Happy path versus exception: Compare outcomes side by side
+
+18
+00:08:25,486 --> 00:08:53,510
+Causal analytics: Actions reconcile to dashboards
+
+19
+00:08:53,510 --> 00:09:24,812
+Cross-persona handoff: The next actor receives exact work
+
+20
+00:09:24,812 --> 00:09:55,201
+Business Case 01 complete: Approved demand to reconciled posting

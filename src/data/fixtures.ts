@@ -3,7 +3,7 @@ export type Tone = "success" | "warning" | "danger" | "info" | "neutral";
 export const prototypeMeta = {
   employer: "Harbor & Pine Labs",
   candidate: "Maya Chen",
-  release: "v3.0-full-system-wireframe",
+  release: "v3.2-connected-use-case-wireframe",
   generatedAt: "2026-08-28T12:00:00.000Z",
   fictional: true,
 } as const;
@@ -104,7 +104,7 @@ export const jobs = [
     location: "California · Remote",
     workplace: "Remote",
     type: "Full time",
-    pay: "$148,000–$176,000 USD",
+    pay: "$168,000–$196,000 USD",
     status: "Published",
     posted: "12 days ago",
     version: "Posting v3 · Policy v2",

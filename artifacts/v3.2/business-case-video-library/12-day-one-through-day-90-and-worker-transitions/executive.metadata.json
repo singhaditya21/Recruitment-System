@@ -1,0 +1,67 @@
+{
+  "id": "UC-12-EXEC",
+  "title": "Day one through day 90 and worker transitions · executive cut",
+  "generatedAt": "2026-08-29T06:34:04.197Z",
+  "durationSeconds": 153.64,
+  "captionCues": 31,
+  "embeddedChapters": 7,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-12",
+      "title": "Day one through day 90 and worker transitions",
+      "start": 0,
+      "end": 29.317596,
+      "durationSeconds": 29.317596
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "5 accountable processes",
+      "start": 29.317596,
+      "end": 51.371156,
+      "durationSeconds": 22.05356
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open TRN-DEMO-001 in context",
+      "start": 51.371156,
+      "end": 69.540544,
+      "durationSeconds": 18.169388
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Approve and execute transition",
+      "start": 69.540544,
+      "end": 87.438503,
+      "durationSeconds": 17.897959
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate partial downstream success",
+      "start": 87.438503,
+      "end": 106.45460299999999,
+      "durationSeconds": 19.0161
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Run compensating work",
+      "start": 106.45460299999999,
+      "end": 127.63387699999998,
+      "durationSeconds": 21.179274
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-12 complete",
+      "title": "Milestones and transition effects remain effective-dated, reversible and reconciled.",
+      "start": 127.63387699999998,
+      "end": 153.639591,
+      "durationSeconds": 26.005714
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

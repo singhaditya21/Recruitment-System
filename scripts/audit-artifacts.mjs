@@ -24,6 +24,18 @@ function assertSeries(items, prefix, count) {
   );
 }
 
+function assertTwoDigitSeries(items, prefix, count) {
+  const actual = items.map(({ id }) => id).sort();
+  const expected = Array.from(
+    { length: count },
+    (_, index) => `${prefix}-${String(index + 1).padStart(2, "0")}`,
+  );
+  assert(
+    JSON.stringify(actual) === JSON.stringify(expected),
+    `${prefix} IDs are not contiguous: ${actual.join(", ")}`,
+  );
+}
+
 async function sourceFiles(directory) {
   if (directory instanceof URL) directory = fileURLToPath(directory);
   const entries = await readdir(directory, { withFileTypes: true });
@@ -176,6 +188,36 @@ const v30Visuals = JSON.parse(
 const v30Deployment = JSON.parse(
   await readFile(
     new URL("../artifacts/v3.0/deployment.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v31 = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v3.1/readiness.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v31Routes = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v3.1/routes.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v32 = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v3.2/readiness.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v32Routes = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v3.2/routes.json", import.meta.url),
+    "utf8",
+  ),
+);
+const v32Backlog = JSON.parse(
+  await readFile(
+    new URL("../artifacts/v3.2/backlog.json", import.meta.url),
     "utf8",
   ),
 );
@@ -595,6 +637,145 @@ assert(
     v30Deployment.branchProtectionAfterMerge.requiredApprovingReviewCount === 1,
   "v3.0 merged-commit, Pages, served-site and restored-protection evidence must reconcile",
 );
+assert(
+  v31.version === "3.1.0" && v31.syntheticOnly === true,
+  "v3.1 must identify the demo-journey release as synthetic-only",
+);
+assert(
+  v31.counts.actorPersonas === 13 &&
+    v31.counts.internalRoles === 12 &&
+    v31.counts.screenContracts === 66 &&
+    v31.counts.routeDeclarations === 160 &&
+    v31.counts.functionalDestinations === 158 &&
+    v31Routes.totalScreenContracts === 66 &&
+    v31Routes.addedScreenContracts.length === 4 &&
+    v31Routes.routeDeclarationCount === 160 &&
+    v31Routes.functionalDestinationCount === 158,
+  "v3.1 persona, screen and route counts must reconcile",
+);
+assert(
+  v31.counts.businessUseCaseDiagrams === 12 &&
+    v31.counts.journeyUnits === 84 &&
+    v31.counts.guidedHandoffSteps === 61 &&
+    v31.counts.demoPacks === 8,
+  "v3.1 demo diagrams, journeys, handoffs and packs must reconcile",
+);
+assert(
+  v31.counts.routedObjectFamilies === 138 &&
+    v31.counts.routedObjectPageInstances === 552 &&
+    v31.counts.combinedLogicalConcepts === 175 &&
+    v31.counts.physicalObjectsApproved === 0,
+  "v3.1 must preserve object coverage and zero approved physical objects",
+);
+assert(
+  v31.validation.buttons === 294 &&
+    v31.validation.links === 303 &&
+    v31.validation.routeDeclarations === 160 &&
+    v31.validation.staticInteractionDefects === 0 &&
+    v31.validation.unitComponentContractAndAxeTestsPassed === 116 &&
+    v31.validation.desktopAndMobileE2eTestsPassed === 67 &&
+    v31.validation.e2eTestsIntentionallySkipped === 1 &&
+    v31.validation.liveDestinationsCrawled === 1056 &&
+    v31.validation.liveRouteDefects === 0 &&
+    v31.validation.browserErrors === 0,
+  "v3.1 interaction and automated-test evidence must reconcile",
+);
+assert(
+  v31.production.authentication === "not implemented" &&
+    v31.production.serverAuthorization === "not implemented" &&
+    v31.production.persistence === "browser memory only" &&
+    v31.production.physicalSchemaApproved === false &&
+    v31.production.pilot === "blocked",
+  "v3.1 must retain every production identity, persistence, schema and pilot gate",
+);
+assert(
+  v32.version === "3.2.0" && v32.syntheticOnly === true,
+  "v3.2 must identify the connected-use-case release as synthetic-only",
+);
+assert(
+  v32.counts.actorPersonas === 13 &&
+    v32.counts.internalRoles === 12 &&
+    v32.counts.screenContracts === 72 &&
+    v32.counts.routeDeclarations === 166 &&
+    v32.counts.functionalDestinations === 164 &&
+    v32Routes.totalScreenContracts === 72 &&
+    v32Routes.addedScreenContracts.length === 6 &&
+    v32Routes.routeDeclarationCount === 166 &&
+    v32Routes.functionalDestinationCount === 164,
+  "v3.2 persona, screen and route counts must reconcile",
+);
+assert(
+  v32.counts.businessUseCases === 12 &&
+    v32.counts.levelTwoDfdProcesses === 52 &&
+    v32.counts.p0Requirements === 15 &&
+    v32.counts.p1Requirements === 12 &&
+    v32.counts.p2Requirements === 8 &&
+    v32.counts.totalImplementedUpdates === 35 &&
+    v32.counts.connectedP0Workbenches === 13 &&
+    v32.counts.seededWorkbenchFields === 78,
+  "v3.2 use-case, DFD, backlog, workbench and field counts must reconcile",
+);
+assert(
+  v32Backlog.counts.P0 === 15 &&
+    v32Backlog.counts.P1 === 12 &&
+    v32Backlog.counts.P2 === 8 &&
+    v32Backlog.counts.total === 35 &&
+    v32Backlog.requirements.length === 35 &&
+    new Set(v32Backlog.requirements.map(({ id }) => id)).size === 35,
+  "v3.2 backlog must contain 35 unique requirements",
+);
+assertTwoDigitSeries(
+  v32Backlog.requirements.filter(({ id }) => id.startsWith("WF-P0")),
+  "WF-P0",
+  15,
+);
+assertTwoDigitSeries(
+  v32Backlog.requirements.filter(({ id }) => id.startsWith("WF-P1")),
+  "WF-P1",
+  12,
+);
+assertTwoDigitSeries(
+  v32Backlog.requirements.filter(({ id }) => id.startsWith("WF-P2")),
+  "WF-P2",
+  8,
+);
+assert(
+  v32.counts.countryVariants === 4 &&
+    v32.counts.preparedErrorRecoveryStates === 9 &&
+    v32.counts.demoRunbooks === 3,
+  "v3.2 country, error/recovery and runbook coverage must reconcile",
+);
+assert(
+  v32.validation.sourceFilesScanned === 20 &&
+    v32.validation.buttons === 313 &&
+    v32.validation.links === 319 &&
+    v32.validation.routeDeclarations === 166 &&
+    v32.validation.staticInteractionDefects === 0 &&
+    v32.validation.unitComponentContractAndAxeTestsPassed === 130 &&
+    v32.validation.v32ContractTestsPassed === 7 &&
+    v32.validation.v32AccessibilityBaselinesPassed === 7 &&
+    v32.validation.desktopAndMobileE2eTestsPassed === 73 &&
+    v32.validation.e2eTestsIntentionallySkipped === 1 &&
+    v32.validation.liveDestinationsCrawled === 1103 &&
+    v32.validation.liveRouteDefects === 0 &&
+    v32.validation.browserErrors === 0 &&
+    v32.validation.desktopOverflowPixels === 0 &&
+    v32.validation.mobileOverflowPixels === 0 &&
+    v32.validation.fullVerification.includes("passed locally"),
+  "v3.2 interaction, automated-test, crawl and responsive evidence must reconcile",
+);
+assert(
+  v32.counts.routedObjectFamilies === 138 &&
+    v32.counts.routedObjectPageInstances === 552 &&
+    v32.counts.combinedLogicalConcepts === 175 &&
+    v32.counts.physicalObjectsApproved === 0 &&
+    v32.production.authentication === "not implemented" &&
+    v32.production.serverAuthorization === "not implemented" &&
+    v32.production.persistence === "browser memory only" &&
+    v32.production.physicalSchemaApproved === false &&
+    v32.production.pilot === "blocked",
+  "v3.2 must preserve object coverage and every production identity, persistence, schema and pilot gate",
+);
 
 const sourcePaths = await sourceFiles(new URL("../src/", import.meta.url));
 const source = (
@@ -662,14 +843,14 @@ assert(
   "The v1.9 canonical model, runtime, relationship access and event lineage must be present",
 );
 assert(
-  source.includes("v3.0 full-system wireframe") &&
+  source.includes("v3.2 connected-use-case wireframe") &&
     source.includes("lifecycleObjectContracts") &&
     source.includes("newHireRecords") &&
     source.includes("talentCampaigns") &&
     source.includes("screeningCases") &&
     source.includes("agencySubmissions") &&
     source.includes("recoveryScenarios"),
-  "The v3.0 release marker and inherited deep-journey contracts must be visible in the wireframe",
+  "The v3.2 release marker and inherited deep-journey contracts must be visible in the wireframe",
 );
 assert(
   source.includes("fullSystemCounts") &&
@@ -682,10 +863,26 @@ assert(
 );
 const appSource = await readFile(new URL("../src/App.tsx", import.meta.url), "utf8");
 assert(
-  (appSource.match(/<Route\b/g) ?? []).length === 156,
-  "The executable v3.0 route declaration count must remain 156",
+  (appSource.match(/<Route\b/g) ?? []).length === 166,
+  "The executable v3.2 route declaration count must remain 166",
+);
+assert(
+  source.includes("businessUseCases") &&
+    source.includes("journeyCatalog") &&
+    source.includes("DemoProvider") &&
+    source.includes("Demo Journey Studio") &&
+    source.includes("Business use case as a level-one data-flow diagram"),
+  "The v3.1 demo catalogue, state provider, command center and data-flow surface must be present",
+);
+assert(
+  source.includes("WireframeProvider") &&
+    source.includes("completeV32Backlog") &&
+    source.includes("Use Case–Screen–Action–DFD–Feature Workbench") &&
+    source.includes("Actor → screen/action → object/event/store → downstream state") &&
+    source.includes("Recruitment and onboarding control scorecard"),
+  "The v3.2 shared state, complete backlog, action-level DFD and governed reporting surfaces must be present",
 );
 
 console.log(
-  "Artifact audit passed: v3.0 exposes 62 screen contracts and 156 routes across the complete candidate, recruiting, onboarding, role-portal and administration wireframe while preserving zero production connections or approved physical objects.",
+  "Artifact audit passed: v3.2 exposes 72 screen contracts, 166 routes, 12 use cases, 52 action-level DFD processes and all 35 P0/P1/P2 updates while preserving zero production connections or approved physical objects.",
 );

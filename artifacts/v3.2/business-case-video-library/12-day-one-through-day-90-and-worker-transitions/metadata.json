@@ -1,0 +1,79 @@
+{
+  "id": "UC-12",
+  "title": "Day one through day 90 and worker transitions",
+  "generatedAt": "2026-08-29T06:33:52.667Z",
+  "recordId": "TRN-DEMO-001",
+  "featureId": "WF-P0-15",
+  "videos": {
+    "client": "client-demo.mp4",
+    "executive": "executive-cut.mp4",
+    "evidence": "evidence-master.mp4"
+  },
+  "captions": "captions.srt",
+  "transcript": "transcript.md",
+  "thumbnail": "thumbnail.png",
+  "qaContactSheet": "qa-contact-sheet.png",
+  "durationSeconds": 231.395,
+  "resolution": "1920x1080",
+  "frameRate": 30,
+  "audioSampleRate": 48000,
+  "captionCues": 38,
+  "embeddedChapters": 9,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-12",
+      "title": "Day one through day 90 and worker transitions",
+      "durationSeconds": 29.318
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "5 accountable processes",
+      "durationSeconds": 22.054
+    },
+    {
+      "id": "dfd-processes",
+      "chapter": "Process walkthrough",
+      "title": "Actor, action, evidence and downstream state",
+      "durationSeconds": 46.433
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open TRN-DEMO-001 in context",
+      "durationSeconds": 18.169
+    },
+    {
+      "id": "workbench-data",
+      "chapter": "Governed data",
+      "title": "Inspect fields, scope and business grains",
+      "durationSeconds": 31.322
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Approve and execute transition",
+      "durationSeconds": 17.898
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate partial downstream success",
+      "durationSeconds": 19.016
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Run compensating work",
+      "durationSeconds": 21.179
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-12 complete",
+      "title": "Milestones and transition effects remain effective-dated, reversible and reconciled.",
+      "durationSeconds": 26.006
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

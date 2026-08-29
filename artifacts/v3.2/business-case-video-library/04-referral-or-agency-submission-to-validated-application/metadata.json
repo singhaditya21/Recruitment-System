@@ -1,0 +1,79 @@
+{
+  "id": "UC-04",
+  "title": "Referral or agency submission to validated application",
+  "generatedAt": "2026-08-29T05:52:23.239Z",
+  "recordId": "SUB-DEMO-001",
+  "featureId": "WF-P0-07",
+  "videos": {
+    "client": "client-demo.mp4",
+    "executive": "executive-cut.mp4",
+    "evidence": "evidence-master.mp4"
+  },
+  "captions": "captions.srt",
+  "transcript": "transcript.md",
+  "thumbnail": "thumbnail.png",
+  "qaContactSheet": "qa-contact-sheet.png",
+  "durationSeconds": 221.388,
+  "resolution": "1920x1080",
+  "frameRate": 30,
+  "audioSampleRate": 48000,
+  "captionCues": 36,
+  "embeddedChapters": 9,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "UC-04",
+      "title": "Referral or agency submission to validated application",
+      "durationSeconds": 28.303
+    },
+    {
+      "id": "dfd-overview",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "4 accountable processes",
+      "durationSeconds": 17.471
+    },
+    {
+      "id": "dfd-processes",
+      "chapter": "Process walkthrough",
+      "title": "Actor, action, evidence and downstream state",
+      "durationSeconds": 43.332
+    },
+    {
+      "id": "product-route",
+      "chapter": "Product wireframe",
+      "title": "Open SUB-DEMO-001 in context",
+      "durationSeconds": 17.132
+    },
+    {
+      "id": "workbench-data",
+      "chapter": "Governed data",
+      "title": "Inspect fields, scope and business grains",
+      "durationSeconds": 29.194
+    },
+    {
+      "id": "primary-action",
+      "chapter": "Happy-path action",
+      "title": "Validate and convert submission",
+      "durationSeconds": 19.862
+    },
+    {
+      "id": "controlled-exception",
+      "chapter": "Controlled exception",
+      "title": "Simulate ownership dispute",
+      "durationSeconds": 19.067
+    },
+    {
+      "id": "recovery-evidence",
+      "chapter": "Recovery and evidence",
+      "title": "Resolve scope and convert",
+      "durationSeconds": 22.047
+    },
+    {
+      "id": "closing",
+      "chapter": "UC-04 complete",
+      "title": "A permission-bound source relationship converts into a separate application only after validation.",
+      "durationSeconds": 24.981
+    }
+  ],
+  "productionBoundary": "Synthetic browser-memory wireframe; no external or production effect."
+}

@@ -1,0 +1,153 @@
+{
+  "id": "UC-01",
+  "title": "Hiring demand to published job · client demonstration",
+  "generatedAt": "2026-08-29T05:20:06.148Z",
+  "video": "client-demo.mp4",
+  "subtitles": "captions.srt",
+  "transcript": "transcript.md",
+  "thumbnail": "thumbnail.png",
+  "voice": "Aman (English (India))",
+  "narrationRate": 170,
+  "durationSeconds": 438.133,
+  "scenes": [
+    {
+      "id": "opening",
+      "chapter": "Business Case 01",
+      "title": "Hiring demand to published job",
+      "durationSeconds": 33.22
+    },
+    {
+      "id": "dfd-intro",
+      "chapter": "Dynamic data-flow diagram",
+      "title": "One governed record across five processes",
+      "durationSeconds": 21.973
+    },
+    {
+      "id": "dfd-1",
+      "chapter": "Process 1 of 5",
+      "title": "Capture governed demand",
+      "durationSeconds": 15.337
+    },
+    {
+      "id": "dfd-2",
+      "chapter": "Process 2 of 5",
+      "title": "Submit the exact version",
+      "durationSeconds": 13.499
+    },
+    {
+      "id": "dfd-3",
+      "chapter": "Process 3 of 5",
+      "title": "Approve with separation of duties",
+      "durationSeconds": 12.525
+    },
+    {
+      "id": "dfd-4",
+      "chapter": "Process 4 of 5",
+      "title": "Configure the job and openings",
+      "durationSeconds": 12.662
+    },
+    {
+      "id": "dfd-5",
+      "chapter": "Process 5 of 5",
+      "title": "Publish and reconcile",
+      "durationSeconds": 14.309
+    },
+    {
+      "id": "manager-demand",
+      "chapter": "Hiring Manager",
+      "title": "Create controlled workforce demand",
+      "durationSeconds": 29.629
+    },
+    {
+      "id": "requisition-submit",
+      "chapter": "Exact-version submission",
+      "title": "Submit requisition version three",
+      "durationSeconds": 24.371
+    },
+    {
+      "id": "finance-approval",
+      "chapter": "Finance approval",
+      "title": "Approve headcount and budget evidence",
+      "durationSeconds": 20.585
+    },
+    {
+      "id": "compensation-approval",
+      "chapter": "Compensation approval",
+      "title": "Approve the band and release demand",
+      "durationSeconds": 17.875
+    },
+    {
+      "id": "job-edit",
+      "chapter": "Recruiter configuration",
+      "title": "Configure job and two openings",
+      "durationSeconds": 25.973
+    },
+    {
+      "id": "job-readiness",
+      "chapter": "Publication readiness",
+      "title": "Verify the pre-publication state",
+      "durationSeconds": 21.546
+    },
+    {
+      "id": "publication-prep",
+      "chapter": "Publication preparation",
+      "title": "Inspect every object and destination",
+      "durationSeconds": 23.054
+    },
+    {
+      "id": "publication",
+      "chapter": "Publication action",
+      "title": "Publish posting version seven",
+      "durationSeconds": 19.166
+    },
+    {
+      "id": "candidate-outcome",
+      "chapter": "Candidate-facing outcome",
+      "title": "Verify the public projection",
+      "durationSeconds": 23.182
+    },
+    {
+      "id": "channel-failure",
+      "chapter": "Controlled exception",
+      "title": "Detect a stale LinkedIn delivery",
+      "durationSeconds": 21.205
+    },
+    {
+      "id": "channel-recovery",
+      "chapter": "Targeted recovery",
+      "title": "Retry only the failed destination",
+      "durationSeconds": 18.681
+    },
+    {
+      "id": "analytics",
+      "chapter": "Causal analytics",
+      "title": "Drill from the metric to the exact receipt",
+      "durationSeconds": 20.708
+    },
+    {
+      "id": "handoff",
+      "chapter": "Cross-persona handoff",
+      "title": "Acknowledge the next actor’s work",
+      "durationSeconds": 20.073
+    },
+    {
+      "id": "closing",
+      "chapter": "Business Case 01 complete",
+      "title": "Approved demand to reconciled public job",
+      "durationSeconds": 28.559
+    }
+  ],
+  "resolution": "1920x1080",
+  "frameRate": 30,
+  "audioSampleRate": 48000,
+  "captionCues": 71,
+  "embeddedChapters": 21,
+  "productionBoundary": "Synthetic browser-memory wireframe; no external job publication or production effect.",
+  "videos": {
+    "client": "client-demo.mp4",
+    "executive": "executive-cut.mp4",
+    "evidence": "evidence-master.mp4"
+  },
+  "captions": "captions.srt",
+  "qaContactSheet": "qa-contact-sheet.png"
+}
